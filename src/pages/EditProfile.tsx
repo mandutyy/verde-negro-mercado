@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { Camera, MapPin, User, FileText, Save, ArrowLeft } from 'lucide-react';
+import LocationMap from '@/components/LocationMap';
+import { Camera, MapPin, User, FileText, Save, ArrowLeft, Search } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { spanishCities, searchSpanishCities } from '@/data/spanishCities';
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -18,8 +20,13 @@ const EditProfile = () => {
     name: 'Juan Díaz',
     location: 'Madrid, España',
     bio: '🌱 Amante de las plantas desde siempre. Me encanta intercambiar y ayudar a otros con sus jardines urbanos.',
-    avatar: ''
+    avatar: '',
+    coordinates: [-3.7038, 40.4168] as [number, number]
   });
+
+  const [showMap, setShowMap] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<typeof spanishCities>([]);
 
   const handleSave = () => {
     // Here you would typically save to a backend
@@ -35,6 +42,34 @@ const EditProfile = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleLocationSelect = (location: { name: string; coordinates: [number, number] }) => {
+    setFormData(prev => ({
+      ...prev,
+      location: location.name,
+      coordinates: location.coordinates
+    }));
+    setShowMap(false);
+    setLocationSearch('');
+    setSearchResults([]);
+  };
+
+  const handleLocationSearch = (query: string) => {
+    setLocationSearch(query);
+    if (query.length > 2) {
+      const results = searchSpanishCities(query);
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const selectCityFromSearch = (city: typeof spanishCities[0]) => {
+    handleLocationSelect({
+      name: `${city.name}, ${city.region}`,
+      coordinates: city.coordinates as [number, number]
+    });
   };
 
   return (
@@ -104,13 +139,66 @@ const EditProfile = () => {
                 <MapPin size={16} />
                 Ubicación
               </Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                className="border-plant-200 focus:border-plant-400"
-                placeholder="Ciudad, País"
-              />
+              
+              <div className="space-y-3">
+                {/* Buscador de ciudades */}
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Buscar ciudad o provincia..."
+                    value={locationSearch}
+                    onChange={(e) => handleLocationSearch(e.target.value)}
+                    className="pl-10 border-plant-200 focus:border-plant-400"
+                  />
+                  
+                  {/* Resultados de búsqueda */}
+                  {searchResults.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {searchResults.map((city, index) => (
+                        <button
+                          key={index}
+                          onClick={() => selectCityFromSearch(city)}
+                          className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-plant-800">{city.name}</div>
+                          <div className="text-sm text-gray-600">{city.region}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Campo de ubicación actual */}
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  className="border-plant-200 focus:border-plant-400"
+                  placeholder="Ciudad, País"
+                />
+                
+                {/* Botón para mostrar/ocultar mapa */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowMap(!showMap)}
+                  className="w-full border-plant-300 text-plant-600"
+                >
+                  <MapPin size={16} className="mr-2" />
+                  {showMap ? 'Ocultar mapa' : 'Seleccionar en mapa'}
+                </Button>
+                
+                {/* Mapa */}
+                {showMap && (
+                  <LocationMap
+                    onLocationSelect={handleLocationSelect}
+                    initialLocation={{
+                      name: formData.location,
+                      coordinates: formData.coordinates
+                    }}
+                  />
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
