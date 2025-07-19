@@ -10,6 +10,7 @@ import Upload from "./pages/Upload";
 import Favorites from "./pages/Favorites";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Navigation />

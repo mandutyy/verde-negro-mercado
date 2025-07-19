@@ -57,7 +57,12 @@ const Profile = () => {
                   Miembro desde marzo 2024
                 </p>
               </div>
-              <Button variant="outline" size="sm" className="border-plant-300">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-plant-300"
+                onClick={() => window.location.href = '/profile/edit'}
+              >
                 <Settings size={16} className="mr-2" />
                 Editar
               </Button>
