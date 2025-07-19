@@ -17,16 +17,9 @@ const LocationMap: React.FC<LocationMapProps> = ({ onLocationSelect, initialLoca
   const [showTokenInput, setShowTokenInput] = useState(false);
 
   useEffect(() => {
-    // Comprobar si hay token de Mapbox (aquí podrías obtenerlo de Supabase Edge Functions)
-    const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
-    
-    if (!token) {
-      setShowTokenInput(true);
-      return;
-    }
-    
-    setMapboxToken(token);
-    initializeMap(token);
+    // Para usar Mapbox, necesitas introducir tu token público
+    // Los tokens públicos de Mapbox son seguros para usar en el frontend
+    setShowTokenInput(true);
   }, []);
 
   const initializeMap = (token: string) => {
