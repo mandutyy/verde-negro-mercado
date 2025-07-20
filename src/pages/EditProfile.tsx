@@ -140,65 +140,65 @@ const EditProfile = () => {
                 Ubicación
               </Label>
               
-              <div className="space-y-3">
-                {/* Buscador de ciudades */}
-                <div className="relative">
-                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Buscar ciudad o provincia..."
-                    value={locationSearch}
-                    onChange={(e) => handleLocationSearch(e.target.value)}
-                    className="pl-10 border-plant-200 focus:border-plant-400"
-                  />
-                  
-                  {/* Resultados de búsqueda */}
-                  {searchResults.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      {searchResults.map((city, index) => (
-                        <button
-                          key={index}
-                          onClick={() => selectCityFromSearch(city)}
-                          className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0"
-                        >
-                          <div className="font-medium text-plant-800">{city.name}</div>
-                          <div className="text-sm text-gray-600">{city.region}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Campo de ubicación actual */}
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
                   id="location"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="border-plant-200 focus:border-plant-400"
-                  placeholder="Ciudad, País"
+                  placeholder="Buscar ciudad..."
+                  value={locationSearch}
+                  onChange={(e) => handleLocationSearch(e.target.value)}
+                  className="pl-10 border-plant-200 focus:border-plant-400"
                 />
                 
-                {/* Botón para mostrar/ocultar mapa */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowMap(!showMap)}
-                  className="w-full border-plant-300 text-plant-600"
-                >
-                  <MapPin size={16} className="mr-2" />
-                  {showMap ? 'Ocultar mapa' : 'Seleccionar en mapa'}
-                </Button>
+                {/* Sugerencias de búsqueda */}
+                {searchResults.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {searchResults.map((city, index) => (
+                      <button
+                        key={index}
+                        onClick={() => selectCityFromSearch(city)}
+                        className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0 flex items-center gap-2"
+                      >
+                        <MapPin size={14} className="text-gray-400" />
+                        <div>
+                          <div className="font-medium text-plant-800">{city.name}</div>
+                          <div className="text-sm text-gray-600">{city.region}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 
-                {/* Mapa */}
-                {showMap && (
-                  <LocationMap
-                    onLocationSelect={handleLocationSelect}
-                    initialLocation={{
-                      name: formData.location,
-                      coordinates: formData.coordinates
-                    }}
-                  />
+                {/* Mostrar ubicación seleccionada */}
+                {formData.location && !locationSearch && (
+                  <div className="mt-2 text-sm text-gray-600 flex items-center gap-2">
+                    <MapPin size={14} />
+                    {formData.location}
+                  </div>
                 )}
               </div>
+              
+              {/* Botón para mostrar/ocultar mapa */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowMap(!showMap)}
+                className="w-full border-plant-300 text-plant-600 mt-3"
+              >
+                <MapPin size={16} className="mr-2" />
+                {showMap ? 'Ocultar mapa' : 'Seleccionar en mapa'}
+              </Button>
+              
+              {/* Mapa */}
+              {showMap && (
+                <LocationMap
+                  onLocationSelect={handleLocationSelect}
+                  initialLocation={{
+                    name: formData.location,
+                    coordinates: formData.coordinates
+                  }}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
