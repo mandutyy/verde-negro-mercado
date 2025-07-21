@@ -61,10 +61,10 @@ const Profile = () => {
                 variant="outline" 
                 size="sm" 
                 className="border-plant-300"
-                onClick={() => window.location.href = '/profile/edit'}
+                onClick={() => window.location.href = '/edit-profile'}
               >
                 <Settings size={16} className="mr-2" />
-                Editar
+                Editar perfil
               </Button>
             </div>
             
@@ -125,7 +125,7 @@ const Profile = () => {
               </Button>
               <Button variant="outline" className="w-full justify-start border-plant-300">
                 <Settings size={16} className="mr-3" />
-                Configuración
+                Editar perfil
               </Button>
             </div>
           </CardContent>
