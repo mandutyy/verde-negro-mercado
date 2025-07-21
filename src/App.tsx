@@ -28,7 +28,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Navigation />
