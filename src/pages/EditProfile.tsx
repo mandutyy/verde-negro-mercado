@@ -312,10 +312,21 @@ const EditProfile = () => {
                 <Input 
                   id="location" 
                   placeholder="Buscar ciudad..." 
-                  value={locationSearch || formData.location} 
+                  value={locationSearch} 
                   onChange={e => handleLocationSearch(e.target.value)} 
                   className="pl-10 border-plant-200 focus:border-plant-400" 
                 />
+                
+                {/* Mostrar ubicación actual si no se está buscando */}
+                {!locationSearch && formData.location && (
+                  <div className="mt-2 p-3 bg-plant-50 rounded-lg border border-plant-200">
+                    <div className="flex items-center gap-2 text-plant-700">
+                      <MapPin size={16} />
+                      <span className="font-medium">Ubicación actual:</span>
+                      <span>{formData.location}</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Sugerencias de búsqueda */}
                 {searchResults.length > 0 && locationSearch && (

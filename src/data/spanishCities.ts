@@ -250,16 +250,6 @@ export const searchSpanishCities = (query: string) => {
     city.name.toLowerCase().includes(query.toLowerCase()) ||
     city.region.toLowerCase().includes(query.toLowerCase())
   );
-
-  // Si no hay resultados exactos y el usuario está buscando algo específico,
-  // sugerimos que puede añadir esa ciudad
-  if (results.length === 0 && query.length > 2) {
-    return [{
-      name: query,
-      region: "Ciudad personalizada",
-      coordinates: [-3.7038, 40.4168] // Coordenadas por defecto (Madrid)
-    }];
-  }
   
   return results.slice(0, 10); // Limitar a 10 resultados
 };
