@@ -309,21 +309,32 @@ const EditProfile = () => {
               
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input id="location" placeholder="Buscar ciudad..." value={locationSearch} onChange={e => handleLocationSearch(e.target.value)} className="pl-10 border-plant-200 focus:border-plant-400" />
+                <Input 
+                  id="location" 
+                  placeholder="Buscar ciudad..." 
+                  value={locationSearch || formData.location} 
+                  onChange={e => handleLocationSearch(e.target.value)} 
+                  className="pl-10 border-plant-200 focus:border-plant-400" 
+                />
                 
                 {/* Sugerencias de búsqueda */}
-                {searchResults.length > 0 && <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                    {searchResults.map((city, index) => <button key={index} onClick={() => selectCityFromSearch(city)} className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0 flex items-center gap-2">
+                {searchResults.length > 0 && locationSearch && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {searchResults.map((city, index) => (
+                      <button 
+                        key={index} 
+                        onClick={() => selectCityFromSearch(city)} 
+                        className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0 flex items-center gap-2"
+                      >
                         <MapPin size={14} className="text-gray-400" />
                         <div>
                           <div className="font-medium text-plant-800">{city.name}</div>
                           <div className="text-sm text-gray-600">{city.region}</div>
                         </div>
-                      </button>)}
-                  </div>}
-                
-                {/* Mostrar ubicación seleccionada */}
-                {formData.location && !locationSearch}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Botón para mostrar/ocultar mapa */}
