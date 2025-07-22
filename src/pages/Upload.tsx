@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 
 const Upload = () => {
   const [selectedOption, setSelectedOption] = useState<'sell' | 'exchange' | 'gift' | null>(null);
-  const [showForm, setShowForm] = useState(false);
   const [saleType, setSaleType] = useState<'sell' | 'exchange' | 'gift' | 'sell-exchange' | 'sell-gift' | 'exchange-gift' | 'all'>('sell');
   const [images, setImages] = useState<string[]>([]);
   const [formData, setFormData] = useState({
@@ -135,47 +134,30 @@ const Upload = () => {
   const showExchangeField = ['exchange', 'sell-exchange', 'exchange-gift', 'all'].includes(saleType);
   const showGiftMessage = ['gift', 'sell-gift', 'exchange-gift', 'all'].includes(saleType);
 
-  const handleOptionSelect = (option: 'sell' | 'exchange' | 'gift') => {
-    setSelectedOption(option);
-    setSaleType(option);
-    setShowForm(true);
-  };
+  // Si no se ha seleccionado una opción, mostrar las 3 opciones principales
+  if (!selectedOption) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
+        <Header title="🌱 Subir contenido" />
+        
+        <div className="px-4 py-8">
+          <div className="max-w-md mx-auto">
+            {/* Título principal */}
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-plant-800 mb-2">¿Qué quieres hacer?</h1>
+              <p className="text-plant-600">Elige cómo quieres compartir tu planta</p>
+            </div>
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
-      <Header title="🌱 Subir contenido" />
-      
-      <div className="px-4 py-8">
-        <div className="max-w-md mx-auto">
-          {/* Título principal */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-plant-800 mb-2">¿Qué quieres hacer?</h1>
-            <p className="text-plant-600">Elige cómo quieres compartir tu planta</p>
-          </div>
-
-          {/* Diseño del árbol con ramas */}
-          <div className="relative mb-8">
-            {/* Contenedor de las opciones con ramas */}
-            <div className="relative">
-              {/* Tronco principal vertical */}
-              <div className="absolute left-1/2 top-16 w-1 h-24 bg-gradient-to-b from-amber-700 to-amber-800 transform -translate-x-1/2 z-10"></div>
-              
-              {/* Ramas diagonales */}
-              <div className="absolute left-1/2 top-20 transform -translate-x-1/2 z-10">
-                {/* Rama izquierda - Vender */}
-                <div className="absolute w-16 h-0.5 bg-amber-700 transform -rotate-45 -translate-x-16 translate-y-4"></div>
-                {/* Rama derecha - Regalar */}
-                <div className="absolute w-16 h-0.5 bg-amber-700 transform rotate-45 translate-x-0 translate-y-4"></div>
-                {/* Rama central - Intercambiar */}
-                <div className="absolute w-12 h-0.5 bg-amber-700 transform -translate-x-6 translate-y-8"></div>
-              </div>
-
-              {/* Las tres opciones principales */}
-              <div className="flex justify-between items-start relative z-20">
+            {/* Árbol visual (similar a la imagen) */}
+            <div className="relative mb-8">
+              <div className="flex justify-between items-start mb-4">
                 {/* Opción Vender */}
                 <button
-                  onClick={() => handleOptionSelect('sell')}
-                  className={`flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 group w-24 ${selectedOption === 'sell' ? 'border-amber-400 ring-2 ring-amber-200' : 'border-plant-200 hover:border-plant-400'}`}
+                  onClick={() => {
+                    setSelectedOption('sell');
+                    setSaleType('sell');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
                 >
                   <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <DollarSign className="h-8 w-8 text-amber-700" />
@@ -185,8 +167,11 @@ const Upload = () => {
 
                 {/* Opción Intercambiar (centro) */}
                 <button
-                  onClick={() => handleOptionSelect('exchange')}
-                  className={`flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 group w-24 ${selectedOption === 'exchange' ? 'border-plant-400 ring-2 ring-plant-200' : 'border-plant-200 hover:border-plant-400'}`}
+                  onClick={() => {
+                    setSelectedOption('exchange');
+                    setSaleType('exchange');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
                 >
                   <div className="w-16 h-16 bg-gradient-to-br from-plant-200 to-emerald-300 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <ArrowLeftRight className="h-8 w-8 text-plant-700" />
@@ -196,8 +181,11 @@ const Upload = () => {
 
                 {/* Opción Regalar */}
                 <button
-                  onClick={() => handleOptionSelect('gift')}
-                  className={`flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 group w-24 ${selectedOption === 'gift' ? 'border-rose-400 ring-2 ring-rose-200' : 'border-plant-200 hover:border-plant-400'}`}
+                  onClick={() => {
+                    setSelectedOption('gift');
+                    setSaleType('gift');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
                 >
                   <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <Gift className="h-8 w-8 text-rose-700" />
@@ -206,47 +194,43 @@ const Upload = () => {
                 </button>
               </div>
 
-              {/* Raíces decorativas */}
-              <div className="flex justify-center mt-4">
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-amber-200 rounded-full border-4 border-amber-700 flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-amber-700" />
-                  </div>
-                  {/* Raíces que se extienden */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-32 h-0.5 bg-amber-600 absolute transform -rotate-12 -translate-x-16"></div>
-                    <div className="w-32 h-0.5 bg-amber-600 absolute transform rotate-12 -translate-x-16"></div>
-                    <div className="w-24 h-0.5 bg-amber-600 absolute transform -translate-x-12"></div>
+              {/* Tronco del árbol decorativo */}
+              <div className="flex justify-center">
+                <div className="w-3 h-20 bg-gradient-to-b from-amber-700 to-amber-800 rounded-full relative">
+                  {/* Raíces decorativas */}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
+                    <div className="w-8 h-8 border-2 border-amber-700 rounded-full bg-plant-100"></div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Mensaje motivacional */}
-          <div className="text-center p-4 bg-white/70 rounded-xl border border-plant-200 mb-6">
-            <p className="text-plant-700 text-sm">
-              🌱 Cada planta compartida hace crecer nuestra comunidad verde
-            </p>
-          </div>
-
-          {/* Botón para mostrar/ocultar formulario */}
-          {selectedOption && (
-            <div className="text-center">
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="bg-gradient-to-r from-plant-500 to-emerald-600 hover:from-plant-600 hover:to-emerald-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                {showForm ? 'Ocultar formulario' : 'Continuar con el formulario'}
-              </button>
+            {/* Mensaje motivacional */}
+            <div className="text-center p-4 bg-white/70 rounded-xl border border-plant-200">
+              <p className="text-plant-700 text-sm">
+                🌱 Cada planta compartida hace crecer nuestra comunidad verde
+              </p>
             </div>
-          )}
+          </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Formulario desplegable */}
-        {selectedOption && showForm && (
-          <div className="mt-8 animate-fade-in">
-            <form onSubmit={handleSubmit}>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
+      <Header title="🌱 Comparte tu Planta" />
+      
+      <div className="px-4 py-4">
+        {/* Botón para volver */}
+        <button
+          onClick={() => setSelectedOption(null)}
+          className="mb-4 flex items-center gap-2 text-plant-600 hover:text-plant-800 transition-colors"
+        >
+          ← Volver a opciones
+        </button>
+        
+        <form onSubmit={handleSubmit}>
           <Card className="border-plant-200 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader className="bg-gradient-to-r from-plant-500 to-emerald-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2 text-white">
@@ -469,10 +453,8 @@ const Upload = () => {
                 🌱 Publicar mi Planta
               </Button>
             </CardContent>
-            </Card>
-            </form>
-          </div>
-        )}
+          </Card>
+        </form>
       </div>
     </div>
   );
