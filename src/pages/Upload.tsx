@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 
 const Upload = () => {
+  const [selectedOption, setSelectedOption] = useState<'sell' | 'exchange' | 'gift' | null>(null);
   const [saleType, setSaleType] = useState<'sell' | 'exchange' | 'gift' | 'sell-exchange' | 'sell-gift' | 'exchange-gift' | 'all'>('sell');
   const [images, setImages] = useState<string[]>([]);
   const [formData, setFormData] = useState({
@@ -133,11 +134,102 @@ const Upload = () => {
   const showExchangeField = ['exchange', 'sell-exchange', 'exchange-gift', 'all'].includes(saleType);
   const showGiftMessage = ['gift', 'sell-gift', 'exchange-gift', 'all'].includes(saleType);
 
+  // Si no se ha seleccionado una opción, mostrar las 3 opciones principales
+  if (!selectedOption) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
+        <Header title="🌱 Subir contenido" />
+        
+        <div className="px-4 py-8">
+          <div className="max-w-md mx-auto">
+            {/* Título principal */}
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-plant-800 mb-2">¿Qué quieres hacer?</h1>
+              <p className="text-plant-600">Elige cómo quieres compartir tu planta</p>
+            </div>
+
+            {/* Árbol visual (similar a la imagen) */}
+            <div className="relative mb-8">
+              <div className="flex justify-between items-start mb-4">
+                {/* Opción Vender */}
+                <button
+                  onClick={() => {
+                    setSelectedOption('sell');
+                    setSaleType('sell');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <DollarSign className="h-8 w-8 text-amber-700" />
+                  </div>
+                  <span className="text-plant-800 font-semibold text-sm">Vender</span>
+                </button>
+
+                {/* Opción Intercambiar (centro) */}
+                <button
+                  onClick={() => {
+                    setSelectedOption('exchange');
+                    setSaleType('exchange');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-plant-200 to-emerald-300 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <ArrowLeftRight className="h-8 w-8 text-plant-700" />
+                  </div>
+                  <span className="text-plant-800 font-semibold text-sm">Intercambiar</span>
+                </button>
+
+                {/* Opción Regalar */}
+                <button
+                  onClick={() => {
+                    setSelectedOption('gift');
+                    setSaleType('gift');
+                  }}
+                  className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <Gift className="h-8 w-8 text-rose-700" />
+                  </div>
+                  <span className="text-plant-800 font-semibold text-sm">Regalar</span>
+                </button>
+              </div>
+
+              {/* Tronco del árbol decorativo */}
+              <div className="flex justify-center">
+                <div className="w-3 h-20 bg-gradient-to-b from-amber-700 to-amber-800 rounded-full relative">
+                  {/* Raíces decorativas */}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
+                    <div className="w-8 h-8 border-2 border-amber-700 rounded-full bg-plant-100"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mensaje motivacional */}
+            <div className="text-center p-4 bg-white/70 rounded-xl border border-plant-200">
+              <p className="text-plant-700 text-sm">
+                🌱 Cada planta compartida hace crecer nuestra comunidad verde
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
       <Header title="🌱 Comparte tu Planta" />
       
       <div className="px-4 py-4">
+        {/* Botón para volver */}
+        <button
+          onClick={() => setSelectedOption(null)}
+          className="mb-4 flex items-center gap-2 text-plant-600 hover:text-plant-800 transition-colors"
+        >
+          ← Volver a opciones
+        </button>
+        
         <form onSubmit={handleSubmit}>
           <Card className="border-plant-200 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader className="bg-gradient-to-r from-plant-500 to-emerald-600 text-white rounded-t-lg">
