@@ -1,10 +1,12 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import PlantCard from '@/components/PlantCard';
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('Todas');
   
   const categories = ['Todas', 'Interior', 'Exterior', 'Suculentas', 'Frutales', 'Aromáticas'];
@@ -89,18 +91,45 @@ const Home = () => {
           ))}
         </div>
 
-        {/* Highlighted Section */}
+        {/* News Section */}
         <div className="bg-gradient-plant rounded-xl p-6 mb-6 text-white">
-          <h2 className="text-xl font-bold mb-2">¡Intercambia sin dinero!</h2>
-          <p className="text-plant-100 mb-4">
-            Encuentra plantas increíbles a cambio de las tuyas
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-plant-100">Noticias PlantApp</span>
+          </div>
+          
+          <h2 className="text-xl font-bold mb-3">🌱 ¡Más de 10,000 plantas intercambiadas este mes!</h2>
+          <p className="text-plant-100 mb-4 text-sm leading-relaxed">
+            Los usuarios han ahorrado más de €25,000 intercambiando plantas en lugar de comprarlas. 
+            <span className="font-semibold"> María de Barcelona</span> consiguió 15 plantas nuevas sin gastar ni un euro.
           </p>
-          <Button 
-            variant="secondary" 
-            className="bg-white text-plant-600 hover:bg-plant-50"
-          >
-            Ver intercambios
-          </Button>
+          
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <Button 
+              variant="secondary" 
+              size="sm"
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30 text-xs"
+              onClick={() => navigate('/upload')}
+            >
+              Vender 💰
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm"
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30 text-xs"
+              onClick={() => navigate('/upload')}
+            >
+              Intercambiar 🔄
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm"
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30 text-xs"
+              onClick={() => navigate('/upload')}
+            >
+              Regalar 🎁
+            </Button>
+          </div>
         </div>
 
         {/* Plants Grid */}
