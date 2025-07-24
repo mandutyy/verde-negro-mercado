@@ -38,8 +38,8 @@ const EditProfile = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // For now, we'll simulate a user ID since auth isn't implemented yet
-      const userId = 'temp-user-id'; // This should be auth.uid() when authentication is added
+      // Generate a valid UUID for demo purposes since auth isn't implemented yet
+      const userId = crypto.randomUUID(); // This should be auth.uid() when authentication is added
       
       const { error } = await supabase
         .from('profiles')
