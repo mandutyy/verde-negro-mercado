@@ -1,38 +1,40 @@
 
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 const Messages = () => {
-  const conversations = [
-    {
-      id: '1',
-      name: 'María García',
-      lastMessage: '¿Está disponible la Monstera?',
-      time: '2 min',
-      avatar: 'MG',
-      unread: true,
-      plantImage: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=60&h=60&fit=crop'
-    },
-    {
-      id: '2',
-      name: 'Carlos López',
-      lastMessage: 'Perfecto, quedamos el sábado',
-      time: '1h',
-      avatar: 'CL',
-      unread: false,
-      plantImage: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=60&h=60&fit=crop'
-    },
-    {
-      id: '3',
-      name: 'Ana Ruiz',
-      lastMessage: '¿Podrías enviarme más fotos?',
-      time: '3h',
-      avatar: 'AR',
-      unread: true,
-      plantImage: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=60&h=60&fit=crop'
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { conversations, loading } = useRealtimeChat();
+  const [newMessage, setNewMessage] = useState('');
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
     }
-  ];
+  }, [user, authLoading, navigate]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-plant-subtle pb-20">
+        <Header title="Mensajes" />
+        <div className="flex items-center justify-center py-16">
+          <div className="text-plant-600">Cargando...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-plant-subtle pb-20">
@@ -41,48 +43,44 @@ const Messages = () => {
       <div className="px-4 py-4">
         {conversations.length > 0 ? (
           <div className="space-y-2">
-            {conversations.map((conversation) => (
-              <div
-                key={conversation.id}
-                className="bg-white rounded-lg p-4 shadow-sm border border-plant-100 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src="" />
-                      <AvatarFallback className="bg-plant-100 text-plant-700">
-                        {conversation.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    {conversation.unread && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-plant-500 rounded-full"></div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-semibold text-gray-900 truncate">
-                        {conversation.name}
-                      </h3>
-                      <span className="text-xs text-gray-500 ml-2">
-                        {conversation.time}
-                      </span>
+            {conversations.map((conversation) => {
+              const otherUserId = conversation.participant_1 === user.id 
+                ? conversation.participant_2 
+                : conversation.participant_1;
+              
+              return (
+                <div
+                  key={conversation.id}
+                  className="bg-white rounded-lg p-4 shadow-sm border border-plant-100 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/chat/${conversation.id}`)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src="" />
+                        <AvatarFallback className="bg-plant-100 text-plant-700">
+                          {otherUserId.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
-                    <p className={`text-sm truncate ${
-                      conversation.unread ? 'text-gray-900 font-medium' : 'text-gray-600'
-                    }`}>
-                      {conversation.lastMessage}
-                    </p>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-semibold text-gray-900 truncate">
+                          Usuario {otherUserId.slice(-4)}
+                        </h3>
+                        <span className="text-xs text-gray-500 ml-2">
+                          {new Date(conversation.updated_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 truncate">
+                        Conversación iniciada
+                      </p>
+                    </div>
                   </div>
-                  
-                  <img
-                    src={conversation.plantImage}
-                    alt="Plant"
-                    className="w-12 h-12 rounded-lg object-cover"
-                  />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
