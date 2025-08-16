@@ -86,6 +86,25 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div 
       className="relative flex size-full min-h-screen flex-col bg-neutral-50 justify-between"
@@ -190,6 +209,7 @@ const Auth = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={handleGoogleSignIn}
                   className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ededed] text-[#141414] text-sm font-bold leading-normal tracking-[0.015em] grow"
                 >
                   <span className="truncate">Google</span>
