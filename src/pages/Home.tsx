@@ -53,7 +53,7 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
@@ -62,10 +62,10 @@ const Home = () => {
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set(["2", "5"]));
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const toggleLike = (id: string) => {
     setLikedItems(prev => {

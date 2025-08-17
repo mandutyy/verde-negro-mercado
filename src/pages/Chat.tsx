@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 const Chat = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { messages, sendMessage } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -26,10 +26,10 @@ const Chat = () => {
   }, [messages]);
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
