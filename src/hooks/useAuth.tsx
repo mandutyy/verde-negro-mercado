@@ -30,41 +30,74 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    // Get initial session first
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (mounted) {
+          if (error) {
+            console.error('Error getting session:', error);
+          }
+          
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error in getInitialSession:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.id);
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Create profile when user signs up
+        // Create profile when user signs up (avoid blocking the auth flow)
         if (event === 'SIGNED_IN' && session?.user) {
+          // Use setTimeout to avoid blocking the auth state change
           setTimeout(async () => {
-            const { error } = await supabase
-              .from('profiles')
-              .insert([
-                {
-                  user_id: session.user.id,
-                  name: session.user.user_metadata?.name || '',
-                }
-              ]);
+            try {
+              const { error } = await supabase
+                .from('profiles')
+                .insert([
+                  {
+                    user_id: session.user.id,
+                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+                  }
+                ]);
 
-            if (error) {
-              console.error('Error creating profile:', error);
+              // Ignore duplicate key errors (user already has profile)
+              if (error && !error.message.includes('duplicate key')) {
+                console.error('Error creating profile:', error);
+              }
+            } catch (error) {
+              console.error('Error in profile creation:', error);
             }
-          }, 0);
+          }, 100);
         }
       }
     );
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Initialize session
+    getInitialSession();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
