@@ -5,8 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PlantCard from '@/components/PlantCard';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const userPlants = [
     {
       id: '7',
@@ -61,7 +63,7 @@ const Profile = () => {
                 variant="outline" 
                 size="sm" 
                 className="border-plant-300"
-                onClick={() => window.location.href = '/edit-profile'}
+                onClick={() => navigate('/edit-profile')}
               >
                 <Settings size={16} className="mr-2" />
                 Editar perfil
@@ -96,7 +98,12 @@ const Profile = () => {
             <h3 className="text-lg font-semibold text-gray-900">
               Mis plantas
             </h3>
-            <Button variant="outline" size="sm" className="border-plant-300 text-plant-600">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-plant-300 text-plant-600"
+              onClick={() => navigate('/upload')}
+            >
               Ver todas
             </Button>
           </div>
@@ -115,15 +122,27 @@ const Profile = () => {
               Acciones rápidas
             </h3>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start border-plant-300">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-plant-300"
+                onClick={() => navigate('/upload')}
+              >
                 <Package size={16} className="mr-3" />
                 Gestionar mis plantas
               </Button>
-              <Button variant="outline" className="w-full justify-start border-plant-300">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-plant-300"
+                onClick={() => navigate('/favorites')}
+              >
                 <Star size={16} className="mr-3" />
                 Mis valoraciones
               </Button>
-              <Button variant="outline" className="w-full justify-start border-plant-300">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-plant-300"
+                onClick={() => navigate('/edit-profile')}
+              >
                 <Settings size={16} className="mr-3" />
                 Editar perfil
               </Button>
