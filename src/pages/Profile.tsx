@@ -102,7 +102,7 @@ const Profile = () => {
               variant="outline" 
               size="sm" 
               className="border-plant-300 text-plant-600"
-              onClick={() => navigate('/upload')}
+              onClick={() => navigate('/my-plants')}
             >
               Ver todas
             </Button>
@@ -125,7 +125,7 @@ const Profile = () => {
               <Button 
                 variant="outline" 
                 className="w-full justify-start border-plant-300"
-                onClick={() => navigate('/upload')}
+                onClick={() => navigate('/my-plants')}
               >
                 <Package size={16} className="mr-3" />
                 Gestionar mis plantas
@@ -133,7 +133,7 @@ const Profile = () => {
               <Button 
                 variant="outline" 
                 className="w-full justify-start border-plant-300"
-                onClick={() => navigate('/favorites')}
+                onClick={() => navigate('/my-reviews')}
               >
                 <Star size={16} className="mr-3" />
                 Mis valoraciones
