@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PlantCard from '@/components/PlantCard';
+import { mockPlants } from '@/data/mockPlants';
 import {
   Dialog,
   DialogContent,
@@ -88,129 +89,6 @@ const Home = () => {
     { value: "frutales", label: "Con flor", icon: Flower },
   ];
   
-  const mockPlants = [
-    {
-      id: '1',
-      title: 'Monstera Deliciosa - Planta adulta 2 años',
-      price: '€45',
-      location: 'Madrid Centro',
-      image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
-      images: [
-        'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop'
-      ],
-      category: 'interior',
-      condition: 'excellent',
-      seller: 'PlantLover23',
-      rating: 4.8,
-      isLiked: false,
-      type: 'sell' as const,
-      description: 'Monstera deliciosa adulta de 2 años, muy sana y con muchas hojas fenestradas. Incluye maceta de cerámica.',
-      timeAgo: 'hace 2h',
-      views: 127,
-      distance: '0.5 km',
-      isPromoted: true,
-      tags: ['Entrega a domicilio', 'Negociable']
-    },
-    {
-      id: '2',
-      title: 'Colección de suculentas variadas',
-      price: 'Intercambio',
-      location: 'Barcelona',
-      image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop',
-      images: ['https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop'],
-      category: 'suculentas',
-      condition: 'good',
-      seller: 'SucculentSwap',
-      rating: 4.9,
-      isLiked: true,
-      type: 'exchange' as const,
-      description: 'Colección de suculentas variadas. Busco intercambiar por cactus de diferentes tamaños.',
-      timeAgo: 'hace 3h',
-      views: 89,
-      distance: '1.2 km',
-      isUrgent: true,
-      tags: ['Intercambio directo', 'Sin envío']
-    },
-    {
-      id: '3',
-      title: 'Ficus Lyrata en maceta decorativa',
-      price: '€35',
-      location: 'Valencia',
-      image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400&h=300&fit=crop',
-      images: ['https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400&h=300&fit=crop'],
-      category: 'interior',
-      condition: 'excellent',
-      seller: 'OrchidExpert',
-      rating: 4.7,
-      isLiked: false,
-      type: 'sell' as const,
-      description: 'Hermosa Ficus Lyrata con 8 hojas grandes. Muy fácil de cuidar, perfecta para principiantes.',
-      timeAgo: 'hace 5h',
-      views: 213,
-      distance: '3.8 km',
-      tags: ['Incluye maceta', 'Saludable']
-    },
-    {
-      id: '4',
-      title: 'Pothos dorado - Muy sano',
-      price: '€15',
-      location: 'Sevilla',
-      image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=400&h=300&fit=crop',
-      images: ['https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=400&h=300&fit=crop'],
-      category: 'interior',
-      condition: 'excellent',
-      seller: 'PropagationPro',
-      rating: 4.6,
-      isLiked: false,
-      type: 'sell' as const,
-      description: 'Lote de 5 esquejes de Pothos: dorado, mármol, neon y plateado. Ya enraizados y listos para plantar.',
-      timeAgo: 'hace 1 día',
-      views: 156,
-      distance: '0.8 km',
-      tags: ['Lote', 'Enraizados']
-    },
-    {
-      id: '5',
-      title: 'Palmera Areca - Decorativa',
-      price: '€60',
-      location: 'Bilbao',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop',
-      images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop'],
-      category: 'interior',
-      condition: 'excellent',
-      seller: 'PlantCollector',
-      rating: 4.4,
-      isLiked: true,
-      type: 'sell' as const,
-      description: 'Palmera Areca grande y decorativa para salones amplios.',
-      timeAgo: 'hace 2 días',
-      views: 67,
-      distance: '5.2 km',
-      isUrgent: false,
-      tags: ['Planta grande', 'Decorativa']
-    },
-    {
-      id: '6',
-      title: 'Sansevieria - Perfecta para principiantes',
-      price: 'Intercambio',
-      location: 'Málaga',
-      image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
-      images: ['https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop'],
-      category: 'interior',
-      condition: 'excellent',
-      seller: 'EasyPlants',
-      rating: 4.8,
-      isLiked: false,
-      type: 'exchange' as const,
-      description: 'Sansevieria resistente, perfecta para oficinas y espacios con poca luz.',
-      timeAgo: 'hace 3 días',
-      views: 89,
-      distance: '2.1 km',
-      isUrgent: false,
-      tags: ['Resistente', 'Poca luz']
-    }
-  ];
 
   const typeColors = {
     sell: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -438,7 +316,7 @@ const Home = () => {
               key={listing.id}
               id={listing.id}
               title={listing.title}
-              price={typeof listing.price === 'string' ? parseFloat(listing.price.replace('€', '')) || 0 : listing.price}
+              price={listing.price}
               location={listing.location}
               image={listing.image}
               isFavorite={likedItems.has(listing.id)}

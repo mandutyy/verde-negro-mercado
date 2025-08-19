@@ -6,48 +6,32 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
+import { mockPlants } from '@/data/mockPlants';
 
 const PlantDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Mock data - en una app real vendría de una API o base de datos
-  const mockPlant = {
-    id: '1',
-    title: 'Monstera Deliciosa - Planta adulta 2 años',
-    price: '€45',
-    location: 'Madrid Centro',
-    images: [
-      'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&h=400&fit=crop'
-    ],
-    category: 'interior',
-    condition: 'excellent',
-    seller: {
-      name: 'PlantLover23',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      rating: 4.8,
-      reviewCount: 127,
-      joinDate: 'Miembro desde 2023',
-      responseTime: 'Responde en menos de 2 horas'
-    },
-    rating: 4.8,
-    type: 'sell' as const,
-    description: 'Monstera deliciosa adulta de 2 años, muy sana y con muchas hojas fenestradas. Incluye maceta de cerámica blanca. La planta está perfecta para cualquier hogar y es muy fácil de cuidar. Ha estado en mi salón con luz indirecta y se ha desarrollado fantásticamente.',
-    timeAgo: 'hace 2h',
-    views: 127,
-    distance: '0.5 km',
-    isPromoted: true,
-    tags: ['Entrega a domicilio', 'Negociable', 'Incluye maceta', 'Saludable']
-  };
+  // Buscar la planta por ID
+  const plant = mockPlants.find(p => p.id === id);
+  
+  if (!plant) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Planta no encontrada</h1>
+          <Button onClick={() => navigate('/')}>Volver al inicio</Button>
+        </div>
+      </div>
+    );
+  }
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleContact = () => {
     // Navegar al chat con este vendedor
-    navigate(`/chat/seller-${mockPlant.seller.name}`);
+    navigate(`/chat/seller-${plant.seller.name}`);
   };
 
   const toggleFavorite = () => {
@@ -102,17 +86,17 @@ const PlantDetail = () => {
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img 
-              src={mockPlant.images[currentImageIndex]}
-              alt={mockPlant.title}
+              src={plant.images[currentImageIndex]}
+              alt={plant.title}
               className="w-full h-full object-cover"
             />
           </div>
           
           {/* Image indicators */}
-          {mockPlant.images.length > 1 && (
+          {plant.images.length > 1 && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
               <div className="flex gap-2">
-                {mockPlant.images.map((_, index) => (
+                {plant.images.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -127,7 +111,7 @@ const PlantDetail = () => {
 
           {/* Badges */}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
-            {mockPlant.isPromoted && (
+            {plant.isPromoted && (
               <Badge className="bg-plant-500 text-white">
                 Destacado
               </Badge>
@@ -139,20 +123,20 @@ const PlantDetail = () => {
           {/* Title and Price */}
           <div>
             <h1 className="text-2xl font-bold text-foreground mb-2">
-              {mockPlant.title}
+              {plant.title}
             </h1>
             <div className="flex items-center justify-between">
               <div className="text-3xl font-bold text-plant-600">
-                {mockPlant.price}
+                {plant.priceDisplay}
               </div>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  {mockPlant.views}
+                  {plant.views}
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  {mockPlant.timeAgo}
+                  {plant.timeAgo}
                 </div>
               </div>
             </div>
@@ -161,12 +145,12 @@ const PlantDetail = () => {
           {/* Location */}
           <div className="flex items-center gap-2 text-muted-foreground">
             <MapPin className="h-4 w-4" />
-            <span>{mockPlant.location} • {mockPlant.distance}</span>
+            <span>{plant.location} • {plant.distance}</span>
           </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            {mockPlant.tags.map((tag, index) => (
+            {plant.tags.map((tag, index) => (
               <Badge key={index} variant="secondary">
                 {tag}
               </Badge>
@@ -182,11 +166,11 @@ const PlantDetail = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-muted-foreground">Categoría</div>
-                  <div className="font-medium">{categoryLabels[mockPlant.category as keyof typeof categoryLabels]}</div>
+                  <div className="font-medium">{categoryLabels[plant.category as keyof typeof categoryLabels]}</div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Estado</div>
-                  <div className="font-medium">{conditionLabels[mockPlant.condition as keyof typeof conditionLabels]}</div>
+                  <div className="font-medium">{conditionLabels[plant.condition as keyof typeof conditionLabels]}</div>
                 </div>
               </div>
               
@@ -195,7 +179,7 @@ const PlantDetail = () => {
               <div>
                 <div className="text-sm text-muted-foreground mb-2">Descripción</div>
                 <p className="text-foreground leading-relaxed">
-                  {mockPlant.description}
+                  {plant.description}
                 </p>
               </div>
             </CardContent>
@@ -206,7 +190,7 @@ const PlantDetail = () => {
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={mockPlant.seller.avatar} />
+                  <AvatarImage src={plant.seller.avatar} />
                   <AvatarFallback>
                     <User className="h-6 w-6" />
                   </AvatarFallback>
@@ -214,25 +198,25 @@ const PlantDetail = () => {
                 
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground">
-                    {mockPlant.seller.name}
+                    {plant.seller.name}
                   </h3>
                   <div className="flex items-center gap-1 mb-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{mockPlant.seller.rating}</span>
+                    <span className="text-sm font-medium">{plant.seller.rating}</span>
                     <span className="text-sm text-muted-foreground">
-                      ({mockPlant.seller.reviewCount} valoraciones)
+                      ({plant.seller.reviewCount} valoraciones)
                     </span>
                   </div>
                   <div className="space-y-1 text-sm text-muted-foreground">
-                    <div>{mockPlant.seller.joinDate}</div>
-                    <div>{mockPlant.seller.responseTime}</div>
+                    <div>{plant.seller.joinDate}</div>
+                    <div>{plant.seller.responseTime}</div>
                   </div>
                 </div>
                 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate(`/profile/${mockPlant.seller.name}`)}
+                  onClick={() => navigate(`/profile/${plant.seller.name}`)}
                 >
                   Ver perfil
                 </Button>
@@ -251,7 +235,7 @@ const PlantDetail = () => {
             size="lg"
           >
             <MessageCircle className="h-5 w-5 mr-2" />
-            Contactar con {mockPlant.seller.name}
+            Contactar con {plant.seller.name}
           </Button>
         </div>
       </div>
