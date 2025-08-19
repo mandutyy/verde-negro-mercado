@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import PlantCard from '@/components/PlantCard';
 import {
   Dialog,
   DialogContent,
@@ -223,108 +224,6 @@ const Home = () => {
     exchange: "Intercambio"
   };
 
-  const PlantCard = ({ listing }: { listing: typeof mockPlants[0] }) => (
-    <div className="bg-background border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200 group cursor-pointer">
-      <div className="relative">
-        <img 
-          src={listing.image} 
-          alt={listing.title}
-          className="w-full h-44 object-cover"
-        />
-        
-        {/* Badges overlay */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          <div className={cn(
-            "px-2 py-1 rounded text-xs font-medium border backdrop-blur-sm",
-            typeColors[listing.type]
-          )}>
-            {typeLabels[listing.type]}
-          </div>
-          {listing.isPromoted && (
-            <div className="bg-amber-500/90 text-white px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">
-              <TrendingUp className="h-3 w-3 inline mr-1" />
-              Destacado
-            </div>
-          )}
-          {listing.isUrgent && (
-            <div className="bg-red-500/90 text-white px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">
-              <Zap className="h-3 w-3 inline mr-1" />
-              Urgente
-            </div>
-          )}
-        </div>
-        
-        {/* Image count indicator */}
-        {listing.images.length > 1 && (
-          <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs backdrop-blur-sm">
-            {listing.images.length} fotos
-          </div>
-        )}
-        
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute bottom-2 right-2 h-8 w-8 bg-background/80 hover:bg-background/90 backdrop-blur-sm"
-          onClick={() => toggleLike(listing.id)}
-        >
-          <Heart className={cn("h-4 w-4", likedItems.has(listing.id) && "fill-red-500 text-red-500")} />
-        </Button>
-      </div>
-      
-      <div className="p-3 space-y-2">
-        <div className="space-y-1">
-          <h3 className="font-semibold text-foreground line-clamp-2 text-sm leading-tight">{listing.title}</h3>
-          <p className="text-xs text-muted-foreground line-clamp-2">{listing.description}</p>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-primary">{listing.price}</span>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            {listing.rating}
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {listing.location} • {listing.distance}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <Eye className="h-3 w-3" />
-              {listing.views}
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {listing.timeAgo}
-            </div>
-          </div>
-        </div>
-        
-        {/* Tags */}
-        {listing.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 pt-1">
-            {listing.tags.map((tag, index) => (
-              <span key={index} className="bg-muted text-muted-foreground px-2 py-1 rounded text-xs">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        
-        <div className="flex gap-2 pt-2">
-          <Button size="sm" className="flex-1" onClick={() => navigate('/messages')}>
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Contactar
-          </Button>
-          <Button size="sm" variant="outline">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50/50 to-emerald-50/30">
@@ -535,7 +434,16 @@ const Home = () => {
         {/* Plant Listings Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-20">
           {mockPlants.map((listing) => (
-            <PlantCard key={listing.id} listing={listing} />
+            <PlantCard 
+              key={listing.id}
+              id={listing.id}
+              title={listing.title}
+              price={typeof listing.price === 'string' ? parseFloat(listing.price.replace('€', '')) || 0 : listing.price}
+              location={listing.location}
+              image={listing.image}
+              isFavorite={likedItems.has(listing.id)}
+              isExchange={listing.type === 'exchange'}
+            />
           ))}
         </div>
       </div>
