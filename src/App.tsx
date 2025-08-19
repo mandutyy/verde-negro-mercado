@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import MyPlants from "./pages/MyPlants";
 import MyReviews from "./pages/MyReviews";
+import PlantDetail from "./pages/PlantDetail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/edit-profile" element={<EditProfile />} />
               <Route path="/my-plants" element={<MyPlants />} />
               <Route path="/my-reviews" element={<MyReviews />} />
+              <Route path="/plant/:id" element={<PlantDetail />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

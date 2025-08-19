@@ -1,6 +1,7 @@
 
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface PlantCardProps {
@@ -23,6 +24,7 @@ const PlantCard = ({
   isExchange = false 
 }: PlantCardProps) => {
   const [favorite, setFavorite] = useState(isFavorite);
+  const navigate = useNavigate();
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -30,8 +32,15 @@ const PlantCard = ({
     setFavorite(!favorite);
   };
 
+  const handleCardClick = () => {
+    navigate(`/plant/${id}`);
+  };
+
   return (
-    <div className="plant-card-hover bg-white rounded-xl shadow-sm border border-plant-100 overflow-hidden">
+    <div 
+      onClick={handleCardClick}
+      className="plant-card-hover bg-white rounded-xl shadow-sm border border-plant-100 overflow-hidden cursor-pointer"
+    >
       <div className="relative">
         <img 
           src={image} 
