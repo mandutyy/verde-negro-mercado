@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Auth = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -156,16 +158,23 @@ const Auth = () => {
           
           {/* Password field */}
           <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-            <label className="flex flex-col min-w-40 flex-1">
+            <label className="flex flex-col min-w-40 flex-1 relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder={isSignUp ? "Contraseña (mínimo 6 caracteres)" : "Password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={isSignUp ? 6 : undefined}
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#ededed] focus:border-none h-14 placeholder:text-neutral-500 p-4 text-base font-normal leading-normal"
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#ededed] focus:border-none h-14 placeholder:text-neutral-500 p-4 pr-12 text-base font-normal leading-normal"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-neutral-500 hover:text-neutral-700 focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </label>
           </div>
           
