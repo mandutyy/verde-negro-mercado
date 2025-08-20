@@ -16,6 +16,7 @@ import EditProfile from "./pages/EditProfile";
 import MyPlants from "./pages/MyPlants";
 import MyReviews from "./pages/MyReviews";
 import PlantDetail from "./pages/PlantDetail";
+import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/messages" element={<Messages />} />
               <Route path="/chat/:conversationId" element={<Chat />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:username" element={<UserProfile />} />
               <Route path="/edit-profile" element={<EditProfile />} />
               <Route path="/my-plants" element={<MyPlants />} />
               <Route path="/my-reviews" element={<MyReviews />} />
