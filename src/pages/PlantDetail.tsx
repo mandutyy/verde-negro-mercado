@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
 import { mockPlants } from '@/data/mockPlants';
+import { supabase } from '@/integrations/supabase/client';
 
 const PlantDetail = () => {
   const { id } = useParams();
@@ -29,9 +30,44 @@ const PlantDetail = () => {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const handleContact = () => {
-    // Navegar al chat con este vendedor
-    navigate(`/chat/seller-${plant.seller.name}`);
+  const handleContact = async () => {
+    // Crear una conversación con el vendedor
+    const sellerId = plant.seller.id;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      
+      // Buscar conversación existente
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .or(`and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`)
+        .maybeSingle();
+      
+      if (existingConversation) {
+        navigate(`/chat/${existingConversation.id}`);
+      } else {
+        // Crear nueva conversación
+        const { data: newConversation } = await supabase
+          .from('conversations')
+          .insert([{
+            participant_1: user.id,
+            participant_2: sellerId
+          }])
+          .select()
+          .single();
+        
+        if (newConversation) {
+          navigate(`/chat/${newConversation.id}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error al iniciar conversación:', error);
+    }
   };
 
   const toggleFavorite = () => {
