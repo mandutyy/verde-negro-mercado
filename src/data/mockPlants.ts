@@ -14,7 +14,7 @@ export const mockPlants = [
     category: 'interior',
     condition: 'excellent',
     seller: {
-      id: 'seller-001',
+      id: '550e8400-e29b-41d4-a716-446655440001',
       name: 'PlantLover23',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
       rating: 4.8,
@@ -45,7 +45,7 @@ export const mockPlants = [
     category: 'suculentas',
     condition: 'good',
     seller: {
-      id: 'seller-002',
+      id: '550e8400-e29b-41d4-a716-446655440002',
       name: 'SucculentSwap',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
       rating: 4.9,
@@ -75,7 +75,7 @@ export const mockPlants = [
     category: 'interior',
     condition: 'excellent',
     seller: {
-      id: 'seller-003',
+      id: '550e8400-e29b-41d4-a716-446655440003',
       name: 'OrchidExpert',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
       rating: 4.7,
@@ -105,7 +105,7 @@ export const mockPlants = [
     category: 'interior',
     condition: 'excellent',
     seller: {
-      id: 'seller-004',
+      id: '550e8400-e29b-41d4-a716-446655440004',
       name: 'PropagationPro',
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
       rating: 4.6,
@@ -135,7 +135,7 @@ export const mockPlants = [
     category: 'interior',
     condition: 'excellent',
     seller: {
-      id: 'seller-005',
+      id: '550e8400-e29b-41d4-a716-446655440005',
       name: 'PlantCollector',
       avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop&crop=face',
       rating: 4.4,
@@ -165,7 +165,7 @@ export const mockPlants = [
     category: 'interior',
     condition: 'excellent',
     seller: {
-      id: 'seller-006',
+      id: '550e8400-e29b-41d4-a716-446655440006',
       name: 'EasyPlants',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
       rating: 4.8,
