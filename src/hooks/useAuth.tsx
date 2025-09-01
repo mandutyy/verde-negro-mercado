@@ -32,9 +32,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Get initial session first
-    const getInitialSession = async () => {
+    // Initialize session and set up listeners
+    const initializeAuth = async () => {
       try {
+        // Get initial session first
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (mounted) {
@@ -63,11 +64,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        
+        // Only set loading to false after we've handled the auth change
+        if (event !== 'INITIAL_SESSION') {
+          setLoading(false);
+        }
 
-        // Create profile when user signs up (avoid blocking the auth flow)
+        // Create profile when user signs in (non-blocking)
         if (event === 'SIGNED_IN' && session?.user) {
-          // Use setTimeout to avoid blocking the auth state change
           setTimeout(async () => {
             try {
               const { error } = await supabase
@@ -91,8 +95,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // Initialize session
-    getInitialSession();
+    // Initialize session after setting up the listener
+    initializeAuth();
 
     return () => {
       mounted = false;
