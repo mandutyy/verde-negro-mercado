@@ -1,14 +1,51 @@
 
 import Header from '@/components/Header';
-import { Settings, Star, Package, Heart, MessageCircle } from 'lucide-react';
+import { Settings, Star, Package, Heart, MessageCircle, LogIn } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PlantCard from '@/components/PlantCard';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-plant-subtle">
+        <Header title="Mi Perfil" />
+        
+        <div className="px-4 py-8 flex flex-col items-center justify-center">
+          <Card className="border-plant-200 shadow-sm w-full max-w-sm">
+            <CardContent className="p-8 text-center">
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-plant-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                  <LogIn size={32} className="text-plant-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  Inicia sesión
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Accede a tu cuenta para ver tu perfil y gestionar tus plantas
+                </p>
+              </div>
+              
+              <Button 
+                className="w-full bg-plant-600 hover:bg-plant-700 text-white"
+                onClick={() => navigate('/auth')}
+              >
+                <LogIn size={16} className="mr-2" />
+                Iniciar sesión
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+  
   const userPlants = [
     {
       id: '7',
