@@ -4,8 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Favorites from "./pages/Favorites";
@@ -22,6 +23,75 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const { user } = useAuth();
+  
+  return (
+    <div className="min-h-screen bg-gradient-plant-subtle w-full">
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
+        <Route path="/upload" element={
+          <ProtectedRoute>
+            <Upload />
+          </ProtectedRoute>
+        } />
+        <Route path="/favorites" element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        } />
+        <Route path="/messages" element={
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        } />
+        <Route path="/chat/:conversationId" element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/:username" element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/edit-profile" element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/my-plants" element={
+          <ProtectedRoute>
+            <MyPlants />
+          </ProtectedRoute>
+        } />
+        <Route path="/my-reviews" element={
+          <ProtectedRoute>
+            <MyReviews />
+          </ProtectedRoute>
+        } />
+        <Route path="/plant/:id" element={
+          <ProtectedRoute>
+            <PlantDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {user && <Navigation />}
+    </div>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -29,24 +99,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen bg-gradient-plant-subtle w-full">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/upload" element={<Upload />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/chat/:conversationId" element={<Chat />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/:username" element={<UserProfile />} />
-              <Route path="/edit-profile" element={<EditProfile />} />
-              <Route path="/my-plants" element={<MyPlants />} />
-              <Route path="/my-reviews" element={<MyReviews />} />
-              <Route path="/plant/:id" element={<PlantDetail />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Navigation />
-          </div>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

@@ -55,7 +55,7 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
@@ -63,11 +63,10 @@ const Home = () => {
   const [newListingType, setNewListingType] = useState<"sell" | "buy" | "exchange">("sell");
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set(["2", "5"]));
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, authLoading, navigate]);
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   const toggleLike = (id: string) => {
     setLikedItems(prev => {
@@ -141,7 +140,7 @@ const Home = () => {
                     Configuración
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600" onClick={() => navigate('/auth')}>
+                  <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Cerrar Sesión
                   </DropdownMenuItem>
