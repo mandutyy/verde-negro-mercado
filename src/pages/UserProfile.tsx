@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PlantCard from '@/components/PlantCard';
 import { mockPlants } from '@/data/mockPlants';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserProfile = () => {
   const { username } = useParams();
@@ -39,8 +40,41 @@ const UserProfile = () => {
     { icon: MessageCircle, label: 'Intercambios', value: '8' }
   ];
 
-  const handleContact = () => {
-    navigate(`/chat/seller-${seller.name}`);
+  const handleContact = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      
+      // Buscar conversación existente
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .or(`and(participant_1.eq.${user.id},participant_2.eq.${seller.id}),and(participant_1.eq.${seller.id},participant_2.eq.${user.id})`)
+        .maybeSingle();
+      
+      if (existingConversation) {
+        navigate(`/chat/${existingConversation.id}`);
+      } else {
+        // Crear nueva conversación
+        const { data: newConversation } = await supabase
+          .from('conversations')
+          .insert([{
+            participant_1: user.id,
+            participant_2: seller.id
+          }])
+          .select()
+          .single();
+        
+        if (newConversation) {
+          navigate(`/chat/${newConversation.id}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error al iniciar conversación:', error);
+    }
   };
 
   return (
