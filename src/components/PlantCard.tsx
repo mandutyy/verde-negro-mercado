@@ -1,6 +1,6 @@
 
 import { Heart } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,7 @@ interface PlantCardProps {
   isExchange?: boolean;
 }
 
-const PlantCard = ({ 
+const PlantCard = memo(({ 
   id, 
   title, 
   price, 
@@ -26,15 +26,15 @@ const PlantCard = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const navigate = useNavigate();
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const toggleFavorite = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorite(!favorite);
-  };
+    setFavorite(prev => !prev);
+  }, []);
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     navigate(`/plant/${id}`);
-  };
+  }, [navigate, id]);
 
   return (
     <div 
@@ -46,6 +46,7 @@ const PlantCard = ({
           src={image} 
           alt={title}
           className="w-full h-48 object-cover"
+          loading="lazy"
         />
         <button
           onClick={toggleFavorite}
@@ -83,6 +84,8 @@ const PlantCard = ({
       </div>
     </div>
   );
-};
+});
+
+PlantCard.displayName = 'PlantCard';
 
 export default PlantCard;

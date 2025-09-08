@@ -1,19 +1,19 @@
 
-import { useState } from 'react';
+import { useMemo, memo } from 'react';
 import { Heart, Home, MessageCircle, Upload, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
-const Navigation = () => {
+const Navigation = memo(() => {
   const location = useLocation();
   
-  const navItems = [
+  const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
     { icon: Upload, label: 'Subir', path: '/upload', id: 'upload' },
     { icon: Heart, label: 'Favoritos', path: '/favorites', id: 'favorites' },
     { icon: MessageCircle, label: 'Mensajes', path: '/messages', id: 'messages' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
-  ];
+  ], []);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-plant-200 z-50">
@@ -51,6 +51,8 @@ const Navigation = () => {
       </div>
     </nav>
   );
-};
+});
+
+Navigation.displayName = 'Navigation';
 
 export default Navigation;

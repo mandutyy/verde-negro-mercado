@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -70,22 +70,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setLoading(false);
         }
 
-        // Create profile when user signs in (non-blocking)
+        // Create or update profile when user signs in (non-blocking)
         if (event === 'SIGNED_IN' && session?.user) {
           setTimeout(async () => {
             try {
               const { error } = await supabase
                 .from('profiles')
-                .insert([
+                .upsert([
                   {
                     user_id: session.user.id,
                     name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
                   }
-                ]);
+                ], {
+                  onConflict: 'user_id'
+                });
 
-              // Ignore duplicate key errors (user already has profile)
-              if (error && !error.message.includes('duplicate key')) {
-                console.error('Error creating profile:', error);
+              if (error) {
+                console.error('Error upserting profile:', error);
               }
             } catch (error) {
               console.error('Error in profile creation:', error);
@@ -104,9 +105,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, signOut }}>
