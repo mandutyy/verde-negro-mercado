@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PlantCard from '@/components/PlantCard';
-import { mockPlants } from '@/data/mockPlants';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +62,33 @@ const Home = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newListingType, setNewListingType] = useState<"sell" | "buy" | "exchange">("sell");
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set(["2", "5"]));
+  const [plants, setPlants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPlants();
+  }, []);
+
+  const fetchPlants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('plants')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching plants:', error);
+        return;
+      }
+
+      setPlants(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -234,7 +261,7 @@ const Home = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
             <h2 className="text-2xl font-bold text-foreground">Anuncios Recientes</h2>
-            <p className="text-sm text-muted-foreground">{mockPlants.length} resultados encontrados</p>
+            <p className="text-sm text-muted-foreground">{plants.length} resultados encontrados</p>
           </div>
           
           <div className="flex gap-2">
@@ -310,18 +337,46 @@ const Home = () => {
         
         {/* Plant Listings Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-20">
-          {mockPlants.map((listing) => (
-            <PlantCard 
-              key={listing.id}
-              id={listing.id}
-              title={listing.title}
-              price={listing.price}
-              location={listing.location}
-              image={listing.image}
-              isFavorite={likedItems.has(listing.id)}
-              isExchange={listing.type === 'exchange'}
-            />
-          ))}
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-sm border border-plant-100 overflow-hidden animate-pulse">
+                <div className="w-full h-48 bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded w-20"></div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : plants.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <div className="text-gray-500 mb-4">
+                <Leaf className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">No hay plantas disponibles</h3>
+                <p>Sé el primero en publicar una planta</p>
+              </div>
+              <Button onClick={() => navigate('/upload')} className="bg-plant-600 hover:bg-plant-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Publicar mi primera planta
+              </Button>
+            </div>
+          ) : (
+            plants.map((plant) => (
+              <PlantCard 
+                key={plant.id}
+                id={plant.id}
+                title={plant.title}
+                price={plant.price || 0}
+                location={plant.location}
+                image={plant.images && plant.images.length > 0 ? plant.images[0] : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=300&h=300&fit=crop'}
+                isFavorite={likedItems.has(plant.id)}
+                isExchange={plant.sale_type && plant.sale_type.includes('exchange')}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

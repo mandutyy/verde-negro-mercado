@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
+import Purchase from "./pages/Purchase";
 import Favorites from "./pages/Favorites";
 import Messages from "./pages/Messages";
 import Chat from "./pages/Chat";
@@ -38,6 +39,11 @@ const AppContent = () => {
         <Route path="/upload" element={
           <ProtectedRoute>
             <Upload />
+          </ProtectedRoute>
+        } />
+        <Route path="/purchase/:id" element={
+          <ProtectedRoute>
+            <Purchase />
           </ProtectedRoute>
         } />
         <Route path="/favorites" element={

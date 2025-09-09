@@ -145,27 +145,81 @@ const Upload = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const currentOption = saleOptions.find(opt => opt.value === saleType);
-      toast({
-        title: "¡Planta publicada! 🌱",
-        description: `Tu planta se ha publicado como: ${currentOption?.label}`,
-        variant: "default"
-      });
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          toast({
+            title: "Error de autenticación",
+            description: "Debes iniciar sesión para publicar una planta",
+            variant: "destructive"
+          });
+          return;
+        }
 
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        price: '',
-        exchangeFor: '',
-        location: ''
-      });
-      setImages([]);
-      setSaleType('sell');
+        // Prepare plant data
+        const plantData = {
+          user_id: user.id,
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          category: formData.category,
+          location: formData.location.trim(),
+          sale_type: saleType,
+          images: images,
+          price: ['sell', 'sell-exchange', 'sell-gift', 'all'].includes(saleType) 
+            ? parseFloat(formData.price) || null 
+            : null,
+          exchange_for: ['exchange', 'sell-exchange', 'exchange-gift', 'all'].includes(saleType) 
+            ? formData.exchangeFor.trim() || null 
+            : null
+        };
+
+        const { error } = await supabase
+          .from('plants')
+          .insert(plantData);
+
+        if (error) {
+          console.error('Error saving plant:', error);
+          toast({
+            title: "Error al publicar",
+            description: "Hubo un problema al guardar tu planta. Inténtalo de nuevo.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const currentOption = saleOptions.find(opt => opt.value === saleType);
+        toast({
+          title: "¡Planta publicada! 🌱",
+          description: `Tu planta se ha publicado como: ${currentOption?.label}`,
+          variant: "default"
+        });
+
+        // Reset form
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          price: '',
+          exchangeFor: '',
+          location: ''
+        });
+        setImages([]);
+        setSaleType('sell');
+        setSelectedOption(null);
+        
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: "Error inesperado",
+          description: "Hubo un problema al publicar tu planta",
+          variant: "destructive"
+        });
+      }
     }
   };
   const showPriceField = ['sell', 'sell-exchange', 'sell-gift', 'all'].includes(saleType);

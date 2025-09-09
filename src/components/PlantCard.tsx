@@ -33,7 +33,7 @@ const PlantCard = memo(({
   }, []);
 
   const handleCardClick = useCallback(() => {
-    navigate(`/plant/${id}`);
+    navigate(`/purchase/${id}`);
   }, [navigate, id]);
 
   return (

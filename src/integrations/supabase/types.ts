@@ -73,6 +73,107 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          amount: number | null
+          buyer_id: string
+          created_at: string
+          id: string
+          message: string | null
+          order_type: string
+          plant_id: string
+          seller_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          buyer_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          order_type: string
+          plant_id: string
+          seller_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          order_type?: string
+          plant_id?: string
+          seller_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plants: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          exchange_for: string | null
+          favorites_count: number | null
+          id: string
+          images: string[] | null
+          location: string
+          price: number | null
+          sale_type: string
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          views_count: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          exchange_for?: string | null
+          favorites_count?: number | null
+          id?: string
+          images?: string[] | null
+          location: string
+          price?: number | null
+          sale_type: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          exchange_for?: string | null
+          favorites_count?: number | null
+          id?: string
+          images?: string[] | null
+          location?: string
+          price?: number | null
+          sale_type?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
