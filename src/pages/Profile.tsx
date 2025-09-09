@@ -1,39 +1,41 @@
-
-import Header from '@/components/Header';
-import { Settings, Star, Package, Heart, MessageCircle, LogIn } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Settings, Star, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import PlantCard from '@/components/PlantCard';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('publicaciones');
   
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-plant-subtle">
-        <Header title="Mi Perfil" />
+      <div className="min-h-screen bg-[#122118]">
+        <header className="flex items-center justify-between p-4 pb-2">
+          <div className="w-12"></div>
+          <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Perfil</h1>
+          <div className="w-12"></div>
+        </header>
         
         <div className="px-4 py-8 flex flex-col items-center justify-center">
-          <Card className="border-plant-200 shadow-sm w-full max-w-sm">
+          <Card className="bg-[#1b3124] border-[#366348] shadow-sm w-full max-w-sm">
             <CardContent className="p-8 text-center">
               <div className="mb-6">
-                <div className="w-20 h-20 bg-plant-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                  <LogIn size={32} className="text-plant-600" />
+                <div className="w-20 h-20 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+                  <LogIn size={32} className="text-[#38e07b]" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-white mb-2">
                   Inicia sesión
                 </h2>
-                <p className="text-gray-600 text-sm">
+                <p className="text-[#96c5a9] text-sm">
                   Accede a tu cuenta para ver tu perfil y gestionar tus plantas
                 </p>
               </div>
               
               <Button 
-                className="w-full bg-plant-600 hover:bg-plant-700 text-white"
+                className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
                 onClick={() => navigate('/auth')}
               >
                 <LogIn size={16} className="mr-2" />
@@ -45,147 +47,91 @@ const Profile = () => {
       </div>
     );
   }
-  
-  const userPlants = [
-    {
-      id: '7',
-      title: 'Mi Pilea Peperomioides',
-      price: 25,
-      location: 'Madrid',
-      image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
-      isFavorite: false,
-      isExchange: false
-    },
-    {
-      id: '8',
-      title: 'Cactus en maceta artesanal',
-      price: 0,
-      location: 'Madrid',
-      image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop',
-      isFavorite: false,
-      isExchange: true
-    }
+
+  const plantImages = [
+    'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1592150621744-aca64f48394a?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1493120952221-2a1b63c9c4e5?w=400&h=300&fit=crop',
   ];
 
-  const stats = [
-    { icon: Package, label: 'Publicadas', value: '12' },
-    { icon: Star, label: 'Valoración', value: '4.8' },
-    { icon: Heart, label: 'Favoritos', value: '8' },
-    { icon: MessageCircle, label: 'Intercambios', value: '5' }
+  const tabs = [
+    { id: 'publicaciones', label: 'Publicaciones' },
+    { id: 'ventas', label: 'Ventas' },
+    { id: 'compras', label: 'Compras' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-plant-subtle pb-20">
-      <Header title="Mi Perfil" />
-      
-      <div className="px-4 py-4">
-        {/* Profile Info */}
-        <Card className="border-plant-200 shadow-sm mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-plant-100 text-plant-700 text-xl font-semibold">
-                  JD
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-gray-900">Juan Díaz</h2>
-                <p className="text-gray-600">Madrid, España</p>
-                <p className="text-sm text-plant-600 mt-1">
-                  Miembro desde marzo 2024
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-plant-300"
-                onClick={() => navigate('/edit-profile')}
-              >
-                <Settings size={16} className="mr-2" />
-                Editar perfil
-              </Button>
-            </div>
-            
-            <p className="text-gray-700 text-sm">
-              🌱 Amante de las plantas desde siempre. Me encanta intercambiar y ayudar a otros con sus jardines urbanos.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 mb-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={index} className="border-plant-200 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <Icon size={20} className="text-plant-500 mx-auto mb-2" />
-                  <p className="text-lg font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-xs text-gray-600">{stat.label}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
+    <div className="min-h-screen bg-[#122118] text-white font-[Spline_Sans,Noto_Sans,sans-serif]">
+      {/* Header */}
+      <header className="flex items-center justify-between p-4 pb-2">
+        <div className="w-12"></div>
+        <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+          Perfil
+        </h1>
+        <div className="flex w-12 items-center justify-end">
+          <button 
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors"
+            onClick={() => navigate('/edit-profile')}
+          >
+            <Settings size={24} />
+          </button>
         </div>
+      </header>
 
-        {/* My Plants */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Mis plantas
-            </h3>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-plant-300 text-plant-600"
-              onClick={() => navigate('/my-plants')}
+      {/* Profile Info */}
+      <div className="flex flex-col items-center p-4">
+        <div 
+          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 mb-4"
+          style={{
+            backgroundImage: `url("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face")`
+          }}
+        />
+        <p className="text-white text-xl font-bold leading-tight tracking-[-0.015em] text-center">
+          {user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario'}
+        </p>
+        <div className="flex items-center gap-1 text-[#96c5a9] text-sm mt-1">
+          <Star size={16} className="text-[#f5d76e] fill-current" />
+          <p className="font-bold">4.8 <span className="font-normal">(125)</span></p>
+        </div>
+        <p className="text-[#96c5a9] text-sm font-normal leading-normal text-center mt-2">
+          120 seguidores · 100 seguidos
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div className="pb-3">
+        <div className="flex border-b border-[#366348] px-4 justify-around">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${
+                activeTab === tab.id
+                  ? 'border-b-[#38e07b] text-white'
+                  : 'border-b-transparent text-[#96c5a9] hover:text-white'
+              }`}
+              onClick={() => setActiveTab(tab.id)}
             >
-              Ver todas
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {userPlants.map((plant) => (
-              <PlantCard key={plant.id} {...plant} />
-            ))}
-          </div>
+              <p className="text-sm font-bold leading-normal tracking-[0.015em]">
+                {tab.label}
+              </p>
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Quick Actions */}
-        <Card className="border-plant-200 shadow-sm">
-          <CardContent className="p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Acciones rápidas
-            </h3>
-            <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start border-plant-300"
-                onClick={() => navigate('/my-plants')}
-              >
-                <Package size={16} className="mr-3" />
-                Gestionar mis plantas
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start border-plant-300"
-                onClick={() => navigate('/my-reviews')}
-              >
-                <Star size={16} className="mr-3" />
-                Mis valoraciones
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start border-plant-300"
-                onClick={() => navigate('/edit-profile')}
-              >
-                <Settings size={16} className="mr-3" />
-                Editar perfil
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Content Grid */}
+      <div className="grid grid-cols-3 gap-1 p-1 pb-24">
+        {plantImages.map((image, index) => (
+          <div
+            key={index}
+            className="w-full bg-center bg-no-repeat aspect-square bg-cover cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ backgroundImage: `url("${image}")` }}
+            onClick={() => navigate(`/plant/${index + 1}`)}
+          />
+        ))}
       </div>
     </div>
   );

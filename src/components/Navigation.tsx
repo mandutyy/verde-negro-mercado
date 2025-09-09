@@ -9,15 +9,15 @@ const Navigation = memo(() => {
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
-    { icon: Upload, label: 'Subir', path: '/upload', id: 'upload' },
+    { icon: Upload, label: 'Publicar', path: '/upload', id: 'upload' },
     { icon: Heart, label: 'Favoritos', path: '/favorites', id: 'favorites' },
     { icon: MessageCircle, label: 'Mensajes', path: '/messages', id: 'messages' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
   ], []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-plant-200 z-50">
-      <div className="flex justify-around items-center py-2 px-4 max-w-md mx-auto">
+    <footer className="fixed bottom-0 left-0 right-0 z-50">
+      <div className="flex border-t border-[#264532] bg-[#1b3124] px-4 pb-3 pt-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -27,29 +27,25 @@ const Navigation = memo(() => {
               key={item.id}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200",
+                "flex flex-1 flex-col items-center justify-center gap-1 transition-colors",
                 isActive 
-                  ? "text-plant-600 bg-plant-50" 
-                  : "text-gray-500 hover:text-plant-500 hover:bg-plant-25"
+                  ? "text-[#38e07b]" 
+                  : "text-[#96c5a9] hover:text-[#38e07b]"
               )}
             >
-              <Icon 
-                size={24} 
-                className={cn(
-                  isActive ? "text-plant-600" : "text-gray-500"
-                )} 
-              />
-              <span className={cn(
-                "text-xs mt-1 font-medium",
-                isActive ? "text-plant-600" : "text-gray-500"
+              <Icon size={24} />
+              <p className={cn(
+                "text-xs leading-normal tracking-[0.015em]",
+                isActive ? "font-bold" : "font-medium"
               )}>
                 {item.label}
-              </span>
+              </p>
             </Link>
           );
         })}
       </div>
-    </nav>
+      <div className="h-5 bg-[#1b3124]"></div>
+    </footer>
   );
 });
 
