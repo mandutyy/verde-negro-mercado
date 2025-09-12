@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 interface Plant {
   id: string;
@@ -27,6 +28,7 @@ const Purchase = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { sendMessage } = useRealtimeChat();
   
   const [plant, setPlant] = useState<Plant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,6 +139,46 @@ const Purchase = () => {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleContact = async () => {
+    if (!user || !plant) {
+      toast({
+        title: "Error de autenticación",
+        description: "Debes iniciar sesión para contactar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (user.id === plant.user_id) {
+      toast({
+        title: "No puedes contactarte contigo mismo",
+        description: "Esta es tu planta",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const initialMessage = message.trim() || `Hola, estoy interesado en tu planta "${plant.title}"`;
+      await sendMessage(initialMessage, plant.user_id);
+      
+      toast({
+        title: "¡Mensaje enviado!",
+        description: "Tu mensaje se ha enviado al propietario",
+        variant: "default"
+      });
+
+      navigate('/messages');
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error al enviar mensaje",
+        description: "Hubo un problema al enviar tu mensaje",
+        variant: "destructive"
+      });
     }
   };
 
@@ -285,6 +327,15 @@ const Purchase = () => {
             </div>
 
             <div className="space-y-2">
+              {/* Contact Button - Always available */}
+              <Button 
+                onClick={handleContact}
+                disabled={submitting}
+                className="w-full bg-plant-600 hover:bg-plant-700 text-white font-semibold py-3 rounded-xl"
+              >
+                💬 Contactar
+              </Button>
+
               {canPurchase && (
                 <Button 
                   onClick={() => handlePurchase('purchase')}
