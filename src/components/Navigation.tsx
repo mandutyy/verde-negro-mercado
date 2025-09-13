@@ -16,8 +16,8 @@ const Navigation = memo(() => {
   ], []);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="flex border-t border-[#264532] bg-[#1b3124] px-4 pb-3 pt-2">
+    <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
+      <div className="flex px-2 py-2 safe-area-pb">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -27,16 +27,16 @@ const Navigation = memo(() => {
               key={item.id}
               to={item.path}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 transition-colors",
+                "flex flex-1 flex-col items-center justify-center gap-1 transition-colors py-2 px-1 rounded-lg",
                 isActive 
-                  ? "text-[#38e07b]" 
-                  : "text-[#96c5a9] hover:text-[#38e07b]"
+                  ? "text-primary bg-primary/10" 
+                  : "text-secondary hover:text-primary hover:bg-primary/5"
               )}
             >
-              <Icon size={24} />
+              <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               <p className={cn(
-                "text-xs leading-normal tracking-[0.015em]",
-                isActive ? "font-bold" : "font-medium"
+                "text-xs leading-tight tracking-wide",
+                isActive ? "font-semibold" : "font-medium"
               )}>
                 {item.label}
               </p>
@@ -44,7 +44,6 @@ const Navigation = memo(() => {
           );
         })}
       </div>
-      <div className="h-5 bg-[#1b3124]"></div>
     </footer>
   );
 });

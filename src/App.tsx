@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import BottomNavigation from "@/components/BottomNavigation";
+import Navigation from "@/components/Navigation";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Purchase from "./pages/Purchase";
@@ -26,6 +26,14 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  
+  // Hide navigation on specific pages
+  const shouldShowNavigation = user && 
+                               location.pathname !== '/auth' && 
+                               !location.pathname.startsWith('/purchase') && 
+                               !location.pathname.startsWith('/chat') && 
+                               !location.pathname.startsWith('/plant/');
   
   return (
     <div className="min-h-screen bg-background w-full relative">
@@ -94,8 +102,8 @@ const AppContent = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Show bottom navigation only for authenticated users and not on auth page or purchase page */}
-      {user && window.location.pathname !== '/auth' && !window.location.pathname.startsWith('/purchase') && <BottomNavigation />}
+      {/* Mobile-optimized bottom navigation */}
+      {shouldShowNavigation && <Navigation />}
     </div>
   );
 };

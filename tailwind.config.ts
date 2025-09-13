@@ -19,6 +19,12 @@ export default {
 			}
 		},
 		extend: {
+			spacing: {
+				'safe-area-inset-top': 'var(--safe-area-inset-top)',
+				'safe-area-inset-bottom': 'var(--safe-area-inset-bottom)',
+				'safe-area-inset-left': 'var(--safe-area-inset-left)',
+				'safe-area-inset-right': 'var(--safe-area-inset-right)',
+			},
 			fontFamily: {
 				'spline': ['Spline Sans', 'Noto Sans', 'sans-serif'],
 				'noto': ['Noto Sans', 'sans-serif'],
