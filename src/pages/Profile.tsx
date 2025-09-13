@@ -15,7 +15,7 @@ const Profile = () => {
     const shareData = {
       title: 'Plantify - Compra y vende plantas',
       text: '¡Descubre Plantify! La mejor app para comprar, vender e intercambiar plantas. ¡Únete a nuestra comunidad verde!',
-      url: window.location.origin
+      url: 'https://tu-app-plantify.com' // Cambia esta URL por la de tu app desplegada
     };
 
     try {
