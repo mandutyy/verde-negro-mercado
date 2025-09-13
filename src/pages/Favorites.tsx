@@ -70,7 +70,7 @@ const Favorites = () => {
   };
 
   const handlePlantClick = (plantId: string) => {
-    navigate(`/purchase/${plantId}`);
+    navigate(`/plant/${plantId}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent, plantId: string) => {
