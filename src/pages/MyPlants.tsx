@@ -61,7 +61,7 @@ const MyPlants = () => {
 
   return (
     <div className="min-h-screen bg-gradient-plant-subtle pb-20">
-      <Header title="Mis Plantas" />
+      <Header title="Mis Plantas" showBackButton />
       
       <div className="px-4 py-4">
         {/* Add New Plant Button */}

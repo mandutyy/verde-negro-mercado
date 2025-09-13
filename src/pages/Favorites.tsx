@@ -27,7 +27,7 @@ const Favorites = () => {
 
   return (
     <div className="min-h-screen bg-gradient-plant-subtle pb-20">
-      <Header title="Favoritos" />
+      <Header title="Favoritos" showBackButton />
       
       <div className="px-4 py-4">
         {favoritePlants.length > 0 ? (

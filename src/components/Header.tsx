@@ -1,20 +1,46 @@
 
-import { Search } from 'lucide-react';
+import { Search, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
   showSearch?: boolean;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
-const Header = ({ title, showSearch = false }: HeaderProps) => {
+const Header = ({ title, showSearch = false, showBackButton = false, onBack }: HeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <header className="bg-white border-b border-plant-200 sticky top-0 z-40">
       <div className="px-4 py-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold bg-gradient-plant bg-clip-text text-transparent">
-            {title}
-          </h1>
+          <div className="flex items-center gap-3">
+            {showBackButton && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBack}
+                className="h-10 w-10 p-0"
+              >
+                <ArrowLeft size={20} />
+              </Button>
+            )}
+            <h1 className="text-2xl font-bold bg-gradient-plant bg-clip-text text-transparent">
+              {title}
+            </h1>
+          </div>
         </div>
         
         {showSearch && (

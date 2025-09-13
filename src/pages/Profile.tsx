@@ -1,4 +1,4 @@
-import { Settings, Star, LogIn, Share } from 'lucide-react';
+import { Settings, Star, LogIn, Share, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +38,14 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-[#122118]">
         <header className="flex items-center justify-between p-4 pb-2">
-          <div className="w-12"></div>
+          <div className="flex w-12 items-center justify-start">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors"
+            >
+              <ArrowLeft size={24} />
+            </button>
+          </div>
           <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Perfil</h1>
           <div className="w-12"></div>
         </header>
@@ -91,7 +98,14 @@ const Profile = () => {
     <div className="min-h-screen bg-[#122118] text-white font-[Spline_Sans,Noto_Sans,sans-serif]">
       {/* Header */}
       <header className="flex items-center justify-between p-4 pb-2">
-        <div className="w-12"></div>
+        <div className="flex w-12 items-center justify-start">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        </div>
         <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           Perfil
         </h1>

@@ -19,15 +19,11 @@ const UserProfile = () => {
   if (!seller) {
     return (
       <div className="min-h-screen bg-gradient-plant-subtle">
-        <Header title="Perfil no encontrado" />
+        <Header title="Perfil no encontrado" showBackButton />
         <div className="px-4 py-8 text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Usuario no encontrado
           </h2>
-          <Button onClick={() => navigate(-1)}>
-            <ArrowLeft size={16} className="mr-2" />
-            Volver
-          </Button>
         </div>
       </div>
     );
@@ -79,7 +75,7 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-plant-subtle pb-20">
-      <Header title={`Perfil de ${seller.name}`} />
+      <Header title={`Perfil de ${seller.name}`} showBackButton />
       
       <div className="px-4 py-4">
         {/* Profile Info */}

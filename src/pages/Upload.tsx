@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Upload as UploadIcon, X, Gift, DollarSign, ArrowLeftRight, Sparkles } from 'lucide-react';
+import { Upload as UploadIcon, X, Gift, DollarSign, ArrowLeftRight, Sparkles, ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 const Upload = () => {
+  const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState<'sell' | 'exchange' | 'gift' | null>(null);
   const [saleType, setSaleType] = useState<'sell' | 'exchange' | 'gift' | 'sell-exchange' | 'sell-gift' | 'exchange-gift' | 'all'>('sell');
   const [images, setImages] = useState<string[]>([]);
@@ -229,7 +231,20 @@ const Upload = () => {
   // Si no se ha seleccionado una opción, mostrar las 3 opciones principales
   if (!selectedOption) {
     return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
-        <Header title="🌱 Subir contenido" />
+        <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
+          <div className="flex w-12 items-center justify-start">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </div>
+          <h1 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+            🌱 Subir contenido
+          </h1>
+          <div className="flex w-12 items-center justify-end"></div>
+        </div>
         
         <div className="px-4 py-8">
           <div className="max-w-md mx-auto">
@@ -293,7 +308,20 @@ const Upload = () => {
       </div>;
   }
   return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
-      <Header title="🌱 Comparte tu Planta" />
+      <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
+        <div className="flex w-12 items-center justify-start">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        </div>
+        <h1 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+          🌱 Comparte tu Planta
+        </h1>
+        <div className="flex w-12 items-center justify-end"></div>
+      </div>
       
       <div className="px-4 py-4">
         {/* Botón para volver */}

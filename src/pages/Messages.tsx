@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { MessageCircle, Send, Search, PencilIcon } from 'lucide-react';
+import { MessageCircle, Send, Search, PencilIcon, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +40,17 @@ const Messages = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
-        <h2 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12">
+        <div className="flex w-12 items-center justify-start">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+        <h2 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           Mensajes
         </h2>
         <div className="flex w-12 items-center justify-end">
