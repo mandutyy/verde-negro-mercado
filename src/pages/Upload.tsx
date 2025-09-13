@@ -197,148 +197,20 @@ const Upload = () => {
         >
           <span className="material-symbols-outlined text-3xl">close</span>
         </button>
-        <h1 className="text-xl font-bold">Nuevo anuncio</h1>
+        <h1 className="text-xl font-bold">Publicar Anuncio</h1>
         <div className="w-8"></div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Transaction Type */}
+          {/* Photos Section - Now at the top */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="transaction-type">
-              Tipo de transacción
-            </label>
-            <select 
-              className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-              id="transaction-type"
-              value={saleType}
-              onChange={(e) => setSaleType(e.target.value as any)}
-            >
-              {saleOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Plant Name */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="plant-name">
-              Nombre de la planta
-            </label>
-            <input 
-              className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-              id="plant-name" 
-              placeholder="Ej: Monstera Deliciosa" 
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-            />
-            {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="description">
-              Descripción
-            </label>
-            <textarea 
-              className="form-textarea min-h-[120px] w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-              id="description" 
-              placeholder="Añade detalles sobre tu planta, su estado, cuidados, etc."
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-            />
-            {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="category">
-              Categoría
-            </label>
-            <select 
-              className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-              id="category"
-              value={formData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
-            >
-              <option value="">Selecciona una categoría</option>
-              {plantCategories.map(category => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-            {errors.category && <p className="text-red-400 text-sm mt-1">{errors.category}</p>}
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="location">
-              Ubicación
-            </label>
-            <input 
-              className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-              id="location" 
-              placeholder="Ej: Madrid, Centro" 
-              type="text"
-              value={formData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-            />
-            {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
-          </div>
-
-          {/* Price - Only for sell and all */}
-          {showPriceField && (
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
-                Precio (opcional)
-              </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">€</span>
-                <input 
-                  className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 pl-7 pr-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-                  id="price" 
-                  placeholder="0.00" 
-                  type="text"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                />
-              </div>
-              {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
-            </div>
-          )}
-
-          {/* Exchange For - Only for exchange and all */}
-          {showExchangeField && (
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="exchange-for">
-                ¿Qué buscas a cambio?
-              </label>
-              <input 
-                className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-                id="exchange-for" 
-                placeholder="Ej: Pothos, Suculentas" 
-                type="text"
-                value={formData.exchangeFor}
-                onChange={(e) => handleInputChange('exchangeFor', e.target.value)}
-              />
-              {errors.exchangeFor && <p className="text-red-400 text-sm mt-1">{errors.exchangeFor}</p>}
-            </div>
-          )}
-
-          {/* Photos */}
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-gray-300">Fotos</h3>
-            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#366348] p-8 text-center">
-              <div className="mb-4 rounded-full bg-[#264532] p-4">
-                <span className="material-symbols-outlined text-4xl text-[#38e07b]">add_a_photo</span>
-              </div>
-              <p className="mb-1 font-semibold">Añadir fotos</p>
-              <p className="mb-4 text-sm text-gray-400">Muestra tu planta desde diferentes ángulos</p>
+            <h2 className="mb-3 text-lg font-semibold text-white">Añadir Fotos</h2>
+            <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#366348] bg-[#1b3124] p-6 text-center">
+              <span className="material-symbols-outlined text-5xl text-[#38e07b]">add_photo_alternate</span>
+              <p className="mt-2 font-semibold">Arrastra y suelta tus fotos aquí</p>
+              <p className="text-sm text-gray-400">o</p>
               <input 
                 type="file" 
                 multiple 
@@ -349,10 +221,11 @@ const Upload = () => {
               />
               <label 
                 htmlFor="photo-upload"
-                className="rounded-full bg-white/10 px-6 py-2 text-sm font-bold text-white hover:bg-white/20 cursor-pointer"
+                className="mt-2 rounded-full bg-[#38e07b] px-6 py-2 text-sm font-bold text-[#122118] hover:bg-opacity-90 cursor-pointer"
               >
-                Subir fotos
+                Seleccionar archivos
               </label>
+              <p className="mt-2 text-xs text-gray-500">Muestra tu planta desde diferentes ángulos.</p>
             </div>
             
             {/* Display uploaded images */}
@@ -377,6 +250,134 @@ const Upload = () => {
               </div>
             )}
             {errors.images && <p className="text-red-400 text-sm mt-2">{errors.images}</p>}
+          </div>
+
+          <div className="space-y-4">
+            {/* Transaction Type */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="transaction-type">
+                Tipo de transacción
+              </label>
+              <select 
+                className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="transaction-type"
+                value={saleType}
+                onChange={(e) => setSaleType(e.target.value as any)}
+              >
+                {saleOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Plant Name */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="plant-name">
+                Nombre de la planta
+              </label>
+              <input 
+                className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="plant-name" 
+                placeholder="Ej: Monstera Deliciosa" 
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
+              />
+              {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="description">
+                Descripción
+              </label>
+              <textarea 
+                className="form-textarea min-h-[100px] w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="description" 
+                placeholder="Añade detalles sobre tu planta, su estado, cuidados, etc."
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+              />
+              {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="category">
+                Categoría
+              </label>
+              <select 
+                className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="category"
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+              >
+                <option value="">Selecciona una categoría</option>
+                {plantCategories.map(category => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+              {errors.category && <p className="text-red-400 text-sm mt-1">{errors.category}</p>}
+            </div>
+
+            {/* Location */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="location">
+                Ubicación
+              </label>
+              <input 
+                className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="location" 
+                placeholder="Ej: Madrid, Centro" 
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+              />
+              {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
+            </div>
+
+            {/* Price - Only for sell and all */}
+            {showPriceField && (
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
+                  Precio (opcional)
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">€</span>
+                  <input 
+                    className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 pl-8 pr-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                    id="price" 
+                    placeholder="0.00" 
+                    type="text"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                  />
+                </div>
+                {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
+              </div>
+            )}
+
+            {/* Exchange For - Only for exchange and all */}
+            {showExchangeField && (
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="exchange-for">
+                  ¿Qué buscas a cambio?
+                </label>
+                <input 
+                  className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                  id="exchange-for" 
+                  placeholder="Ej: Pothos, Suculentas" 
+                  type="text"
+                  value={formData.exchangeFor}
+                  onChange={(e) => handleInputChange('exchangeFor', e.target.value)}
+                />
+                {errors.exchangeFor && <p className="text-red-400 text-sm mt-1">{errors.exchangeFor}</p>}
+              </div>
+            )}
           </div>
         </form>
       </main>
