@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import { Upload as UploadIcon, X, Gift, DollarSign, ArrowLeftRight, Sparkles, ArrowLeft } from 'lucide-react';
-import Header from '@/components/Header';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 const Upload = () => {
   const navigate = useNavigate();
@@ -27,43 +18,12 @@ const Upload = () => {
   const {
     toast
   } = useToast();
-  const exchangeSuggestions = ['Pino', 'Monstera', 'Ficus', 'Suculentas variadas', 'Plantas aromáticas', 'Cactus', 'Pothos', 'Sansevieria', 'Plantas de interior', 'Plantas de exterior'];
-  const saleOptions = [{
-    value: 'sell',
-    label: 'Solo venta',
-    icon: DollarSign,
-    color: 'bg-emerald-100 text-emerald-700 border-emerald-200'
-  }, {
-    value: 'exchange',
-    label: 'Solo intercambio',
-    icon: ArrowLeftRight,
-    color: 'bg-teal-100 text-teal-700 border-teal-200'
-  }, {
-    value: 'gift',
-    label: 'Solo regalo',
-    icon: Gift,
-    color: 'bg-rose-100 text-rose-700 border-rose-200'
-  }, {
-    value: 'sell-exchange',
-    label: 'Venta e intercambio',
-    icon: DollarSign,
-    color: 'bg-blue-100 text-blue-700 border-blue-200'
-  }, {
-    value: 'sell-gift',
-    label: 'Venta o regalo',
-    icon: Sparkles,
-    color: 'bg-purple-100 text-purple-700 border-purple-200'
-  }, {
-    value: 'exchange-gift',
-    label: 'Intercambio o regalo',
-    icon: ArrowLeftRight,
-    color: 'bg-orange-100 text-orange-700 border-orange-200'
-  }, {
-    value: 'all',
-    label: 'Todas las opciones',
-    icon: Sparkles,
-    color: 'bg-gradient-to-r from-plant-100 to-emerald-100 text-plant-800 border-plant-300'
-  }];
+  const saleOptions = [
+    { value: 'sell', label: 'Venta' },
+    { value: 'exchange', label: 'Intercambio' },
+    { value: 'gift', label: 'Regalo' },
+    { value: 'all', label: 'Todas las opciones' }
+  ];
   const plantCategories = [{
     value: 'interior',
     label: '🌿 Plantas de Interior',
@@ -224,260 +184,216 @@ const Upload = () => {
       }
     }
   };
-  const showPriceField = ['sell', 'sell-exchange', 'sell-gift', 'all'].includes(saleType);
-  const showExchangeField = ['exchange', 'sell-exchange', 'exchange-gift', 'all'].includes(saleType);
-  const showGiftMessage = ['gift', 'sell-gift', 'exchange-gift', 'all'].includes(saleType);
+  const showPriceField = ['sell', 'all'].includes(saleType);
+  const showExchangeField = ['exchange', 'all'].includes(saleType);
 
-  // Si no se ha seleccionado una opción, mostrar las 3 opciones principales
-  if (!selectedOption) {
-    return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-32">
-        <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
-          <div className="flex w-12 items-center justify-start">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
+  return (
+    <div className="flex h-screen flex-col bg-[#122118] text-white">
+      {/* Header */}
+      <header className="flex items-center justify-between p-4">
+        <button 
+          onClick={() => navigate(-1)}
+          className="text-white"
+        >
+          <span className="material-symbols-outlined text-3xl">close</span>
+        </button>
+        <h1 className="text-xl font-bold">Nuevo anuncio</h1>
+        <div className="w-8"></div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto p-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Transaction Type */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="transaction-type">
+              Tipo de transacción
+            </label>
+            <select 
+              className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+              id="transaction-type"
+              value={saleType}
+              onChange={(e) => setSaleType(e.target.value as any)}
             >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
+              {saleOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
-          <h1 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-            🌱 Subir contenido
-          </h1>
-          <div className="flex w-12 items-center justify-end"></div>
-        </div>
-        
-        <div className="px-4 py-8">
-          <div className="max-w-md mx-auto">
-            {/* Título principal */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-plant-800 mb-2">¿Qué quieres hacer?</h1>
-              <p className="text-plant-600">Elige cómo quieres compartir tu planta</p>
-            </div>
 
-            {/* Árbol visual (similar a la imagen) */}
-            <div className="relative mb-8">
-              <div className="flex justify-between items-start mb-4">
-                {/* Opción Vender */}
-                <button onClick={() => {
-                setSelectedOption('sell');
-                setSaleType('sell');
-              }} className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <DollarSign className="h-8 w-8 text-amber-700" />
-                  </div>
-                  <span className="text-plant-800 font-semibold text-sm">Vender</span>
-                </button>
-
-                {/* Opción Intercambiar (centro) */}
-                <button onClick={() => {
-                setSelectedOption('exchange');
-                setSaleType('exchange');
-              }} className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24">
-                  <div className="w-16 h-16 bg-gradient-to-br from-plant-200 to-emerald-300 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <ArrowLeftRight className="h-8 w-8 text-plant-700" />
-                  </div>
-                  <span className="text-plant-800 font-semibold text-sm">Intercambiar</span>
-                </button>
-
-                {/* Opción Regalar */}
-                <button onClick={() => {
-                setSelectedOption('gift');
-                setSaleType('gift');
-              }} className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-plant-200 hover:border-plant-400 group w-24">
-                  <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-200 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <Gift className="h-8 w-8 text-rose-700" />
-                  </div>
-                  <span className="text-plant-800 font-semibold text-sm">Regalar</span>
-                </button>
-              </div>
-
-              {/* Tronco del árbol decorativo */}
-              <div className="flex justify-center">
-                
-              </div>
-            </div>
-
-            {/* Mensaje motivacional */}
-            <div className="text-center p-4 bg-white/70 rounded-xl border border-plant-200">
-              <p className="text-plant-700 text-sm">
-                🌱 Cada planta compartida hace crecer nuestra comunidad verde
-              </p>
-            </div>
+          {/* Plant Name */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="plant-name">
+              Nombre de la planta
+            </label>
+            <input 
+              className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+              id="plant-name" 
+              placeholder="Ej: Monstera Deliciosa" 
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+            />
+            {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
           </div>
-        </div>
-      </div>;
-  }
-  return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-32">
-      <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
-        <div className="flex w-12 items-center justify-start">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
+
+          {/* Description */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="description">
+              Descripción
+            </label>
+            <textarea 
+              className="form-textarea min-h-[120px] w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+              id="description" 
+              placeholder="Añade detalles sobre tu planta, su estado, cuidados, etc."
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+            />
+            {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="category">
+              Categoría
+            </label>
+            <select 
+              className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+              id="category"
+              value={formData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+            >
+              <option value="">Selecciona una categoría</option>
+              {plantCategories.map(category => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+            {errors.category && <p className="text-red-400 text-sm mt-1">{errors.category}</p>}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="location">
+              Ubicación
+            </label>
+            <input 
+              className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+              id="location" 
+              placeholder="Ej: Madrid, Centro" 
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+            />
+            {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
+          </div>
+
+          {/* Price - Only for sell and all */}
+          {showPriceField && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
+                Precio (opcional)
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">€</span>
+                <input 
+                  className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 pl-7 pr-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                  id="price" 
+                  placeholder="0.00" 
+                  type="text"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                />
+              </div>
+              {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
+            </div>
+          )}
+
+          {/* Exchange For - Only for exchange and all */}
+          {showExchangeField && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="exchange-for">
+                ¿Qué buscas a cambio?
+              </label>
+              <input 
+                className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="exchange-for" 
+                placeholder="Ej: Pothos, Suculentas" 
+                type="text"
+                value={formData.exchangeFor}
+                onChange={(e) => handleInputChange('exchangeFor', e.target.value)}
+              />
+              {errors.exchangeFor && <p className="text-red-400 text-sm mt-1">{errors.exchangeFor}</p>}
+            </div>
+          )}
+
+          {/* Photos */}
+          <div>
+            <h3 className="mb-2 text-sm font-medium text-gray-300">Fotos</h3>
+            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#366348] p-8 text-center">
+              <div className="mb-4 rounded-full bg-[#264532] p-4">
+                <span className="material-symbols-outlined text-4xl text-[#38e07b]">add_a_photo</span>
+              </div>
+              <p className="mb-1 font-semibold">Añadir fotos</p>
+              <p className="mb-4 text-sm text-gray-400">Muestra tu planta desde diferentes ángulos</p>
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*" 
+                onChange={handleImageUpload} 
+                className="hidden" 
+                id="photo-upload" 
+              />
+              <label 
+                htmlFor="photo-upload"
+                className="rounded-full bg-white/10 px-6 py-2 text-sm font-bold text-white hover:bg-white/20 cursor-pointer"
+              >
+                Subir fotos
+              </label>
+            </div>
+            
+            {/* Display uploaded images */}
+            {images.length > 0 && (
+              <div className="grid grid-cols-3 gap-3 mt-4">
+                {images.map((img, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={img} 
+                      alt={`Uploaded ${index + 1}`} 
+                      className="w-full h-24 object-cover rounded-xl" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => removeImage(index)} 
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <span className="material-symbols-outlined text-sm">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {errors.images && <p className="text-red-400 text-sm mt-2">{errors.images}</p>}
+          </div>
+        </form>
+      </main>
+
+      {/* Footer */}
+      <footer className="sticky bottom-0 bg-[#122118] pb-safe">
+        <div className="p-4">
+          <button 
+            onClick={handleSubmit}
+            className="w-full rounded-full bg-[#38e07b] py-3.5 text-center font-bold text-[#122118]"
           >
-            <ArrowLeft className="h-5 w-5" />
+            Publicar
           </button>
         </div>
-        <h1 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-          🌱 Comparte tu Planta
-        </h1>
-        <div className="flex w-12 items-center justify-end"></div>
-      </div>
-      
-      <div className="px-4 py-4">
-        {/* Botón para volver */}
-        <button onClick={() => setSelectedOption(null)} className="mb-4 flex items-center gap-2 text-plant-600 hover:text-plant-800 transition-colors">
-          ← Volver a opciones
-        </button>
-        
-        <form onSubmit={handleSubmit}>
-          <Card className="border-plant-200 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="bg-gradient-to-r from-plant-500 to-emerald-600 text-white rounded-t-lg">
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Sparkles className="h-6 w-6" />
-                Añade tu planta al jardín comunitario
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 p-6">
-              {/* Image Upload with Plant Theme */}
-              <div>
-                <Label htmlFor="images" className="text-plant-800 font-semibold text-lg flex items-center gap-2">
-                  📸 Fotos de tu planta (máximo 5) *
-                </Label>
-                <div className="mt-3">
-                  <input id="images" type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  <label htmlFor="images" className="flex flex-col items-center justify-center w-full h-40 border-2 border-plant-300 border-dashed rounded-2xl cursor-pointer bg-gradient-to-br from-plant-50 to-emerald-100 hover:from-plant-100 hover:to-emerald-200 transition-all duration-300 shadow-inner">
-                    <div className="text-center">
-                      <UploadIcon className="text-plant-600 mb-3 mx-auto" size={40} />
-                      <span className="text-plant-700 font-medium text-lg">
-                        🌿 Toca para subir fotos
-                      </span>
-                      <p className="text-plant-600 text-sm mt-1">
-                        Muestra la belleza de tu planta
-                      </p>
-                    </div>
-                  </label>
-                  
-                  {images.length > 0 && <div className="grid grid-cols-3 gap-3 mt-4">
-                      {images.map((img, index) => <div key={index} className="relative group">
-                          <img src={img} alt={`Uploaded ${index + 1}`} className="w-full h-24 object-cover rounded-xl shadow-md group-hover:shadow-lg transition-shadow" />
-                          <button type="button" onClick={() => removeImage(index)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                            <X size={14} />
-                          </button>
-                        </div>)}
-                    </div>}
-                  {errors.images && <p className="text-red-500 text-sm mt-2 flex items-center gap-1">⚠️ {errors.images}</p>}
-                </div>
-              </div>
-
-              {/* Title */}
-              <div>
-                <Label htmlFor="title" className="text-plant-800 font-semibold text-lg">
-                  🏷️ Nombre de tu planta *
-                </Label>
-                <Input id="title" value={formData.title} onChange={e => handleInputChange('title', e.target.value)} placeholder="Ej: Monstera Deliciosa majestuosa 🌿" className="mt-2 border-plant-300 focus:border-plant-500 rounded-xl text-lg p-4 bg-white/50" />
-                {errors.title && <p className="text-red-500 text-sm mt-1">⚠️ {errors.title}</p>}
-              </div>
-
-              {/* Description */}
-              <div>
-                <Label htmlFor="description" className="text-plant-800 font-semibold text-lg">
-                  📝 Cuenta la historia de tu planta *
-                </Label>
-                <Textarea id="description" value={formData.description} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe tu planta: edad, tamaño, cuidados especiales, por qué es especial para ti... 🌱" className="mt-2 border-plant-300 focus:border-plant-500 min-h-[120px] rounded-xl text-base p-4 bg-white/50" />
-                {errors.description && <p className="text-red-500 text-sm mt-1">⚠️ {errors.description}</p>}
-              </div>
-
-              {/* Category with Emojis */}
-              <div>
-                <Label className="text-plant-800 font-semibold text-lg">🌿 Tipo de planta *</Label>
-                <Select value={formData.category} onValueChange={value => handleInputChange('category', value)}>
-                  <SelectTrigger className="mt-2 border-plant-300 focus:border-plant-500 rounded-xl text-base p-4 bg-white/50">
-                    <SelectValue placeholder="Selecciona el tipo de planta" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-plant-200 rounded-xl">
-                    {plantCategories.map(category => <SelectItem key={category.value} value={category.value} className="hover:bg-plant-50 rounded-lg">
-                        {category.label}
-                      </SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">⚠️ {errors.category}</p>}
-              </div>
-
-              {/* Sale Type Selection - Enhanced Design */}
-              <div className="p-6 bg-gradient-to-r from-plant-50 to-emerald-50 rounded-2xl border border-plant-200">
-                <Label className="text-plant-800 font-semibold text-lg mb-4 block flex items-center gap-2">
-                  💚 ¿Cómo quieres compartir tu planta? *
-                </Label>
-                <RadioGroup value={saleType} onValueChange={(value: typeof saleType) => setSaleType(value)} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {saleOptions.map(option => {
-                  const Icon = option.icon;
-                  return <div key={option.value} className="flex items-center space-x-3">
-                        <RadioGroupItem value={option.value} id={option.value} className="text-plant-600" />
-                        <Label htmlFor={option.value} className={`flex-1 flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md ${option.color} ${saleType === option.value ? 'ring-2 ring-plant-400 shadow-md' : ''}`}>
-                          <Icon size={20} />
-                          <span className="font-medium">{option.label}</span>
-                        </Label>
-                      </div>;
-                })}
-                </RadioGroup>
-              </div>
-
-              {/* Gift Message */}
-              {showGiftMessage && <div className="p-4 bg-gradient-to-r from-rose-50 to-pink-100 rounded-xl border border-rose-200">
-                  <p className="text-rose-700 font-medium flex items-center gap-2">
-                    <Gift className="h-5 w-5" />
-                    ¡Qué generoso! Regalar plantas es una forma hermosa de compartir amor por la naturaleza 🌱💕
-                  </p>
-                </div>}
-
-              {/* Price Field */}
-              {showPriceField && <div>
-                  <Label htmlFor="price" className="text-plant-800 font-semibold text-lg flex items-center gap-2">
-                    💰 Precio de venta (€) *
-                  </Label>
-                  <Input id="price" type="number" value={formData.price} onChange={e => handleInputChange('price', e.target.value)} placeholder="Ej: 15" className="mt-2 border-plant-300 focus:border-plant-500 rounded-xl text-lg p-4 bg-white/50" />
-                  {errors.price && <p className="text-red-500 text-sm mt-1">⚠️ {errors.price}</p>}
-                </div>}
-
-              {/* Exchange Field */}
-              {showExchangeField && <div>
-                  <Label htmlFor="exchange" className="text-plant-800 font-semibold text-lg flex items-center gap-2">
-                    🔄 ¿Qué plantas te gustaría recibir? *
-                  </Label>
-                  <Textarea id="exchange" value={formData.exchangeFor} onChange={e => handleInputChange('exchangeFor', e.target.value)} placeholder="Ej: Me encantaría un pino pequeño, suculentas variadas, o plantas aromáticas... 🌿" className="mt-2 border-plant-300 focus:border-plant-500 rounded-xl text-base p-4 bg-white/50" />
-                  <div className="mt-3">
-                    <p className="text-sm text-plant-700 mb-3 font-medium">🌟 Sugerencias populares:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {exchangeSuggestions.map(suggestion => <button key={suggestion} type="button" onClick={() => {
-                    const current = formData.exchangeFor;
-                    const newValue = current ? `${current}, ${suggestion}` : suggestion;
-                    handleInputChange('exchangeFor', newValue);
-                  }} className="px-4 py-2 bg-plant-100 text-plant-800 rounded-full text-sm hover:bg-plant-200 transition-colors border border-plant-300 shadow-sm hover:shadow-md">
-                          + {suggestion}
-                        </button>)}
-                    </div>
-                  </div>
-                  {errors.exchangeFor && <p className="text-red-500 text-sm mt-1">⚠️ {errors.exchangeFor}</p>}
-                </div>}
-
-              {/* Location */}
-              <div>
-                <Label htmlFor="location" className="text-plant-800 font-semibold text-lg flex items-center gap-2">
-                  📍 ¿Dónde te encuentras? *
-                </Label>
-                <Input id="location" value={formData.location} onChange={e => handleInputChange('location', e.target.value)} placeholder="Ciudad o zona" className="mt-2 border-plant-300 focus:border-plant-500 rounded-xl text-lg p-4 bg-white/50" />
-                {errors.location && <p className="text-red-500 text-sm mt-1">⚠️ {errors.location}</p>}
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full bg-gradient-to-r from-plant-500 to-emerald-600 hover:from-plant-600 hover:to-emerald-700 text-white font-semibold py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" size="lg">
-                <Sparkles className="mr-2 h-5 w-5" />
-                🌱 Publicar mi Planta
-              </Button>
-            </CardContent>
-          </Card>
-        </form>
-      </div>
-    </div>;
+      </footer>
+    </div>
+  );
 };
+
 export default Upload;
