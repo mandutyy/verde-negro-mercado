@@ -69,6 +69,16 @@ const Favorites = () => {
     }
   };
 
+  const handlePlantClick = (plantId: string) => {
+    navigate(`/purchase/${plantId}`);
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent, plantId: string) => {
+    e.stopPropagation();
+    console.log('Toggling favorite for plant:', plantId);
+    // TODO: Implement favorite toggle logic
+  };
+
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#122118] text-white">
       <div className="flex-grow">
@@ -91,13 +101,20 @@ const Favorites = () => {
             const transactionInfo = getTransactionTypeDisplay(plant.transactionType, plant.price);
             
             return (
-              <div key={plant.id} className="relative group">
+              <div 
+                key={plant.id} 
+                className="relative group cursor-pointer"
+                onClick={() => handlePlantClick(plant.id)}
+              >
                 <div 
                   className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-2xl"
                   style={{ backgroundImage: `url("${plant.image}")` }}
                 />
                 <div className="absolute top-2 right-2">
-                  <button className="bg-black/50 backdrop-blur-sm p-2 rounded-full text-white hover:text-[var(--primary-color)] transition-colors">
+                  <button 
+                    className="bg-black/50 backdrop-blur-sm p-2 rounded-full text-white hover:text-[var(--primary-color)] transition-colors"
+                    onClick={(e) => handleFavoriteClick(e, plant.id)}
+                  >
                     <Heart size={24} fill="currentColor" />
                   </button>
                 </div>
