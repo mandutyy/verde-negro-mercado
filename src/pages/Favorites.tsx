@@ -1,58 +1,42 @@
 
 import { ArrowLeft, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { mockPlants } from '@/data/mockPlants';
 
 const Favorites = () => {
   const navigate = useNavigate();
   
+  // Usar plantas de mockPlants para mantener consistencia
   const favoritePlants = [
     {
-      id: '1',
-      title: 'Monstera Deliciosa',
+      ...mockPlants[0], // Monstera Deliciosa
       category: 'Planta de interior',
-      price: 25,
-      transactionType: 'sale',
-      image: 'https://images.unsplash.com/photo-1545239705-1564e58b4ed4?w=400&h=400&fit=crop'
+      transactionType: 'sale'
     },
     {
-      id: '2',
-      title: 'Ficus Lyrata',
+      ...mockPlants[1], // Colección de suculentas
+      category: 'Planta suculenta', 
+      transactionType: 'exchange'
+    },
+    {
+      ...mockPlants[2], // Ficus Lyrata
       category: 'Planta de interior',
-      price: 0,
-      transactionType: 'exchange',
-      image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop'
+      transactionType: 'sale'
     },
     {
-      id: '3',
-      title: 'Sansevieria Trifasciata',
-      category: 'Planta suculenta',
-      price: 18,
-      transactionType: 'sale',
-      image: 'https://images.unsplash.com/photo-1493292596946-ec20ae47c4d6?w=400&h=400&fit=crop'
-    },
-    {
-      id: '4',
-      title: 'Calathea Ornata',
-      category: 'Planta tropical',
-      price: 0,
-      transactionType: 'gift',
-      image: 'https://images.unsplash.com/photo-1590320025107-a2b0f9c5d8bc?w=400&h=400&fit=crop'
-    },
-    {
-      id: '5',
-      title: 'Pothos',
+      ...mockPlants[3], // Pothos dorado
       category: 'Planta trepadora',
-      price: 12,
-      transactionType: 'sale',
-      image: 'https://images.unsplash.com/photo-1436018640332-42ec8b2d2e81?w=400&h=400&fit=crop'
+      transactionType: 'sale'
     },
     {
-      id: '6',
-      title: 'ZZ Plant',
+      ...mockPlants[4], // Palmera Areca
       category: 'Planta de interior',
-      price: 0,
-      transactionType: 'exchange',
-      image: 'https://images.unsplash.com/photo-1544076804-0a1b9030b1bf?w=400&h=400&fit=crop'
+      transactionType: 'sale'
+    },
+    {
+      ...mockPlants[5], // Sansevieria
+      category: 'Planta de interior',
+      transactionType: 'exchange'
     }
   ];
 
@@ -98,7 +82,7 @@ const Favorites = () => {
         {/* Plants Grid */}
         <div className="grid grid-cols-2 gap-4 p-4">
           {favoritePlants.map((plant) => {
-            const transactionInfo = getTransactionTypeDisplay(plant.transactionType, plant.price);
+            const transactionInfo = getTransactionTypeDisplay(plant.type, plant.price);
             
             return (
               <div 
@@ -127,7 +111,7 @@ const Favorites = () => {
                     </p>
                     {transactionInfo.showPrice && (
                       <p className="text-base font-bold text-white">
-                        ${plant.price.toFixed(2)}
+                        {plant.priceDisplay}
                       </p>
                     )}
                   </div>
