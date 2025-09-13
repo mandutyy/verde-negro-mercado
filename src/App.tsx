@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import Navigation from "@/components/Navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
@@ -28,7 +27,7 @@ const AppContent = () => {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-gradient-plant-subtle w-full">
+    <div className="min-h-screen bg-background w-full">
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/" element={
@@ -93,7 +92,6 @@ const AppContent = () => {
         } />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {user && <Navigation />}
     </div>
   );
 };
