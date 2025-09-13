@@ -94,8 +94,8 @@ const AppContent = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Show bottom navigation only for authenticated users and not on auth page */}
-      {user && window.location.pathname !== '/auth' && <BottomNavigation />}
+      {/* Show bottom navigation only for authenticated users and not on auth page or purchase page */}
+      {user && window.location.pathname !== '/auth' && !window.location.pathname.startsWith('/purchase') && <BottomNavigation />}
     </div>
   );
 };
