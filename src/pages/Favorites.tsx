@@ -86,7 +86,7 @@ const Favorites = () => {
         </div>
 
         {/* Plants Grid */}
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+        <div className="grid grid-cols-2 gap-4 p-4">
           {favoritePlants.map((plant) => {
             const transactionInfo = getTransactionTypeDisplay(plant.transactionType, plant.price);
             
