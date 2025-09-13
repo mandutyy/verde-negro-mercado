@@ -19,18 +19,27 @@ const Profile = () => {
     };
 
     try {
-      if (navigator.share) {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-      } else {
-        // Fallback: copiar al portapapeles
-        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-        toast({
-          title: "¡Enlace copiado!",
-          description: "El enlace de la app se ha copiado al portapapeles.",
-        });
+        return;
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.log('Web Share API failed, using fallback');
+    }
+
+    // Fallback: copiar al portapapeles
+    try {
+      await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+      toast({
+        title: "¡Enlace copiado!",
+        description: "El enlace de la app se ha copiado al portapapeles. Compártelo con tus amigos.",
+      });
+    } catch (clipboardError) {
+      // Si también falla el portapapeles, mostrar el enlace en un toast
+      toast({
+        title: "Comparte Plantify",
+        description: `Copia este enlace: ${window.location.origin}`,
+      });
     }
   };
   
