@@ -1,14 +1,38 @@
-import { Settings, Star, LogIn } from 'lucide-react';
+import { Settings, Star, LogIn, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('publicaciones');
+  
+  const handleShareApp = async () => {
+    const shareData = {
+      title: 'Plantify - Compra y vende plantas',
+      text: '¡Descubre Plantify! La mejor app para comprar, vender e intercambiar plantas. ¡Únete a nuestra comunidad verde!',
+      url: window.location.origin
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copiar al portapapeles
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        toast({
+          title: "¡Enlace copiado!",
+          description: "El enlace de la app se ha copiado al portapapeles.",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
   
   if (!user) {
     return (
@@ -99,6 +123,17 @@ const Profile = () => {
         <p className="text-[#96c5a9] text-sm font-normal leading-normal text-center mt-2">
           120 seguidores · 100 seguidos
         </p>
+        
+        {/* Share App Button */}
+        <div className="mt-4 w-full max-w-xs">
+          <Button
+            onClick={handleShareApp}
+            className="w-full bg-[#264532] hover:bg-[#366348] text-white border border-[#38e07b] font-medium"
+          >
+            <Share size={16} className="mr-2" />
+            Compartir app con un amigo
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
