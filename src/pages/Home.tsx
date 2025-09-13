@@ -131,31 +131,31 @@ const Home = () => {
         </div>
 
         {/* Plants Grid */}
-        <div className="p-4 grid gap-6">
+        <div className="p-4 space-y-6 pb-24">
           {loading ? (
             // Loading skeleton
             Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="flex flex-col items-stretch justify-start rounded-2xl overflow-hidden bg-card shadow-lg animate-pulse">
-                <div className="w-full aspect-square bg-muted"></div>
+              <div key={index} className="flex flex-col items-stretch justify-start rounded-2xl overflow-hidden bg-[#1b3124] shadow-lg animate-pulse">
+                <div className="w-full aspect-square bg-[#264532]"></div>
                 <div className="flex w-full grow flex-col items-stretch justify-center gap-1 p-4">
-                  <div className="h-6 bg-muted rounded mb-2"></div>
+                  <div className="h-6 bg-[#264532] rounded mb-2"></div>
                   <div className="flex items-center justify-between">
-                    <div className="h-4 bg-muted rounded w-20"></div>
-                    <div className="h-4 bg-muted rounded w-24"></div>
+                    <div className="h-4 bg-[#264532] rounded w-20"></div>
+                    <div className="h-4 bg-[#264532] rounded w-24"></div>
                   </div>
                 </div>
               </div>
             ))
           ) : plants.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-secondary mb-4">
+              <div className="text-[#96c5a9] mb-4">
                 <span className="material-symbols-outlined text-6xl mb-3 opacity-50 block">local_florist</span>
                 <h3 className="text-lg font-semibold mb-2 text-white">No hay plantas disponibles</h3>
-                <p className="text-secondary">Sé el primero en publicar una planta</p>
+                <p className="text-[#96c5a9]">Sé el primero en publicar una planta</p>
               </div>
               <button 
                 onClick={goToUpload}
-                className="bg-primary text-primary-foreground px-6 py-2 rounded-full font-semibold hover:bg-primary/90"
+                className="bg-[#38e07b] text-[#122118] px-6 py-2 rounded-full font-semibold hover:bg-[#38e07b]/90"
               >
                 Publicar mi primera planta
               </button>
@@ -174,7 +174,7 @@ const Home = () => {
                 <div 
                   key={plant.id}
                   onClick={() => handlePlantClick(plant.id)}
-                  className="flex flex-col items-stretch justify-start rounded-2xl overflow-hidden bg-card shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                  className="flex flex-col items-stretch justify-start rounded-2xl overflow-hidden bg-[#1b3124] shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
                 >
                   <div 
                     className="w-full bg-center bg-no-repeat aspect-square bg-cover" 
@@ -185,10 +185,10 @@ const Home = () => {
                   <div className="flex w-full grow flex-col items-stretch justify-center gap-1 p-4">
                     <p className="text-white text-xl font-bold leading-tight">{plant.title}</p>
                     <div className="flex items-center justify-between">
-                      <p className="text-secondary text-base font-normal">
+                      <p className="text-[#96c5a9] text-base font-normal">
                         {getPlantTypeLabel(plant.sale_type || 'sell', plant.price)}
                       </p>
-                      <p className="text-secondary text-sm font-light">
+                      <p className="text-[#96c5a9] text-sm font-light">
                         {formatTimeAgo(plant.created_at)}
                       </p>
                     </div>
