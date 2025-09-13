@@ -230,7 +230,7 @@ const Upload = () => {
 
   // Si no se ha seleccionado una opción, mostrar las 3 opciones principales
   if (!selectedOption) {
-    return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
+    return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-32">
         <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
           <div className="flex w-12 items-center justify-start">
             <button
@@ -307,7 +307,7 @@ const Upload = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-20">
+  return <div className="min-h-screen bg-gradient-to-br from-plant-50 via-emerald-50 to-teal-50 pb-32">
       <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
         <div className="flex w-12 items-center justify-start">
           <button

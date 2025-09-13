@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import BottomNavigation from "@/components/BottomNavigation";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Purchase from "./pages/Purchase";
@@ -27,7 +28,7 @@ const AppContent = () => {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-background w-full relative">
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/" element={
@@ -92,6 +93,9 @@ const AppContent = () => {
         } />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      
+      {/* Show bottom navigation only for authenticated users and not on auth page */}
+      {user && window.location.pathname !== '/auth' && <BottomNavigation />}
     </div>
   );
 };

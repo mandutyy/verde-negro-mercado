@@ -207,7 +207,7 @@ const EditProfile = () => {
       }
     };
   }, [stream]);
-  return <div className="min-h-screen bg-gradient-plant-subtle pb-20">
+  return <div className="min-h-screen bg-gradient-plant-subtle pb-32">
       <div className="flex items-center justify-between p-4 bg-white border-b border-plant-200">
         <Button variant="ghost" size="sm" onClick={() => navigate('/profile')} className="text-plant-700">
           <ArrowLeft size={20} />

@@ -151,7 +151,7 @@ const MyReviews = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-plant-subtle pb-20">
+    <div className="min-h-screen bg-gradient-plant-subtle pb-32">
       <Header title="Mis Valoraciones" showBackButton />
       
       <div className="px-4 py-4">

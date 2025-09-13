@@ -172,7 +172,7 @@ const Profile = () => {
       </div>
 
       {/* Content Grid */}
-      <div className="grid grid-cols-3 gap-1 p-1 pb-24">
+      <div className="grid grid-cols-3 gap-1 p-1 pb-32">
         {plantImages.map((image, index) => (
           <div
             key={index}

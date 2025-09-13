@@ -117,7 +117,7 @@ const PlantDetail = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="max-w-4xl mx-auto pb-32">
         {/* Image Gallery */}
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">

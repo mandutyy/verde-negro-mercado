@@ -74,7 +74,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-plant-subtle pb-20">
+    <div className="min-h-screen bg-gradient-plant-subtle pb-32">
       <Header title={`Perfil de ${seller.name}`} showBackButton />
       
       <div className="px-4 py-4">

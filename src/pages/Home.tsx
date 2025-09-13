@@ -198,40 +198,6 @@ const Home = () => {
           )}
         </div>
       </div>
-
-      {/* Bottom Navigation */}
-      <div className="sticky bottom-0 bg-card w-full">
-        <div className="flex justify-around border-t border-border pt-2 pb-5">
-          <a 
-            onClick={goToHome}
-            className="flex flex-col items-center justify-end gap-1 text-primary cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-3xl">home</span>
-            <p className="text-xs font-bold leading-normal">Inicio</p>
-          </a>
-          <a 
-            onClick={goToUpload}
-            className="flex flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-3xl">add_circle</span>
-            <p className="text-xs font-medium leading-normal">Publicar</p>
-          </a>
-          <a 
-            onClick={goToMessages}
-            className="flex flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-3xl">chat_bubble</span>
-            <p className="text-xs font-medium leading-normal">Mensajes</p>
-          </a>
-          <a 
-            onClick={goToProfile}
-            className="flex flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-3xl">person</span>
-            <p className="text-xs font-medium leading-normal">Perfil</p>
-          </a>
-        </div>
-      </div>
     </div>
   );
 };

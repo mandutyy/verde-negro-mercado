@@ -23,7 +23,7 @@ const Messages = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-32">
         <Header title="Mensajes" />
         <div className="flex items-center justify-center py-16">
           <div className="text-muted-foreground">Cargando...</div>
@@ -37,7 +37,7 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <div className="flex items-center bg-background p-4 pb-2 justify-between border-b">
         <div className="flex w-12 items-center justify-start">
