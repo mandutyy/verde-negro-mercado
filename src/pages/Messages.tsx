@@ -85,16 +85,18 @@ const Messages = () => {
           <div>
             {conversations
               .filter((conversation) => {
-                const otherUserId = conversation.participant_1 === user.id 
-                  ? conversation.participant_2 
-                  : conversation.participant_1;
-                const userName = `Usuario ${otherUserId.slice(-4)}`;
+                const isUser1 = conversation.participant_1 === user.id;
+                const otherProfile = isUser1 ? conversation.participant_2_profile : conversation.participant_1_profile;
+                const otherUserId = isUser1 ? conversation.participant_2 : conversation.participant_1;
+                const userName = otherProfile?.name || `Usuario ${otherUserId.slice(-4)}`;
                 return userName.toLowerCase().includes(searchQuery.toLowerCase());
               })
               .map((conversation) => {
-                const otherUserId = conversation.participant_1 === user.id 
-                  ? conversation.participant_2 
-                  : conversation.participant_1;
+                const isUser1 = conversation.participant_1 === user.id;
+                const otherProfile = isUser1 ? conversation.participant_2_profile : conversation.participant_1_profile;
+                const otherUserId = isUser1 ? conversation.participant_2 : conversation.participant_1;
+                const userName = otherProfile?.name || `Usuario ${otherUserId.slice(-4)}`;
+                const avatarUrl = otherProfile?.avatar_url;
                 
                 return (
                   <div
@@ -103,15 +105,15 @@ const Messages = () => {
                     onClick={() => navigate(`/chat/${conversation.id}`)}
                   >
                     <Avatar className="h-14 w-14">
-                      <AvatarImage src="" />
+                      <AvatarImage src={avatarUrl || ""} />
                       <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {otherUserId.slice(0, 2).toUpperCase()}
+                        {userName.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="flex flex-col justify-center flex-1 min-w-0">
                       <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                        Usuario {otherUserId.slice(-4)}
+                        {userName}
                       </p>
                       <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
                         Conversación iniciada

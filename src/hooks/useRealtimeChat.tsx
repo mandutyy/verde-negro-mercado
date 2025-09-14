@@ -17,6 +17,14 @@ interface Conversation {
   participant_2: string;
   created_at: string;
   updated_at: string;
+  participant_1_profile?: {
+    name?: string;
+    avatar_url?: string;
+  };
+  participant_2_profile?: {
+    name?: string;
+    avatar_url?: string;
+  };
 }
 
 export const useRealtimeChat = (conversationId?: string) => {
@@ -32,7 +40,11 @@ export const useRealtimeChat = (conversationId?: string) => {
     const loadConversations = async () => {
       const { data, error } = await (supabase as any)
         .from('conversations')
-        .select('*')
+        .select(`
+          *,
+          participant_1_profile:profiles!participant_1(name, avatar_url),
+          participant_2_profile:profiles!participant_2(name, avatar_url)
+        `)
         .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
         .order('updated_at', { ascending: false });
 
