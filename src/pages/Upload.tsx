@@ -105,8 +105,8 @@ const Upload = () => {
     if (images.length === 0) newErrors.images = 'Sube al menos una foto';
 
     // Validation for price field
-    if (['sell', 'sell-exchange', 'sell-gift', 'all'].includes(saleType) && !formData.price.trim()) {
-      newErrors.price = 'El precio es obligatorio para venta';
+    if (!formData.price.trim()) {
+      newErrors.price = 'El precio es obligatorio';
     }
 
     // Validation for exchange field
@@ -349,26 +349,24 @@ const Upload = () => {
               {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
             </div>
 
-            {/* Price - Only for sell and all */}
-            {showPriceField && (
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
-                  Precio (opcional)
-                </label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">€</span>
-                  <input 
-                    className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 pl-8 pr-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
-                    id="price" 
-                    placeholder="0.00" 
-                    type="text"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                  />
-                </div>
-                {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
+            {/* Price - Always required */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
+                Precio
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">€</span>
+                <input 
+                  className="form-input w-full rounded-xl border-0 bg-[#264532] py-3 pl-8 pr-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                  id="price" 
+                  placeholder="0.00" 
+                  type="text"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                />
               </div>
-            )}
+              {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
+            </div>
 
             {/* Exchange For - Only for exchange and all */}
             {showExchangeField && (
