@@ -194,8 +194,8 @@ const Purchase = () => {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-white text-3xl font-bold leading-tight tracking-tight">{plant.title}</h1>
-              <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full mt-2 inline-block">
-                {canPurchase ? `Sale: $${plant.price}.00` : canExchange ? 'Intercambio' : 'Disponible'}
+              <span className="text-lg font-medium text-primary bg-primary/10 px-2 py-1 rounded-full mt-2 inline-block">
+                {canPurchase ? `$${plant.price}.00` : canExchange ? 'Intercambio' : 'Disponible'}
               </span>
             </div>
           </div>
