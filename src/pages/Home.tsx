@@ -200,9 +200,9 @@ const Home = () => {
       {/* Floating Action Button */}
       <button 
         onClick={goToUpload}
-        className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-20 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
+        className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20 w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
       >
-        <span className="material-symbols-outlined text-black text-2xl">add</span>
+        <span className="material-symbols-outlined text-black text-3xl">edit</span>
       </button>
     </div>
   );
