@@ -88,14 +88,6 @@ const Profile = () => {
     );
   }
 
-  const plantImages = [
-    'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1592150621744-aca64f48394a?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1493120952221-2a1b63c9c4e5?w=400&h=300&fit=crop',
-  ];
 
   const tabs = [
     { id: 'publicaciones', label: 'Publicaciones' },
@@ -180,16 +172,25 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-3 gap-1 p-1 pb-32">
-        {plantImages.map((image, index) => (
-          <div
-            key={index}
-            className="w-full bg-center bg-no-repeat aspect-square bg-cover cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ backgroundImage: `url("${image}")` }}
-            onClick={() => navigate(`/plant/${index + 1}`)}
-          />
-        ))}
+      {/* Content */}
+      <div className="flex flex-col items-center justify-center p-8 pb-32">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+            <div className="text-[#38e07b] text-2xl">🌱</div>
+          </div>
+          <h3 className="text-white text-lg font-bold mb-2">
+            No hay publicaciones aún
+          </h3>
+          <p className="text-[#96c5a9] text-sm mb-6">
+            Cuando publiques plantas, aparecerán aquí
+          </p>
+          <Button
+            onClick={() => navigate('/upload')}
+            className="bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
+          >
+            Publicar tu primera planta
+          </Button>
+        </div>
       </div>
     </div>
   );
