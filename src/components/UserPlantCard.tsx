@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Plant } from '@/hooks/useUserPlants';
 
 interface UserPlantCardProps {
@@ -11,6 +12,16 @@ interface UserPlantCardProps {
 }
 
 const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/plant/${plant.id}`);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking edit button
+    onEdit(plant);
+  };
   const getPlantTypeLabel = (saleType: string, price: number | null) => {
     switch (saleType) {
       case 'sell':
@@ -42,7 +53,10 @@ const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
   const mainImage = plant.images && plant.images.length > 0 ? plant.images[0] : '/placeholder.svg';
 
   return (
-    <Card className="bg-[#1b3124] border-[#366348] overflow-hidden">
+    <Card 
+      className="bg-[#1b3124] border-[#366348] overflow-hidden cursor-pointer hover:bg-[#264532] transition-colors"
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <div 
           className="w-full h-48 bg-cover bg-center bg-no-repeat"
@@ -73,7 +87,7 @@ const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
             <p className="text-gray-400 text-xs mt-1 truncate">{plant.location}</p>
           </div>
           <Button
-            onClick={() => onEdit(plant)}
+            onClick={handleEditClick}
             size="sm"
             className="ml-2 bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] flex-shrink-0"
           >
