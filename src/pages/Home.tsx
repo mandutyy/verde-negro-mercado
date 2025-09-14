@@ -87,13 +87,13 @@ const Home = () => {
       <div className="flex-grow">
         {/* Header */}
         <div className="flex items-center bg-background p-4 pb-2 justify-between sticky top-0 z-10">
-          <h1 className="text-white text-xl font-bold tracking-tight flex-1 text-center pl-12">Plantify</h1>
+          <h1 className="text-white text-lg md:text-xl font-bold tracking-tight flex-1 text-center pl-12">Plantificar</h1>
           <div className="flex w-12 items-center justify-end">
             <button 
               onClick={() => navigate('/profile')}
               className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0"
             >
-              <span className="material-symbols-outlined text-white text-3xl">tune</span>
+              <span className="material-symbols-outlined text-white text-2xl md:text-3xl">tune</span>
             </button>
           </div>
         </div>
@@ -127,7 +127,7 @@ const Home = () => {
                   : 'bg-muted'
               }`}
             >
-              <p className={`text-sm font-${activeCategory === category.value ? 'bold' : 'medium'} ${
+              <p className={`text-xs md:text-sm font-${activeCategory === category.value ? 'bold' : 'medium'} ${
                 activeCategory === category.value ? 'text-black' : 'text-white'
               }`}>
                 {category.label}
@@ -189,7 +189,7 @@ const Home = () => {
                     }}
                   ></div>
                   <div className="flex w-full grow flex-col items-stretch justify-center gap-1 p-4">
-                    <p className="text-white text-xl font-bold leading-tight">{plant.title}</p>
+                    <p className="text-white text-base md:text-lg font-bold leading-tight">{plant.title}</p>
                     <div className="flex items-center justify-between">
                       <p className="text-[#96c5a9] text-base font-normal">
                         {getPlantTypeLabel(plant.sale_type || 'sell', plant.price)}

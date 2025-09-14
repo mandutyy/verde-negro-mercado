@@ -107,6 +107,22 @@
     -webkit-text-size-adjust: 100%;
     /* Improve scrolling performance */
     -webkit-overflow-scrolling: touch;
+    /* Base font size for mobile - smaller than default */
+    font-size: 14px;
+    /* Additional mobile optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+    -webkit-touch-callout: none;
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+  }
+
+  /* Responsive font size for larger screens */
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px;
+    }
   }
 
   /* Safe area handling for mobile devices */

@@ -37,7 +37,7 @@ const Header = ({ title, showSearch = false, showBackButton = false, onBack }: H
                 <ArrowLeft size={20} />
               </Button>
             )}
-            <h1 className="text-2xl font-bold bg-gradient-plant bg-clip-text text-transparent">
+            <h1 className="text-lg md:text-2xl font-bold bg-gradient-plant bg-clip-text text-transparent">
               {title}
             </h1>
           </div>
