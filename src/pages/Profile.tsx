@@ -113,7 +113,7 @@ const Profile = () => {
         <div className="flex w-12 items-center justify-end">
           <button 
             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors"
-            onClick={() => navigate('/edit-profile')}
+            onClick={() => navigate('/settings')}
           >
             <Settings size={24} />
           </button>
