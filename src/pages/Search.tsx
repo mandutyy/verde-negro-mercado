@@ -25,7 +25,7 @@ const Search = () => {
         {/* Header */}
         <header className="flex items-center bg-background p-4 pb-2 justify-between sticky top-0 z-10">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="text-foreground flex size-10 items-center justify-center hover:bg-white/10 rounded-full transition-colors"
           >
             <ArrowLeft size={20} />
