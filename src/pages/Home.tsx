@@ -100,19 +100,19 @@ const Home = () => {
 
         {/* Search Bar */}
         <div className="px-4 py-3 sticky top-[76px] z-10 bg-background">
-          <label className="flex flex-col min-w-40 h-12 w-full">
+          <button 
+            onClick={() => navigate('/search')}
+            className="flex flex-col min-w-40 h-12 w-full"
+          >
             <div className="flex w-full flex-1 items-stretch rounded-full h-full">
               <div className="text-secondary flex border-none bg-muted items-center justify-center pl-4 rounded-l-full border-r-0">
                 <span className="material-symbols-outlined">search</span>
               </div>
-              <input 
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-full text-white focus:outline-0 focus:ring-0 border-none bg-muted h-full placeholder:text-secondary px-4 text-base font-normal leading-normal" 
-                placeholder="Buscar plantas" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <div className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-full text-white focus:outline-0 focus:ring-0 border-none bg-muted h-full placeholder:text-secondary px-4 text-base font-normal leading-normal items-center">
+                <span className="text-secondary">Buscar plantas</span>
+              </div>
             </div>
-          </label>
+          </button>
         </div>
 
         {/* Category Filters */}

@@ -16,6 +16,7 @@ import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Settings from "./pages/Settings";
+import Search from "./pages/Search";
 import MyPlants from "./pages/MyPlants";
 import MyReviews from "./pages/MyReviews";
 import PlantDetail from "./pages/PlantDetail";
@@ -36,7 +37,8 @@ const AppContent = () => {
                                !location.pathname.startsWith('/chat') && 
                                !location.pathname.startsWith('/plant/') &&
                                location.pathname !== '/settings' &&
-                               location.pathname !== '/edit-profile';
+                               location.pathname !== '/edit-profile' &&
+                               location.pathname !== '/search';
   
   return (
     <div className="min-h-screen bg-background w-full relative">
@@ -90,6 +92,11 @@ const AppContent = () => {
         <Route path="/settings" element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/search" element={
+          <ProtectedRoute>
+            <Search />
           </ProtectedRoute>
         } />
         <Route path="/my-plants" element={
