@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { spanishCities, searchSpanishCities } from '@/data/spanishCities';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+
 const EditProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -207,215 +208,206 @@ const EditProfile = () => {
       }
     };
   }, [stream]);
-  return <div className="min-h-screen bg-gradient-plant-subtle pb-32">
-      <div className="flex items-center justify-between p-4 bg-white border-b border-plant-200">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/profile')} className="text-plant-700">
-          <ArrowLeft size={20} />
-        </Button>
-        <h1 className="text-lg font-semibold text-plant-800">Editar Perfil</h1>
-        <div className="w-10" />
-      </div>
-      
-      <div className="px-4 py-6 space-y-6">
-        {/* Profile Photo Section */}
-        <Card className="border-plant-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-plant-800">
-              <Camera size={20} />
-              Foto de perfil
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={formData.avatar} />
-                <AvatarFallback className="bg-plant-100 text-plant-700 text-2xl font-semibold">
-                  {formData.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
+  return (
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#122118] justify-between" style={{ fontFamily: '"Spline Sans", "Noto Sans", sans-serif' }}>
+      <div className="flex-grow">
+        {/* Header */}
+        <header className="flex items-center bg-[#122118] p-4 pb-2 justify-between sticky top-0 z-10">
+          <Button 
+            onClick={() => navigate('/profile')} 
+            className="text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/10 transition-colors bg-transparent border-none p-0"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">
+            Editar perfil
+          </h2>
+        </header>
+
+        {/* Main Content */}
+        <main className="p-4 flex flex-col gap-6">
+          {/* Profile Photo Section */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative group">
+              <div 
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-32 w-32"
+                style={{
+                  backgroundImage: formData.avatar 
+                    ? `url("${formData.avatar}")` 
+                    : `url("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")`
+                }}
+              />
               <Sheet open={showPhotoOptions} onOpenChange={setShowPhotoOptions}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="border-plant-300 text-plant-600" disabled={uploading}>
-                    <Camera size={16} className="mr-2" />
-                    {uploading ? 'Subiendo...' : 'Cambiar foto'}
-                  </Button>
+                  <button className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <Camera className="text-white text-3xl" size={32} />
+                  </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-auto">
+                <SheetContent side="bottom" className="h-auto bg-[#1b3124] border-[#264532]">
                   <SheetHeader>
-                    <SheetTitle>Cambiar foto de perfil</SheetTitle>
-                    <SheetDescription>
+                    <SheetTitle className="text-white">Cambiar foto de perfil</SheetTitle>
+                    <SheetDescription className="text-[#96c5a9]">
                       Elige cómo quieres actualizar tu foto
                     </SheetDescription>
                   </SheetHeader>
                   <div className="flex flex-col gap-4 mt-6 pb-6">
                     <Button 
                       onClick={() => fileInputRef.current?.click()} 
-                      className="h-16 text-left justify-start"
+                      className="h-16 text-left justify-start bg-[#264532] hover:bg-[#2a4d36] text-white border-[#264532]"
                       variant="outline"
                     >
                       <Upload size={24} className="mr-4" />
                       <div>
                         <div className="font-medium">Seleccionar de galería</div>
-                        <div className="text-sm text-muted-foreground">Elige una foto existente</div>
+                        <div className="text-sm text-[#96c5a9]">Elige una foto existente</div>
                       </div>
                     </Button>
                     <Button 
                       onClick={startCamera} 
-                      className="h-16 text-left justify-start"
+                      className="h-16 text-left justify-start bg-[#264532] hover:bg-[#2a4d36] text-white border-[#264532]"
                       variant="outline"
                     >
                       <Video size={24} className="mr-4" />
                       <div>
                         <div className="font-medium">Tomar foto</div>
-                        <div className="text-sm text-muted-foreground">Usa la cámara para tomar una nueva foto</div>
+                        <div className="text-sm text-[#96c5a9]">Usa la cámara para tomar una nueva foto</div>
                       </div>
                     </Button>
                   </div>
                 </SheetContent>
               </Sheet>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
             </div>
-          </CardContent>
-        </Card>
+            <Button 
+              onClick={() => setShowPhotoOptions(true)}
+              className="text-[#38e07b] bg-transparent hover:text-[#52f091] transition-colors border-none text-base font-bold leading-normal tracking-[0.015em]"
+              disabled={uploading}
+            >
+              {uploading ? 'Subiendo...' : 'Cambiar foto de perfil'}
+            </Button>
 
-        {/* Personal Information */}
-        <Card className="border-plant-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-plant-800">
-              <User size={20} />
-              Información personal
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-plant-700 font-medium">
-                Nombre completo
-              </Label>
-              <Input id="name" value={formData.name} onChange={e => handleInputChange('name', e.target.value)} className="border-plant-200 focus:border-plant-400" placeholder="Tu nombre completo" />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-plant-700 font-medium flex items-center gap-2">
-                <MapPin size={16} />
-                Ubicación
-              </Label>
-              
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
+
+          {/* Form Fields */}
+          <div className="flex flex-col gap-4">
+            {/* Name Field */}
+            <label className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Nombre</p>
+              <Input 
+                value={formData.name} 
+                onChange={e => handleInputChange('name', e.target.value)}
+                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-[#38e07b] border-none bg-[#264532] h-14 placeholder:text-[#96c5a9] px-4 text-base font-normal leading-normal"
+              />
+            </label>
+
+            {/* Username Field */}
+            <label className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Nombre de usuario</p>
+              <Input 
+                value={`@${formData.name.toLowerCase().replace(' ', '')}`}
+                disabled
+                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-[#38e07b] border-none bg-[#264532] h-14 placeholder:text-[#96c5a9] px-4 text-base font-normal leading-normal opacity-60"
+              />
+            </label>
+
+            {/* Bio Field */}
+            <label className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Bio</p>
+              <Textarea 
+                value={formData.bio}
+                onChange={e => handleInputChange('bio', e.target.value)}
+                placeholder="Cuéntanos un poco sobre ti y tu amor por las plantas..."
+                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-[#38e07b] border-none bg-[#264532] min-h-36 placeholder:text-[#96c5a9] p-4 text-base font-normal leading-normal"
+              />
+            </label>
+
+            {/* Location Field */}
+            <label className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Ubicación</p>
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input 
-                  id="location" 
-                  placeholder="Buscar ciudad..." 
-                  value={locationSearch} 
-                  onChange={e => handleLocationSearch(e.target.value)} 
-                  className="pl-10 border-plant-200 focus:border-plant-400" 
+                  placeholder="Ej. Madrid, España"
+                  value={locationSearch || formData.location}
+                  onChange={e => handleLocationSearch(e.target.value)}
+                  className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-[#38e07b] border-none bg-[#264532] h-14 placeholder:text-[#96c5a9] px-4 text-base font-normal leading-normal"
                 />
                 
-                {/* Mostrar ubicación actual si no se está buscando */}
-                {!locationSearch && formData.location && (
-                  <div className="mt-2 p-3 bg-plant-50 rounded-lg border border-plant-200">
-                    <div className="flex items-center gap-2 text-plant-700">
-                      <MapPin size={16} />
-                      <span className="font-medium">Ubicación actual:</span>
-                      <span>{formData.location}</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Sugerencias de búsqueda */}
+                {/* Search Results */}
                 {searchResults.length > 0 && locationSearch && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-plant-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute z-50 w-full mt-1 bg-[#264532] border border-[#38e07b]/30 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                     {searchResults.map((city, index) => (
                       <button 
                         key={index} 
                         onClick={() => selectCityFromSearch(city)} 
-                        className="w-full text-left px-4 py-2 hover:bg-plant-50 transition-colors border-b border-plant-100 last:border-b-0 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 hover:bg-[#38e07b]/10 transition-colors border-b border-[#38e07b]/20 last:border-b-0 flex items-center gap-2 text-white"
                       >
-                        <MapPin size={14} className="text-gray-400" />
+                        <MapPin size={14} className="text-[#96c5a9]" />
                         <div>
-                          <div className="font-medium text-plant-800">{city.name}</div>
-                          <div className="text-sm text-gray-600">{city.region}</div>
+                          <div className="font-medium">{city.name}</div>
+                          <div className="text-sm text-[#96c5a9]">{city.region}</div>
                         </div>
                       </button>
                     ))}
                   </div>
                 )}
               </div>
-              
-              {/* Botón para mostrar/ocultar mapa */}
-              
-              
-              {/* Mapa */}
-              {showMap && <LocationMap onLocationSelect={handleLocationSelect} initialLocation={{
-              name: formData.location,
-              coordinates: formData.coordinates
-            }} />}
-            </div>
-          </CardContent>
-        </Card>
+            </label>
+          </div>
+        </main>
+      </div>
 
-        {/* Bio Section */}
-        <Card className="border-plant-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-plant-800">
-              <FileText size={20} />
-              Descripción
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="bio" className="text-plant-700 font-medium">
-                Cuéntanos sobre ti y tus plantas
-              </Label>
-              <Textarea id="bio" value={formData.bio} onChange={e => handleInputChange('bio', e.target.value)} className="border-plant-200 focus:border-plant-400 min-h-[100px]" placeholder="Describe tu pasión por las plantas, experiencia, tipos favoritos..." />
-              <p className="text-xs text-gray-500">
-                {formData.bio.length}/500 caracteres
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Save Button */}
-        <div className="pt-4">
+      {/* Footer */}
+      <footer className="bg-[#122118] sticky bottom-0 p-4 border-t border-[#264532]">
+        <div className="flex gap-4 justify-end">
           <Button 
-            onClick={handleSave} 
-            className="w-full bg-plant-500 hover:bg-plant-600 text-white" 
-            size="lg"
-            disabled={loading}
+            onClick={() => navigate('/profile')}
+            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-transparent text-white text-base font-bold leading-normal tracking-[0.015em] border-2 border-[#264532] hover:bg-[#264532] transition-colors"
           >
-            <Save size={20} className="mr-2" />
-            {loading ? 'Guardando...' : 'Guardar cambios'}
+            <span className="truncate">Cancelar</span>
+          </Button>
+          <Button 
+            onClick={handleSave}
+            disabled={loading}
+            className="flex flex-1 sm:flex-none min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#38e07b] text-[#122118] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#32c96e] transition-colors"
+          >
+            <span className="truncate">{loading ? 'Guardando...' : 'Guardar cambios'}</span>
           </Button>
         </div>
-      </div>
+      </footer>
 
       {/* Camera Modal */}
       {showCamera && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 m-4 max-w-md w-full">
+          <div className="bg-[#1b3124] rounded-lg p-6 m-4 max-w-md w-full border border-[#264532]">
             <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold mb-2">Tomar foto</h3>
+              <h3 className="text-lg font-semibold mb-2 text-white">Tomar foto</h3>
               <div className="relative">
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
-                  className="w-full h-64 object-cover rounded-lg bg-gray-100"
+                  className="w-full h-64 object-cover rounded-lg bg-[#264532]"
                 />
                 <canvas ref={canvasRef} className="hidden" />
               </div>
             </div>
             <div className="flex gap-3">
-              <Button onClick={stopCamera} variant="outline" className="flex-1">
+              <Button 
+                onClick={stopCamera} 
+                className="flex-1 bg-transparent border-2 border-[#264532] text-white hover:bg-[#264532]"
+              >
                 Cancelar
               </Button>
-              <Button onClick={capturePhoto} className="flex-1 bg-plant-500 hover:bg-plant-600">
+              <Button 
+                onClick={capturePhoto} 
+                className="flex-1 bg-[#38e07b] text-[#122118] hover:bg-[#32c96e]"
+              >
                 <Camera size={16} className="mr-2" />
                 Capturar
               </Button>
@@ -423,6 +415,7 @@ const EditProfile = () => {
           </div>
         </div>
       )}
-    </div>;
+    </div>
+  );
 };
 export default EditProfile;
