@@ -5,12 +5,28 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { useUserPlants, Plant } from '@/hooks/useUserPlants';
+import UserPlantCard from '@/components/UserPlantCard';
+import EditPlantDialog from '@/components/EditPlantDialog';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('publicaciones');
+  const { plants, loading, updatePlant, deletePlant } = useUserPlants();
+  const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
+  const handleEditPlant = (plant: Plant) => {
+    setEditingPlant(plant);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditingPlant(null);
+    setEditDialogOpen(false);
+  };
+
   const handleShareApp = async () => {
     const shareData = {
       title: 'Plantify - Compra y vende plantas',
@@ -173,25 +189,85 @@ const Profile = () => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col items-center justify-center p-8 pb-32">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
-            <div className="text-[#38e07b] text-2xl">🌱</div>
+      <div className="p-4 pb-32">
+        {activeTab === 'publicaciones' && (
+          <>
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="text-[#96c5a9]">Cargando tus plantas...</div>
+              </div>
+            ) : plants.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+                  <div className="text-[#38e07b] text-2xl">🌱</div>
+                </div>
+                <h3 className="text-white text-lg font-bold mb-2 text-center">
+                  No hay publicaciones aún
+                </h3>
+                <p className="text-[#96c5a9] text-sm mb-6 text-center">
+                  Cuando publiques plantas, aparecerán aquí
+                </p>
+                <Button
+                  onClick={() => navigate('/upload')}
+                  className="bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
+                >
+                  Publicar tu primera planta
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {plants.map((plant) => (
+                  <UserPlantCard
+                    key={plant.id}
+                    plant={plant}
+                    onEdit={handleEditPlant}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+        
+        {activeTab === 'ventas' && (
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+                <div className="text-[#38e07b] text-2xl">💰</div>
+              </div>
+              <h3 className="text-white text-lg font-bold mb-2">
+                Historial de ventas
+              </h3>
+              <p className="text-[#96c5a9] text-sm">
+                Aquí verás el historial de tus ventas completadas
+              </p>
+            </div>
           </div>
-          <h3 className="text-white text-lg font-bold mb-2">
-            No hay publicaciones aún
-          </h3>
-          <p className="text-[#96c5a9] text-sm mb-6">
-            Cuando publiques plantas, aparecerán aquí
-          </p>
-          <Button
-            onClick={() => navigate('/upload')}
-            className="bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
-          >
-            Publicar tu primera planta
-          </Button>
-        </div>
+        )}
+        
+        {activeTab === 'compras' && (
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+                <div className="text-[#38e07b] text-2xl">🛒</div>
+              </div>
+              <h3 className="text-white text-lg font-bold mb-2">
+                Historial de compras
+              </h3>
+              <p className="text-[#96c5a9] text-sm">
+                Aquí verás el historial de tus compras realizadas
+              </p>
+            </div>
+          </div>
+        )}
       </div>
+
+      <EditPlantDialog
+        plant={editingPlant}
+        isOpen={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        onUpdate={updatePlant}
+        onDelete={deletePlant}
+      />
     </div>
   );
 };
