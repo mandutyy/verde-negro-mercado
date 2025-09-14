@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 interface Plant {
   id: string;
@@ -19,14 +18,20 @@ interface Plant {
   created_at: string;
 }
 
+interface Profile {
+  name?: string;
+  avatar_url?: string;
+  bio?: string;
+}
+
 const Purchase = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { sendMessage } = useRealtimeChat();
   
   const [plant, setPlant] = useState<Plant | null>(null);
+  const [sellerProfile, setSellerProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -56,6 +61,19 @@ const Purchase = () => {
       }
 
       setPlant(data);
+
+      // Fetch seller profile
+      if (data.user_id) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('name, avatar_url, bio')
+          .eq('user_id', data.user_id)
+          .single();
+
+        if (!profileError && profileData) {
+          setSellerProfile(profileData);
+        }
+      }
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -70,11 +88,7 @@ const Purchase = () => {
 
   const handleContact = async () => {
     if (!user || !plant) {
-      toast({
-        title: "Error de autenticación",
-        description: "Debes iniciar sesión para contactar",
-        variant: "destructive"
-      });
+      navigate('/auth');
       return;
     }
 
@@ -88,21 +102,39 @@ const Purchase = () => {
     }
 
     try {
-      const initialMessage = `Hola, estoy interesado en tu planta "${plant.title}"`;
-      await sendMessage(initialMessage, plant.user_id);
-      
-      toast({
-        title: "¡Mensaje enviado!",
-        description: "Tu mensaje se ha enviado al propietario",
-        variant: "default"
-      });
+      // Check if conversation exists
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('*')
+        .or(
+          `and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`
+        )
+        .maybeSingle();
 
-      navigate('/messages');
+      if (existingConversation) {
+        // Navigate to existing conversation
+        navigate(`/chat/${existingConversation.id}`);
+      } else {
+        // Create new conversation
+        const { data: newConversation, error } = await supabase
+          .from('conversations')
+          .insert([
+            {
+              participant_1: user.id,
+              participant_2: plant.user_id,
+            },
+          ])
+          .select()
+          .single();
+
+        if (error) throw error;
+        navigate(`/chat/${newConversation.id}`);
+      }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error opening chat:', error);
       toast({
-        title: "Error al enviar mensaje",
-        description: "Hubo un problema al enviar tu mensaje",
+        title: "Error al abrir chat",
+        description: "Hubo un problema al abrir la conversación",
         variant: "destructive"
       });
     }
@@ -205,12 +237,21 @@ const Purchase = () => {
           </p>
 
           <div className="mt-8">
-            <h3 className="text-white text-lg font-bold leading-tight tracking-tight mb-4">Seller Information</h3>
+            <h3 className="text-white text-lg font-bold leading-tight tracking-tight mb-4">Información del vendedor</h3>
             <div className="flex items-center gap-4">
-              <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-2 border-primary bg-muted"></div>
+              <div 
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-2 border-primary bg-muted"
+                style={{ 
+                  backgroundImage: sellerProfile?.avatar_url ? `url("${sellerProfile.avatar_url}")` : undefined 
+                }}
+              ></div>
               <div>
-                <p className="text-white text-lg font-semibold leading-normal">Plant Owner</p>
-                <p className="text-secondary text-base font-normal leading-normal">Plant Enthusiast</p>
+                <p className="text-white text-lg font-semibold leading-normal">
+                  {sellerProfile?.name || `Usuario ${plant.user_id.slice(-4)}`}
+                </p>
+                <p className="text-secondary text-base font-normal leading-normal">
+                  {sellerProfile?.bio || "Amante de las plantas"}
+                </p>
               </div>
             </div>
           </div>
