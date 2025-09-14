@@ -13,15 +13,21 @@ const Home = () => {
 
   useEffect(() => {
     fetchPlants();
-  }, []);
+  }, [user]);
 
   const fetchPlants = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('plants')
         .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
+        .eq('status', 'active');
+
+      // Exclude user's own plants if authenticated
+      if (user) {
+        query = query.neq('user_id', user.id);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching plants:', error);
