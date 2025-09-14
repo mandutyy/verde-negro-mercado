@@ -86,16 +86,8 @@ const Home = () => {
     <div className="relative flex size-full min-h-screen flex-col bg-background font-spline justify-between overflow-x-hidden">
       <div className="flex-grow">
         {/* Header */}
-        <div className="flex items-center bg-background p-4 pb-2 justify-between sticky top-0 z-10">
-          <h1 className="text-white text-lg md:text-xl font-bold tracking-tight flex-1 text-center pl-12">Plantificar</h1>
-          <div className="flex w-12 items-center justify-end">
-            <button 
-              onClick={() => navigate('/profile')}
-              className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0"
-            >
-              <span className="material-symbols-outlined text-white text-2xl md:text-3xl">tune</span>
-            </button>
-          </div>
+        <div className="flex items-center bg-background p-4 pb-2 justify-center sticky top-0 z-10">
+          <h1 className="text-white text-lg md:text-xl font-bold tracking-tight">Plantificar</h1>
         </div>
 
         {/* Search Bar */}
