@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import EditPlantDialog from '@/components/EditPlantDialog';
 
 interface Plant {
   id: string;
@@ -37,11 +39,79 @@ interface Profile {
 const PlantDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [plant, setPlant] = useState<Plant | null>(null);
   const [seller, setSeller] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  const handleEditPlant = () => {
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleUpdatePlant = async (plantId: string, updates: Partial<Plant>) => {
+    try {
+      const { error } = await supabase
+        .from('plants')
+        .update(updates)
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setPlant(prev => prev ? { ...prev, ...updates } : null);
+
+      toast({
+        title: "¡Actualizado!",
+        description: "Los cambios se han guardado correctamente",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error updating plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la planta",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const handleDeletePlant = async (plantId: string) => {
+    try {
+      const { error } = await supabase
+        .from('plants')
+        .delete()
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "¡Eliminado!",
+        description: "La planta ha sido eliminada correctamente",
+      });
+
+      navigate('/profile');
+      return true;
+    } catch (error) {
+      console.error('Error deleting plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la planta",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
 
   useEffect(() => {
     const fetchPlant = async () => {
@@ -215,6 +285,7 @@ const PlantDetail = () => {
 
   const mainImage = plant.images && plant.images.length > 0 ? plant.images[0] : '/placeholder.svg';
   const sellerName = seller?.name || `Usuario ${plant.user_id.slice(0, 8)}`;
+  const isOwner = user?.id === plant.user_id;
 
   return (
     <div className="min-h-screen bg-[#122118] text-white">
@@ -231,6 +302,16 @@ const PlantDetail = () => {
           </Button>
           
           <div className="flex items-center gap-2">
+            {isOwner && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleEditPlant}
+                className="text-white hover:bg-[#1b3124]"
+              >
+                <Pencil className="h-5 w-5" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -400,18 +481,28 @@ const PlantDetail = () => {
       </div>
 
       {/* Contact Button - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
-        <div className="max-w-4xl mx-auto">
-          <Button 
-            onClick={handleContact}
-            className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
-            size="lg"
-          >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Contactar con {sellerName}
-          </Button>
+      {!isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
+          <div className="max-w-4xl mx-auto">
+            <Button 
+              onClick={handleContact}
+              className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
+              size="lg"
+            >
+              <MessageCircle className="h-5 w-5 mr-2" />
+              Contactar con {sellerName}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
+
+      <EditPlantDialog
+        plant={plant}
+        isOpen={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        onUpdate={handleUpdatePlant}
+        onDelete={handleDeletePlant}
+      />
     </div>
   );
 };
