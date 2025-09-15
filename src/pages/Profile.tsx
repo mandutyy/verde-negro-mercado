@@ -109,7 +109,7 @@ const Profile = () => {
   return <div className="min-h-screen bg-[#122118] text-white font-[Spline_Sans,Noto_Sans,sans-serif]">
       {/* Header */}
       <header className="flex items-center justify-between p-4 pb-2">
-        
+        <div className="w-12"></div>
         <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           Perfil
         </h1>
