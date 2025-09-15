@@ -1,10 +1,9 @@
 
 import { useMemo, memo, useState } from 'react';
-import { Heart, Home, MessageCircle, Upload, User, Gift, RefreshCw, DollarSign, MoreHorizontal } from 'lucide-react';
+import { Heart, Home, MessageCircle, Upload, User, RefreshCw, DollarSign } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 const Navigation = memo(() => {
   const location = useLocation();
@@ -18,45 +17,6 @@ const Navigation = memo(() => {
     { icon: MessageCircle, label: 'Mensajes', path: '/messages', id: 'messages' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
   ], []);
-
-  const publishOptions = [
-    { 
-      icon: DollarSign, 
-      label: 'Vender', 
-      description: 'Vende tu planta',
-      action: () => {
-        navigate('/upload?type=sell');
-        setIsSheetOpen(false);
-      }
-    },
-    { 
-      icon: Gift, 
-      label: 'Regalar', 
-      description: 'Regala tu planta',
-      action: () => {
-        navigate('/upload?type=gift');
-        setIsSheetOpen(false);
-      }
-    },
-    { 
-      icon: RefreshCw, 
-      label: 'Intercambiar', 
-      description: 'Intercambia tu planta',
-      action: () => {
-        navigate('/upload?type=exchange');
-        setIsSheetOpen(false);
-      }
-    },
-    { 
-      icon: MoreHorizontal, 
-      label: 'Varias opciones', 
-      description: 'Múltiples opciones disponibles',
-      action: () => {
-        navigate('/upload?type=multiple');
-        setIsSheetOpen(false);
-      }
-    }
-  ];
 
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.id === 'upload') {
@@ -120,33 +80,48 @@ const Navigation = memo(() => {
       </footer>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent side="bottom" className="h-auto max-h-[80vh] bg-[#1b3124] border-t border-[#264532]">
+        <SheetContent side="bottom" className="h-auto max-h-[80vh] bg-[#1a3525] border-t border-[#264532] rounded-t-2xl shadow-[0_-4px_16px_rgba(0,0,0,0.2)] p-4 pt-2">
+          <div className="flex justify-center mb-2">
+            <div className="w-8 h-1 bg-[#4a755d] rounded-full"></div>
+          </div>
+          
           <SheetHeader className="pb-4">
-            <SheetTitle className="text-white text-center">¿Qué quieres hacer con tu planta?</SheetTitle>
+            <SheetTitle className="text-white text-center font-bold text-lg">Elige una opción</SheetTitle>
           </SheetHeader>
           
-          <div className="grid gap-3 pb-6">
-            {publishOptions.map((option) => {
-              const OptionIcon = option.icon;
-              return (
-                <Button
-                  key={option.label}
-                  variant="ghost"
-                  className="h-auto p-4 justify-start bg-[#264532] hover:bg-[#38e07b]/20 text-white border border-[#38e07b]/30"
-                  onClick={option.action}
-                >
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#38e07b]/20 flex items-center justify-center">
-                      <OptionIcon size={20} className="text-[#38e07b]" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-white">{option.label}</p>
-                      <p className="text-sm text-gray-300">{option.description}</p>
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
+          <div className="grid grid-cols-3 gap-3 pb-6">
+            <button
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#264532] hover:bg-[#38e07b] group transition-colors focus:bg-[#38e07b] focus:outline-none"
+              onClick={() => {
+                navigate('/upload?type=sell');
+                setIsSheetOpen(false);
+              }}
+            >
+              <DollarSign className="text-[#38e07b] group-hover:text-[#122118] group-focus:text-[#122118] transition-colors" size={32} />
+              <span className="text-white group-hover:text-[#122118] group-focus:text-[#122118] text-sm font-semibold transition-colors">Vender</span>
+            </button>
+            
+            <button
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#264532] hover:bg-[#38e07b] group transition-colors focus:bg-[#38e07b] focus:outline-none"
+              onClick={() => {
+                navigate('/upload?type=gift');
+                setIsSheetOpen(false);
+              }}
+            >
+              <Heart className="text-[#38e07b] group-hover:text-[#122118] group-focus:text-[#122118] transition-colors" size={32} />
+              <span className="text-white group-hover:text-[#122118] group-focus:text-[#122118] text-sm font-semibold transition-colors">Regalar</span>
+            </button>
+            
+            <button
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#264532] hover:bg-[#38e07b] group transition-colors focus:bg-[#38e07b] focus:outline-none"
+              onClick={() => {
+                navigate('/upload?type=exchange');
+                setIsSheetOpen(false);
+              }}
+            >
+              <RefreshCw className="text-[#38e07b] group-hover:text-[#122118] group-focus:text-[#122118] transition-colors" size={32} />
+              <span className="text-white group-hover:text-[#122118] group-focus:text-[#122118] text-sm font-semibold transition-colors">Intercambiar</span>
+            </button>
           </div>
         </SheetContent>
       </Sheet>
