@@ -1,15 +1,11 @@
 
-import { useMemo, memo, useState } from 'react';
-import { Heart, Home, MessageCircle, Upload, User, RefreshCw, DollarSign } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useMemo, memo } from 'react';
+import { Heart, Home, MessageCircle, Upload, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 const Navigation = memo(() => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
@@ -19,30 +15,6 @@ const Navigation = memo(() => {
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
   ], []);
 
-  const handleNavClick = (item: typeof navItems[0]) => {
-    if (item.id === 'upload') {
-      setIsSheetOpen(true);
-      setSelectedOptions([]);
-    }
-  };
-
-  const toggleOption = (option: string) => {
-    setSelectedOptions(current => 
-      current.includes(option)
-        ? current.filter(item => item !== option)
-        : [...current, option]
-    );
-  };
-
-  const handleContinue = () => {
-    if (selectedOptions.length > 0) {
-      const typesParam = selectedOptions.join(',');
-      navigate(`/upload?type=${typesParam}`);
-      setIsSheetOpen(false);
-      setSelectedOptions([]);
-    }
-  };
-
   return (
     <>
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
@@ -50,29 +22,6 @@ const Navigation = memo(() => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
-            if (item.id === 'upload') {
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item)}
-                  className={cn(
-                    "flex flex-1 flex-col items-center justify-center gap-1 transition-colors py-2 px-1 rounded-lg",
-                    isActive 
-                      ? "text-primary bg-primary/10" 
-                      : "text-secondary hover:text-primary hover:bg-primary/5"
-                  )}
-                >
-                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-                  <p className={cn(
-                    "text-xs leading-tight tracking-wide",
-                    isActive ? "font-semibold" : "font-medium"
-                  )}>
-                    {item.label}
-                  </p>
-                </button>
-              );
-            }
             
             return (
               <Link
@@ -97,115 +46,6 @@ const Navigation = memo(() => {
           })}
         </div>
       </footer>
-
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent side="bottom" className="h-auto max-h-[80vh] bg-[#1a3525] border-t border-[#264532] rounded-t-2xl shadow-[0_-4px_16px_rgba(0,0,0,0.2)] p-4 pt-2">
-          <div className="flex justify-center mb-2">
-            <div className="w-8 h-1 bg-[#4a755d] rounded-full"></div>
-          </div>
-          
-          <SheetHeader className="pb-4">
-            <SheetTitle className="text-white text-center font-bold text-lg">Elige una opción</SheetTitle>
-          </SheetHeader>
-          
-          <div className="grid grid-cols-3 gap-3 pb-4">
-            <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('sell')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('sell')}
-            >
-              <DollarSign 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('sell')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('sell')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Vender
-              </span>
-            </button>
-            
-            <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('gift')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('gift')}
-            >
-              <Heart 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('gift')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('gift')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Regalar
-              </span>
-            </button>
-            
-            <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('exchange')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('exchange')}
-            >
-              <RefreshCw 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('exchange')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('exchange')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Intercambiar
-              </span>
-            </button>
-          </div>
-          
-          {selectedOptions.length > 0 && (
-            <div className="flex gap-3 pt-2">
-              <button
-                className="flex-1 bg-[#38e07b] hover:bg-[#32c96e] text-[#122118] font-bold py-3 px-6 rounded-xl transition-colors"
-                onClick={handleContinue}
-              >
-                Continuar ({selectedOptions.length})
-              </button>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
     </>
   );
 });
