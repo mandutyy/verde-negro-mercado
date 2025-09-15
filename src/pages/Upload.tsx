@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 const Upload = () => {
   const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState<'sell' | 'exchange' | 'gift' | null>(null);
@@ -263,6 +262,25 @@ const Upload = () => {
           </div>
 
           <div className="space-y-4">
+            {/* Transaction Type */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="transaction-type">
+                Tipo de transacción
+              </label>
+              <select 
+                className="form-select w-full rounded-xl border-0 bg-[#264532] py-3 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#38e07b]" 
+                id="transaction-type"
+                value={saleType}
+                onChange={(e) => setSaleType(e.target.value as any)}
+              >
+                {saleOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Plant Name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="plant-name">
@@ -329,108 +347,6 @@ const Upload = () => {
                 onChange={(e) => handleInputChange('location', e.target.value)}
               />
               {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
-            </div>
-
-            {/* Transaction Type Options */}
-            <div>
-              <h3 className="text-white text-center font-bold text-lg mb-4">Elige una opción</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                    saleType.includes('sell')
-                      ? "bg-[#38e07b] text-[#122118]"
-                      : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-                  )}
-                  onClick={() => {
-                    if (saleType.includes('sell')) {
-                      // Remove sell from saleType
-                      if (saleType === 'sell') setSaleType('exchange');
-                      else if (saleType === 'sell-exchange') setSaleType('exchange');
-                      else if (saleType === 'sell-gift') setSaleType('gift');
-                      else if (saleType === 'all') setSaleType('exchange-gift');
-                    } else {
-                      // Add sell to saleType
-                      if (saleType === 'exchange') setSaleType('sell-exchange');
-                      else if (saleType === 'gift') setSaleType('sell-gift');
-                      else if (saleType === 'exchange-gift') setSaleType('all');
-                      else setSaleType('sell');
-                    }
-                  }}
-                >
-                  <span className="material-symbols-outlined text-3xl transition-colors">
-                    sell
-                  </span>
-                  <span className="text-sm font-semibold transition-colors">
-                    Vender
-                  </span>
-                </button>
-                
-                <button
-                  type="button"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                    saleType.includes('gift')
-                      ? "bg-[#38e07b] text-[#122118]"
-                      : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-                  )}
-                  onClick={() => {
-                    if (saleType.includes('gift')) {
-                      // Remove gift from saleType
-                      if (saleType === 'gift') setSaleType('sell');
-                      else if (saleType === 'sell-gift') setSaleType('sell');
-                      else if (saleType === 'exchange-gift') setSaleType('exchange');
-                      else if (saleType === 'all') setSaleType('sell-exchange');
-                    } else {
-                      // Add gift to saleType
-                      if (saleType === 'sell') setSaleType('sell-gift');
-                      else if (saleType === 'exchange') setSaleType('exchange-gift');
-                      else if (saleType === 'sell-exchange') setSaleType('all');
-                      else setSaleType('gift');
-                    }
-                  }}
-                >
-                  <span className="material-symbols-outlined text-3xl transition-colors">
-                    favorite
-                  </span>
-                  <span className="text-sm font-semibold transition-colors">
-                    Regalar
-                  </span>
-                </button>
-                
-                <button
-                  type="button"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                    saleType.includes('exchange')
-                      ? "bg-[#38e07b] text-[#122118]"
-                      : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-                  )}
-                  onClick={() => {
-                    if (saleType.includes('exchange')) {
-                      // Remove exchange from saleType
-                      if (saleType === 'exchange') setSaleType('sell');
-                      else if (saleType === 'sell-exchange') setSaleType('sell');
-                      else if (saleType === 'exchange-gift') setSaleType('gift');
-                      else if (saleType === 'all') setSaleType('sell-gift');
-                    } else {
-                      // Add exchange to saleType
-                      if (saleType === 'sell') setSaleType('sell-exchange');
-                      else if (saleType === 'gift') setSaleType('exchange-gift');
-                      else if (saleType === 'sell-gift') setSaleType('all');
-                      else setSaleType('exchange');
-                    }
-                  }}
-                >
-                  <span className="material-symbols-outlined text-3xl transition-colors">
-                    swap_horiz
-                  </span>
-                  <span className="text-sm font-semibold transition-colors">
-                    Intercambiar
-                  </span>
-                </button>
-              </div>
             </div>
 
             {/* Price - Always required */}
