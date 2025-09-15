@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import defaultProfileIcon from '@/assets/default-profile-icon.png';
 
 interface Plant {
   id: string;
@@ -242,7 +243,7 @@ const Purchase = () => {
               <div 
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-2 border-primary bg-muted"
                 style={{ 
-                  backgroundImage: sellerProfile?.avatar_url ? `url("${sellerProfile.avatar_url}")` : undefined 
+                  backgroundImage: `url("${sellerProfile?.avatar_url || defaultProfileIcon}")` 
                 }}
               ></div>
               <div>
