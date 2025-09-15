@@ -57,7 +57,7 @@ const PlantCard = memo(({
   return (
     <div 
       onClick={handleCardClick}
-      className="plant-card-hover bg-white rounded-xl shadow-sm border border-plant-100 overflow-hidden cursor-pointer"
+      className="plant-card-hover bg-[#1b3124] rounded-xl shadow-sm border border-[#366348] overflow-hidden cursor-pointer hover:bg-[#264532] transition-colors"
     >
       <div className="relative">
         <img 
@@ -83,7 +83,7 @@ const PlantCard = memo(({
       </div>
       
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+        <h3 className="font-semibold text-white mb-1 line-clamp-2">
           {title}
         </h3>
         
@@ -98,11 +98,11 @@ const PlantCard = memo(({
         </div>
         
         <div className="flex justify-between items-end">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-300">
             {location}
           </span>
           {price && (
-            <span className="text-lg font-bold text-plant-600">
+            <span className="text-lg font-bold text-[#38e07b]">
               {price}€
             </span>
           )}
