@@ -241,7 +241,7 @@ const Purchase = () => {
             <h3 className="text-white text-lg font-bold leading-tight tracking-tight mb-4">Información del vendedor</h3>
             <div className="flex items-center gap-4">
               <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-2 border-primary bg-muted"
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-4 border-primary bg-muted"
                 style={{ 
                   backgroundImage: `url("${sellerProfile?.avatar_url || defaultProfileIcon}")` 
                 }}
