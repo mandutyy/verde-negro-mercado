@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import PlantCard from '@/components/PlantCard';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -159,40 +160,29 @@ const Home = () => {
               </button>
             </div>
           ) : (
-            plants
-              .filter(plant => {
-                if (activeCategory === 'all') return true;
-                return plant.category?.toLowerCase() === activeCategory;
-              })
-              .filter(plant => {
-                if (!searchQuery) return true;
-                return plant.title.toLowerCase().includes(searchQuery.toLowerCase());
-              })
-              .map((plant) => (
-                <div 
-                  key={plant.id}
-                  onClick={() => handlePlantClick(plant.id)}
-                  className="flex flex-col items-stretch justify-start rounded-2xl overflow-hidden bg-[#1b3124] shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
-                >
-                  <div 
-                    className="w-full bg-center bg-no-repeat aspect-square bg-cover" 
-                    style={{
-                      backgroundImage: `url("${plant.images && plant.images.length > 0 ? plant.images[0] : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400&h=400&fit=crop'}")`,
-                    }}
-                  ></div>
-                  <div className="flex w-full grow flex-col items-stretch justify-center gap-1 p-4">
-                    <p className="text-white text-base md:text-lg font-bold leading-tight">{plant.title}</p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-[#96c5a9] text-base font-normal">
-                        {getPlantTypeLabel(plant.sale_type || 'sell', plant.price)}
-                      </p>
-                      <p className="text-[#96c5a9] text-sm font-light">
-                        {formatTimeAgo(plant.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
+            <div className="grid grid-cols-1 gap-4">
+              {plants
+                .filter(plant => {
+                  if (activeCategory === 'all') return true;
+                  return plant.category?.toLowerCase() === activeCategory;
+                })
+                .filter(plant => {
+                  if (!searchQuery) return true;
+                  return plant.title.toLowerCase().includes(searchQuery.toLowerCase());
+                })
+                .map((plant) => (
+                  <PlantCard
+                    key={plant.id}
+                    id={plant.id}
+                    title={plant.title}
+                    price={plant.price}
+                    location={plant.location || 'Ubicación no especificada'}
+                    image={plant.images && plant.images.length > 0 ? plant.images[0] : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400&h=400&fit=crop'}
+                    saleType={plant.sale_type || 'sell'}
+                    isFavorite={false}
+                  />
+                ))}
+            </div>
           )}
         </div>
       </div>
