@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Plant } from '@/hooks/useUserPlants';
+import { cn } from '@/lib/utils';
 
 interface UserPlantCardProps {
   plant: Plant;
@@ -22,6 +23,24 @@ const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
     e.stopPropagation(); // Prevent navigation when clicking edit button
     onEdit(plant);
   };
+  const getSaleTypeDisplay = (saleType: string) => {
+    switch (saleType) {
+      case 'gift':
+        return { text: 'REGALO', className: 'bg-green-500 text-white' };
+      case 'sell':
+        return { text: 'VENTA', className: 'bg-blue-500 text-white' };
+      case 'exchange':
+        return { text: 'INTERCAMBIO', className: 'bg-yellow-500 text-black' };
+      case 'all':
+        return { 
+          text: 'TODO', 
+          className: 'bg-gradient-to-r from-green-500 via-blue-500 to-yellow-500 text-white animate-pulse' 
+        };
+      default:
+        return { text: 'VENTA', className: 'bg-blue-500 text-white' };
+    }
+  };
+
   const getPlantTypeLabel = (saleType: string, price: number | null) => {
     switch (saleType) {
       case 'sell':
@@ -81,10 +100,18 @@ const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-bold text-base mb-1 truncate">{plant.title}</h3>
-            <p className="text-[#96c5a9] text-sm font-medium">
-              {getPlantTypeLabel(plant.sale_type, plant.price)}
-            </p>
-            <p className="text-gray-400 text-xs mt-1 truncate">{plant.location}</p>
+            
+            {/* Sale type badge */}
+            <div className="mb-2">
+              <span className={cn(
+                "inline-block px-2 py-1 rounded-full text-xs font-bold",
+                getSaleTypeDisplay(plant.sale_type).className
+              )}>
+                {getSaleTypeDisplay(plant.sale_type).text}
+              </span>
+            </div>
+            
+            <p className="text-gray-400 text-xs truncate">{plant.location}</p>
           </div>
           <Button
             onClick={handleEditClick}
@@ -96,11 +123,18 @@ const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
           </Button>
         </div>
 
-        <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed">
-          {plant.description}
-        </p>
+        <div className="flex justify-between items-end mb-3">
+          <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed flex-1">
+            {plant.description}
+          </p>
+          {plant.price && (
+            <span className="text-lg font-bold text-[#38e07b] ml-2">
+              €{plant.price}
+            </span>
+          )}
+        </div>
 
-        <div className="mt-3 text-xs text-gray-500">
+        <div className="text-xs text-gray-500">
           Publicado: {new Date(plant.created_at).toLocaleDateString('es-ES')}
         </div>
       </CardContent>

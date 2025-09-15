@@ -136,7 +136,15 @@ const UserProfile = () => {
           
           <div className="grid grid-cols-2 gap-4">
             {sellerPlants.slice(0, 4).map((plant) => (
-              <PlantCard key={plant.id} {...plant} />
+              <PlantCard 
+                key={plant.id} 
+                id={plant.id}
+                title={plant.title}
+                price={plant.price}
+                location={plant.location}
+                image={plant.image}
+                saleType={plant.type}
+              />
             ))}
           </div>
           
