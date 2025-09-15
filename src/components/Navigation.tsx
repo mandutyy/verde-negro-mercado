@@ -9,8 +9,8 @@ const Navigation = memo(() => {
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
-    { icon: Upload, label: 'Publicar', path: '/upload', id: 'upload' },
     { icon: Heart, label: 'Favoritos', path: '/favorites', id: 'favorites' },
+    { icon: Upload, label: 'Publicar', path: '/upload', id: 'upload' },
     { icon: MessageCircle, label: 'Mensajes', path: '/messages', id: 'messages' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
   ], []);
