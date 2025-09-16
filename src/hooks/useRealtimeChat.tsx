@@ -337,7 +337,7 @@ export const useRealtimeChat = (conversationId?: string) => {
         {
           conversation_id,
           sender_id: user.id,
-          content: content.trim() || null,
+          content: content.trim() || '',
           image_url,
         },
       ]);
