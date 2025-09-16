@@ -13,7 +13,7 @@ const Chat = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { messages, sendMessage } = useRealtimeChat(conversationId);
+  const { messages, sendMessage, markMessagesAsRead } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
@@ -26,6 +26,13 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Mark messages as read when conversation is opened
+  useEffect(() => {
+    if (conversationId && user) {
+      markMessagesAsRead(conversationId);
+    }
+  }, [conversationId, user, markMessagesAsRead]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -154,18 +161,43 @@ const Chat = () => {
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                <p
-                  className={`text-xs mt-1 ${
-                    message.sender_id === user.id
-                      ? 'text-plant-100'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  {new Date(message.created_at).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
+                <div className="flex items-center justify-between mt-1">
+                  <p
+                    className={`text-xs ${
+                      message.sender_id === user.id
+                        ? 'text-plant-100'
+                        : 'text-gray-500'
+                    }`}
+                  >
+                    {new Date(message.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                  {message.sender_id === user.id && (
+                    <div className="flex items-center ml-2">
+                      {message.status === 'read' ? (
+                        <div className="flex">
+                          <svg width="16" height="12" viewBox="0 0 16 12" className="text-blue-500 fill-current">
+                            <path d="M15.03 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 0 1 1.06-1.06L7 9.44l6.97-6.97a.75.75 0 0 1 1.06 0Z"/>
+                            <path d="M12.53 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 0 1 1.06-1.06l.47.47L11.47 2.47a.75.75 0 0 1 1.06 0Z"/>
+                          </svg>
+                        </div>
+                      ) : message.status === 'delivered' ? (
+                        <div className="flex">
+                          <svg width="16" height="12" viewBox="0 0 16 12" className="text-gray-400 fill-current">
+                            <path d="M15.03 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 0 1 1.06-1.06L7 9.44l6.97-6.97a.75.75 0 0 1 1.06 0Z"/>
+                            <path d="M12.53 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 0 1 1.06-1.06l.47.47L11.47 2.47a.75.75 0 0 1 1.06 0Z"/>
+                          </svg>
+                        </div>
+                      ) : (
+                        <svg width="12" height="12" viewBox="0 0 12 12" className="text-gray-400 fill-current">
+                          <path d="M10.03 2.47a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 0 1 1.06-1.06L4 7.44l4.97-4.97a.75.75 0 0 1 1.06 0Z"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))

@@ -221,6 +221,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_conversations_with_last_message: {
+        Args: { user_uuid: string }
+        Returns: {
+          created_at: string
+          id: string
+          last_message_content: string
+          last_message_sender: string
+          last_message_time: string
+          participant_1: string
+          participant_1_avatar: string
+          participant_1_name: string
+          participant_2: string
+          participant_2_avatar: string
+          participant_2_name: string
+          unread_count: number
+          updated_at: string
+        }[]
+      }
       mark_messages_as_read: {
         Args: { conversation_uuid: string; user_uuid: string }
         Returns: undefined

@@ -63,31 +63,51 @@ const Messages = () => {
         {conversations.length > 0 ? <div>
             {conversations.filter(conversation => {
           const isUser1 = conversation.participant_1 === user.id;
-          const otherProfile = isUser1 ? conversation.participant_2_profile : conversation.participant_1_profile;
+          const otherName = isUser1 ? conversation.participant_2_name : conversation.participant_1_name;
           const otherUserId = isUser1 ? conversation.participant_2 : conversation.participant_1;
-          const userName = otherProfile?.name || `Usuario ${otherUserId.slice(-4)}`;
+          const userName = otherName || `Usuario ${otherUserId.slice(-4)}`;
           return userName.toLowerCase().includes(searchQuery.toLowerCase());
         }).map(conversation => {
           const isUser1 = conversation.participant_1 === user.id;
-          const otherProfile = isUser1 ? conversation.participant_2_profile : conversation.participant_1_profile;
+          const otherName = isUser1 ? conversation.participant_2_name : conversation.participant_1_name;
+          const otherAvatar = isUser1 ? conversation.participant_2_avatar : conversation.participant_1_avatar;
           const otherUserId = isUser1 ? conversation.participant_2 : conversation.participant_1;
-          const userName = otherProfile?.name || `Usuario ${otherUserId.slice(-4)}`;
-          const avatarUrl = otherProfile?.avatar_url;
+          const userName = otherName || `Usuario ${otherUserId.slice(-4)}`;
+          const lastMessage = conversation.last_message_content || 'Conversación iniciada';
+          const unreadCount = conversation.unread_count || 0;
+          
           return <div key={conversation.id} className="flex items-center gap-4 bg-background px-4 min-h-[72px] py-2 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => navigate(`/chat/${conversation.id}`)}>
                     <Avatar className="h-14 w-14">
-                      <AvatarImage src={avatarUrl || ""} />
+                      <AvatarImage src={otherAvatar || ""} />
                       <AvatarFallback className="bg-primary/10 text-primary font-medium">
                         {userName.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="flex flex-col justify-center flex-1 min-w-0">
-                      <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                        {userName}
-                      </p>
-                      <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
-                        Conversación iniciada
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
+                          {userName}
+                        </p>
+                        {conversation.last_message_time && (
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(conversation.last_message_time).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2 flex-1">
+                          {lastMessage}
+                        </p>
+                        {unreadCount > 0 && (
+                          <div className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs font-medium ml-2">
+                            {unreadCount}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>;
         })}

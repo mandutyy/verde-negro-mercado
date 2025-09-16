@@ -9,6 +9,8 @@ interface Message {
   content: string;
   created_at: string;
   read_at?: string;
+  delivered_at?: string;
+  status?: 'sent' | 'delivered' | 'read';
 }
 
 interface Conversation {
@@ -17,14 +19,14 @@ interface Conversation {
   participant_2: string;
   created_at: string;
   updated_at: string;
-  participant_1_profile?: {
-    name?: string;
-    avatar_url?: string;
-  };
-  participant_2_profile?: {
-    name?: string;
-    avatar_url?: string;
-  };
+  last_message_content?: string;
+  last_message_time?: string;
+  last_message_sender?: string;
+  unread_count?: number;
+  participant_1_name?: string;
+  participant_1_avatar?: string;
+  participant_2_name?: string;
+  participant_2_avatar?: string;
 }
 
 export const useRealtimeChat = (conversationId?: string) => {
@@ -33,16 +35,13 @@ export const useRealtimeChat = (conversationId?: string) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load conversations
+  // Load conversations with last message info
   useEffect(() => {
     if (!user) return;
 
     const loadConversations = async () => {
       const { data, error } = await (supabase as any)
-        .from('conversations')
-        .select('*')
-        .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
-        .order('updated_at', { ascending: false });
+        .rpc('get_conversations_with_last_message', { user_uuid: user.id });
 
       if (error) {
         console.error('Error loading conversations:', error);
@@ -211,10 +210,24 @@ export const useRealtimeChat = (conversationId?: string) => {
     }
   };
 
+  const markMessagesAsRead = async (conversationId: string) => {
+    if (!user) return;
+    
+    try {
+      await (supabase as any).rpc('mark_messages_as_read', {
+        conversation_uuid: conversationId,
+        user_uuid: user.id
+      });
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
   return {
     messages,
     conversations,
     loading,
     sendMessage,
+    markMessagesAsRead,
   };
 };
