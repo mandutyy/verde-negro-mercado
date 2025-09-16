@@ -211,7 +211,7 @@ const Upload = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-4">
+      <main className="flex-1 overflow-y-auto p-4 pb-24">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Photos Section - Now at the top */}
           <div>
@@ -349,15 +349,6 @@ const Upload = () => {
               {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
             </div>
 
-            {/* Submit button right after Location */}
-            <div className="mt-6 mb-20">
-              <button 
-                type="submit"
-                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
-              >
-                Publicar
-              </button>
-            </div>
 
             {/* Price - Always required */}
             <div>
@@ -396,7 +387,15 @@ const Upload = () => {
               </div>
             )}
 
-
+            {/* Submit button at the bottom */}
+            <div className="mt-6">
+              <button 
+                type="submit"
+                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
+              >
+                Publicar
+              </button>
+            </div>
           </div>
         </form>
       </main>
