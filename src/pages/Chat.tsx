@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Check, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -26,6 +26,13 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Mark messages as read when conversation opens
+  useEffect(() => {
+    if (conversationId && user) {
+      markMessagesAsRead(conversationId);
+    }
+  }, [conversationId, user]);
 
   // Mark messages as read when conversation is opened
   useEffect(() => {
@@ -161,6 +168,29 @@ const Chat = () => {
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <div className={`flex items-center justify-end gap-1 mt-1 ${
+                  message.sender_id === user.id
+                    ? 'text-plant-100'
+                    : 'text-gray-500'
+                }`}>
+                  <span className="text-xs">
+                    {new Date(message.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                  {message.sender_id === user.id && (
+                    <div className="flex items-center ml-1">
+                      {message.status === 'read' ? (
+                        <CheckCheck size={12} className="text-blue-400" />
+                      ) : message.status === 'delivered' ? (
+                        <CheckCheck size={12} className="text-plant-100" />
+                      ) : (
+                        <Check size={12} className="text-plant-100" />
+                      )}
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center justify-between mt-1">
                   <p
                     className={`text-xs ${

@@ -22,7 +22,7 @@ interface Conversation {
   last_message_content?: string;
   last_message_time?: string;
   last_message_sender?: string;
-  unread_count?: number;
+  unread_count: number;
   participant_1_name?: string;
   participant_1_avatar?: string;
   participant_2_name?: string;
@@ -54,21 +54,32 @@ export const useRealtimeChat = (conversationId?: string) => {
     loadConversations();
   }, [user]);
 
-  // Load messages for specific conversation
+  // Load messages for specific conversation and mark as read
   useEffect(() => {
     if (!user || !conversationId) return;
 
     const loadMessages = async () => {
-      const { data, error } = await (supabase as any)
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+      try {
+        // Load messages
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Error loading messages:', error);
-      } else {
-        setMessages((data as Message[]) || []);
+        if (error) {
+          console.error('Error loading messages:', error);
+        } else {
+          setMessages((data as Message[]) || []);
+          
+          // Mark messages as read
+          await supabase.rpc('mark_messages_as_read', {
+            conversation_uuid: conversationId,
+            user_uuid: user.id
+          });
+        }
+      } catch (error) {
+        console.error('Error in loadMessages:', error);
       }
     };
 
@@ -114,13 +125,19 @@ export const useRealtimeChat = (conversationId?: string) => {
           schema: 'public',
           table: 'conversations',
         },
-        (payload) => {
-          const newConversation = payload.new as Conversation;
+        async (payload) => {
+          const newConversation = payload.new as any;
           if (
             newConversation.participant_1 === user.id ||
             newConversation.participant_2 === user.id
           ) {
-            setConversations((prev) => [newConversation, ...prev]);
+            // Reload conversations to get the full details
+            const { data } = await supabase.rpc('get_conversations_with_last_message', {
+              user_uuid: user.id
+            });
+            if (data) {
+              setConversations(data as Conversation[]);
+            }
           }
         }
       )
@@ -131,17 +148,19 @@ export const useRealtimeChat = (conversationId?: string) => {
           schema: 'public',
           table: 'conversations',
         },
-        (payload) => {
-          const updatedConversation = payload.new as Conversation;
+        async (payload) => {
+          const updatedConversation = payload.new as any;
           if (
             updatedConversation.participant_1 === user.id ||
             updatedConversation.participant_2 === user.id
           ) {
-            setConversations((prev) =>
-              prev.map((conv) =>
-                conv.id === updatedConversation.id ? updatedConversation : conv
-              )
-            );
+            // Reload conversations to get the full details
+            const { data } = await supabase.rpc('get_conversations_with_last_message', {
+              user_uuid: user.id
+            });
+            if (data) {
+              setConversations(data as Conversation[]);
+            }
           }
         }
       )
@@ -160,7 +179,7 @@ export const useRealtimeChat = (conversationId?: string) => {
 
       // If no conversation exists, create one
       if (!conversation_id && otherUserId) {
-        const { data: existingConversation } = await (supabase as any)
+        const { data: existingConversation } = await supabase
           .from('conversations')
           .select('*')
           .or(
@@ -169,9 +188,9 @@ export const useRealtimeChat = (conversationId?: string) => {
           .maybeSingle();
 
         if (existingConversation) {
-          conversation_id = (existingConversation as Conversation).id;
+          conversation_id = existingConversation.id;
         } else {
-          const { data: newConversation, error } = await (supabase as any)
+          const { data: newConversation, error } = await supabase
             .from('conversations')
             .insert([
               {
@@ -183,13 +202,13 @@ export const useRealtimeChat = (conversationId?: string) => {
             .single();
 
           if (error) throw error;
-          conversation_id = (newConversation as Conversation).id;
+          conversation_id = newConversation.id;
         }
       }
 
       if (!conversation_id) throw new Error('No conversation ID');
 
-      const { error } = await (supabase as any).from('messages').insert([
+      const { error } = await supabase.from('messages').insert([
         {
           conversation_id,
           sender_id: user.id,
@@ -200,10 +219,20 @@ export const useRealtimeChat = (conversationId?: string) => {
       if (error) throw error;
 
       // Update conversation timestamp
-      await (supabase as any)
+      await supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversation_id);
+        
+      // Reload conversations to update the UI
+      if (!conversationId) {
+        const { data } = await supabase.rpc('get_conversations_with_last_message', {
+          user_uuid: user.id
+        });
+        if (data) {
+          setConversations(data as Conversation[]);
+        }
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       throw error;
@@ -214,7 +243,7 @@ export const useRealtimeChat = (conversationId?: string) => {
     if (!user) return;
     
     try {
-      await (supabase as any).rpc('mark_messages_as_read', {
+      await supabase.rpc('mark_messages_as_read', {
         conversation_uuid: conversationId,
         user_uuid: user.id
       });
