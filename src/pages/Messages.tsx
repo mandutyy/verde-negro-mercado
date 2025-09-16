@@ -128,7 +128,13 @@ const Messages = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 flex-1">
-                        {lastMessage}
+                        {!conversation.last_message_content && conversation.last_message_sender ? (
+                          <span className="flex items-center gap-1">
+                            📷 Imagen
+                          </span>
+                        ) : (
+                          lastMessage
+                        )}
                       </p>
                       {unreadCount > 0 && (
                         <div className="bg-primary text-primary-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium ml-2">

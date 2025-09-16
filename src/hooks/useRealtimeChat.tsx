@@ -11,6 +11,7 @@ interface Message {
   read_at?: string;
   delivered_at?: string;
   status?: 'sent' | 'delivered' | 'read';
+  image_url?: string;
 }
 
 interface Conversation {
@@ -63,7 +64,7 @@ export const useRealtimeChat = (conversationId?: string) => {
       // 2) Latest messages across these conversations
       const { data: msgs } = await supabase
         .from('messages')
-        .select('id,conversation_id,content,created_at,sender_id,read_at,delivered_at,status')
+        .select('id,conversation_id,content,created_at,sender_id,read_at,delivered_at,status,image_url')
         .in('conversation_id', convIds)
         .order('created_at', { ascending: false });
 
@@ -276,11 +277,30 @@ export const useRealtimeChat = (conversationId?: string) => {
     };
   }, [user]);
 
-  const sendMessage = async (content: string, otherUserId?: string) => {
-    if (!user || !content.trim()) return;
+  const sendMessage = async (content: string, otherUserId?: string, imageFile?: File) => {
+    if (!user || (!content.trim() && !imageFile)) return;
 
     try {
       let conversation_id = conversationId;
+      let image_url = null;
+
+      // Upload image if provided
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('chat-images')
+          .upload(fileName, imageFile);
+
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-images')
+          .getPublicUrl(fileName);
+          
+        image_url = publicUrl;
+      }
 
       // If no conversation exists, create one
       if (!conversation_id && otherUserId) {
@@ -317,7 +337,8 @@ export const useRealtimeChat = (conversationId?: string) => {
         {
           conversation_id,
           sender_id: user.id,
-          content: content.trim(),
+          content: content.trim() || null,
+          image_url,
         },
       ]);
 

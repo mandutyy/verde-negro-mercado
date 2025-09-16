@@ -45,6 +45,7 @@ export type Database = {
           created_at: string
           delivered_at: string | null
           id: string
+          image_url: string | null
           read_at: string | null
           sender_id: string
           status: string | null
@@ -55,6 +56,7 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           id?: string
+          image_url?: string | null
           read_at?: string | null
           sender_id: string
           status?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           id?: string
+          image_url?: string | null
           read_at?: string | null
           sender_id?: string
           status?: string | null

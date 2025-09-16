@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Check, CheckCheck } from 'lucide-react';
+import { ArrowLeft, Send, Camera, Check, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,6 +18,7 @@ const Chat = () => {
   const [sending, setSending] = useState(false);
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,13 +34,6 @@ const Chat = () => {
       markMessagesAsRead(conversationId);
     }
   }, [conversationId, user]);
-
-  // Mark messages as read when conversation is opened
-  useEffect(() => {
-    if (conversationId && user) {
-      markMessagesAsRead(conversationId);
-    }
-  }, [conversationId, user, markMessagesAsRead]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -97,7 +91,7 @@ const Chat = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim()) || sending) return;
 
     setSending(true);
     try {
@@ -114,153 +108,212 @@ const Chat = () => {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Solo se permiten archivos de imagen",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "La imagen no puede ser mayor a 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSending(true);
+    try {
+      await sendMessage('', undefined, file);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo enviar la imagen",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-plant-subtle flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b border-plant-100 p-4 flex items-center space-x-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/messages')}
-          className="p-2"
-        >
-          <ArrowLeft size={20} />
-        </Button>
-        
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={otherUser?.avatar_url || ""} />
-          <AvatarFallback className="bg-plant-100 text-plant-700">
-            {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div>
-          <h1 className="font-semibold text-gray-900">{otherUser?.name || 'Usuario'}</h1>
-          <p className="text-sm text-gray-500">En línea</p>
+    <div className="relative flex h-screen w-full flex-col bg-[#122118] justify-between">
+      <div className="flex-grow">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/messages')}
+            className="text-white flex size-10 items-center justify-center p-0 hover:bg-white/10"
+          >
+            <ArrowLeft size={24} />
+          </Button>
+          
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={otherUser?.avatar_url || ""} />
+              <AvatarFallback className="bg-[#264532] text-white">
+                {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+              {otherUser?.name || 'Usuario'}
+            </h2>
+          </div>
+          
+          <div className="w-10 h-10"></div>
+        </div>
+
+        {/* Messages */}
+        <div className="p-4 space-y-6 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center text-[#96c5a9]">
+                <p className="text-lg mb-2">💬</p>
+                <p>No hay mensajes aún</p>
+                <p className="text-sm">¡Envía el primer mensaje!</p>
+              </div>
+            </div>
+          ) : (
+            messages.map((message) => {
+              const isOwnMessage = message.sender_id === user.id;
+              return (
+                <div
+                  key={message.id}
+                  className={`flex items-end gap-3 ${
+                    isOwnMessage ? 'justify-end ml-auto' : ''
+                  } max-w-[80%]`}
+                >
+                  {!isOwnMessage && (
+                    <Avatar className="w-10 h-10 shrink-0">
+                      <AvatarImage src={otherUser?.avatar_url || ""} />
+                      <AvatarFallback className="bg-[#264532] text-white">
+                        {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  
+                  <div className={`flex flex-1 flex-col gap-1.5 ${
+                    isOwnMessage ? 'items-end' : 'items-start'
+                  }`}>
+                    {message.content && (
+                      <div
+                        className={`text-base font-normal leading-normal flex max-w-[360px] rounded-2xl px-4 py-3 ${
+                          isOwnMessage
+                            ? 'rounded-br-lg bg-[#38e07b] text-[#122118]'
+                            : 'rounded-bl-lg bg-[#264532] text-white'
+                        }`}
+                      >
+                        {message.content}
+                      </div>
+                    )}
+                    
+                    {message.image_url && (
+                      <div className="rounded-2xl overflow-hidden max-w-xs w-full">
+                        <img 
+                          src={message.image_url} 
+                          alt="Imagen compartida"
+                          className="w-full h-auto object-cover aspect-[4/3]"
+                          onError={(e) => {
+                            console.error('Error loading image:', message.image_url);
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    <div className={`flex items-center gap-1 text-xs ${
+                      isOwnMessage ? 'text-[#96c5a9]' : 'text-[#96c5a9]'
+                    }`}>
+                      <span>
+                        {new Date(message.created_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                      {isOwnMessage && (
+                        <div className="flex items-center ml-1">
+                          {message.status === 'read' ? (
+                            <CheckCheck size={12} className="text-[#38e07b]" />
+                          ) : message.status === 'delivered' ? (
+                            <CheckCheck size={12} className="text-[#96c5a9]" />
+                          ) : (
+                            <Check size={12} className="text-[#96c5a9]" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-gray-500">
-              <p className="text-lg mb-2">💬</p>
-              <p>No hay mensajes aún</p>
-              <p className="text-sm">¡Envía el primer mensaje!</p>
-            </div>
-          </div>
-        ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender_id === user.id ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm ${
-                  message.sender_id === user.id
-                    ? 'bg-plant-500 text-white'
-                    : 'bg-white text-gray-900 border border-plant-100'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                <div className={`flex items-center justify-end gap-1 mt-1 ${
-                  message.sender_id === user.id
-                    ? 'text-plant-100'
-                    : 'text-gray-500'
-                }`}>
-                  <span className="text-xs">
-                    {new Date(message.created_at).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                  {message.sender_id === user.id && (
-                    <div className="flex items-center ml-1">
-                      {message.status === 'read' ? (
-                        <CheckCheck size={12} className="text-blue-400" />
-                      ) : message.status === 'delivered' ? (
-                        <CheckCheck size={12} className="text-plant-100" />
-                      ) : (
-                        <Check size={12} className="text-plant-100" />
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <p
-                    className={`text-xs ${
-                      message.sender_id === user.id
-                        ? 'text-plant-100'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {new Date(message.created_at).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-                  {message.sender_id === user.id && (
-                    <div className="flex items-center ml-2">
-                      {message.status === 'read' ? (
-                        <div className="flex">
-                          <svg width="16" height="12" viewBox="0 0 16 12" className="text-blue-500 fill-current">
-                            <path d="M15.03 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 0 1 1.06-1.06L7 9.44l6.97-6.97a.75.75 0 0 1 1.06 0Z"/>
-                            <path d="M12.53 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 0 1 1.06-1.06l.47.47L11.47 2.47a.75.75 0 0 1 1.06 0Z"/>
-                          </svg>
-                        </div>
-                      ) : message.status === 'delivered' ? (
-                        <div className="flex">
-                          <svg width="16" height="12" viewBox="0 0 16 12" className="text-gray-400 fill-current">
-                            <path d="M15.03 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 0 1 1.06-1.06L7 9.44l6.97-6.97a.75.75 0 0 1 1.06 0Z"/>
-                            <path d="M12.53 2.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 0 1 1.06-1.06l.47.47L11.47 2.47a.75.75 0 0 1 1.06 0Z"/>
-                          </svg>
-                        </div>
-                      ) : (
-                        <svg width="12" height="12" viewBox="0 0 12 12" className="text-gray-400 fill-current">
-                          <path d="M10.03 2.47a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 0 1 1.06-1.06L4 7.44l4.97-4.97a.75.75 0 0 1 1.06 0Z"/>
-                        </svg>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
       {/* Message Input */}
-      <div className="bg-white border-t border-plant-100 p-4">
-        <form onSubmit={handleSendMessage} className="flex space-x-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Escribe tu mensaje..."
-            className="flex-1 border-plant-200 focus:border-plant-400"
-            disabled={sending}
-            maxLength={1000}
-          />
+      <div className="sticky bottom-0 bg-[#122118] pt-1">
+        <div className="flex items-center px-4 py-3 gap-3">
+          <div className="flex w-full flex-1 items-center rounded-full bg-[#264532] h-12 px-2">
+            <form onSubmit={handleSendMessage} className="flex w-full items-center">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Escribe un mensaje..."
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-[#96c5a9] px-2 text-base font-normal leading-normal"
+                disabled={sending}
+              />
+            </form>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={sending}
+              className="flex items-center justify-center p-2 text-[#96c5a9] hover:text-white hover:bg-transparent"
+            >
+              <Camera size={20} />
+            </Button>
+          </div>
+          
           <Button
-            type="submit"
-            size="sm"
+            onClick={handleSendMessage}
             disabled={!newMessage.trim() || sending}
-            className="px-4 bg-plant-500 hover:bg-plant-600"
+            className="flex-shrink-0 flex items-center justify-center size-12 rounded-full bg-[#38e07b] text-[#122118] hover:bg-[#38e07b]/90 disabled:opacity-50"
           >
             {sending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#122118]"></div>
             ) : (
-              <Send size={16} />
+              <Send size={20} />
             )}
           </Button>
-        </form>
-        <div className="text-xs text-gray-400 mt-1 text-right">
-          {newMessage.length}/1000
         </div>
       </div>
     </div>
