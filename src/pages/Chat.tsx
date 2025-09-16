@@ -17,6 +17,8 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,12 +93,17 @@ const Chat = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim()) || sending) return;
+    if ((!newMessage.trim() && !selectedImage) || sending) return;
 
     setSending(true);
     try {
-      await sendMessage(newMessage);
+      await sendMessage(newMessage, undefined, selectedImage || undefined);
       setNewMessage('');
+      setSelectedImage(null);
+      setImagePreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -108,7 +115,7 @@ const Chat = () => {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -132,21 +139,20 @@ const Chat = () => {
       return;
     }
 
-    setSending(true);
-    try {
-      await sendMessage('', undefined, file);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo enviar la imagen",
-        variant: "destructive",
-      });
-    } finally {
-      setSending(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    // Set selected image and create preview
+    setSelectedImage(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -271,6 +277,25 @@ const Chat = () => {
 
       {/* Message Input */}
       <div className="sticky bottom-0 bg-[#122118] pt-1">
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="px-4 pb-2">
+            <div className="relative inline-block">
+              <img 
+                src={imagePreview} 
+                alt="Vista previa" 
+                className="w-20 h-20 object-cover rounded-lg border-2 border-[#38e07b]"
+              />
+              <button
+                onClick={removeSelectedImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+        
         <div className="flex items-center px-4 py-3 gap-3">
           <div className="flex w-full flex-1 items-center rounded-full bg-[#264532] h-12 px-2">
             <form onSubmit={handleSendMessage} className="flex w-full items-center">
@@ -291,21 +316,19 @@ const Chat = () => {
               className="hidden"
             />
             
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={sending}
-              className="flex items-center justify-center p-2 text-[#96c5a9] hover:text-white hover:bg-transparent"
+              className="flex items-center justify-center p-2 text-[#96c5a9] hover:text-white"
             >
               <Camera size={20} />
-            </Button>
+            </button>
           </div>
           
-          <Button
+          <button
             onClick={handleSendMessage}
-            disabled={!newMessage.trim() || sending}
+            disabled={(!newMessage.trim() && !selectedImage) || sending}
             className="flex-shrink-0 flex items-center justify-center size-12 rounded-full bg-[#38e07b] text-[#122118] hover:bg-[#38e07b]/90 disabled:opacity-50"
           >
             {sending ? (
@@ -313,7 +336,7 @@ const Chat = () => {
             ) : (
               <Send size={20} />
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </div>
