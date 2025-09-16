@@ -43,25 +43,31 @@ export type Database = {
           content: string
           conversation_id: string
           created_at: string
+          delivered_at: string | null
           id: string
           read_at: string | null
           sender_id: string
+          status: string | null
         }
         Insert: {
           content: string
           conversation_id: string
           created_at?: string
+          delivered_at?: string | null
           id?: string
           read_at?: string | null
           sender_id: string
+          status?: string | null
         }
         Update: {
           content?: string
           conversation_id?: string
           created_at?: string
+          delivered_at?: string | null
           id?: string
           read_at?: string | null
           sender_id?: string
+          status?: string | null
         }
         Relationships: [
           {
@@ -215,7 +221,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mark_messages_as_read: {
+        Args: { conversation_uuid: string; user_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
