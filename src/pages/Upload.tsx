@@ -349,16 +349,6 @@ const Upload = () => {
               {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
             </div>
 
-            {/* Submit button directly under Location */}
-            <div className="mt-4">
-              <button 
-                type="submit"
-                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
-              >
-                Publicar
-              </button>
-            </div>
-
             {/* Price - Always required */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor="price">
@@ -395,6 +385,17 @@ const Upload = () => {
                 {errors.exchangeFor && <p className="text-red-400 text-sm mt-1">{errors.exchangeFor}</p>}
               </div>
             )}
+
+            {/* Submit button at the bottom */}
+            <div className="mt-6">
+              <button 
+                type="submit"
+                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
+              >
+                Publicar
+              </button>
+            </div>
+
           </div>
         </form>
       </main>
