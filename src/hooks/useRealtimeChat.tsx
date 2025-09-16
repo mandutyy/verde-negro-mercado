@@ -35,24 +35,139 @@ export const useRealtimeChat = (conversationId?: string) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load conversations with last message info
+  // Helper to refresh conversations with last message, unread count, and profiles
+  const refreshConversations = async () => {
+    if (!user) return;
+    try {
+      // 1) Base conversations for current user
+      const { data: convs, error: convErr } = await supabase
+        .from('conversations')
+        .select('*')
+        .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`);
+
+      if (convErr) {
+        console.error('Error loading conversations:', convErr);
+        setLoading(false);
+        return;
+      }
+
+      if (!convs || convs.length === 0) {
+        setConversations([]);
+        setLoading(false);
+        return;
+      }
+
+      const convIds = convs.map((c) => c.id);
+      const otherIds = convs.map((c) => (c.participant_1 === user.id ? c.participant_2 : c.participant_1));
+      
+      // 2) Latest messages across these conversations
+      const { data: msgs } = await supabase
+        .from('messages')
+        .select('id,conversation_id,content,created_at,sender_id,read_at,delivered_at,status')
+        .in('conversation_id', convIds)
+        .order('created_at', { ascending: false });
+
+      const lastByConv = new Map<string, Message>();
+      msgs?.forEach((m) => {
+        if (!lastByConv.has(m.conversation_id)) {
+          lastByConv.set(m.conversation_id, m as unknown as Message);
+        }
+      });
+
+      // 3) Unread counts for current user
+      const { data: unreadMsgs } = await supabase
+        .from('messages')
+        .select('id,conversation_id')
+        .in('conversation_id', convIds)
+        .neq('sender_id', user.id)
+        .is('read_at', null);
+
+      const unreadCountByConv = new Map<string, number>();
+      unreadMsgs?.forEach((m: any) => {
+        unreadCountByConv.set(m.conversation_id, (unreadCountByConv.get(m.conversation_id) || 0) + 1);
+      });
+
+      // 4) Profiles for the "other" user in each conversation
+      const uniqueOtherIds = Array.from(new Set(otherIds));
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id,name,avatar_url')
+        .in('user_id', uniqueOtherIds);
+
+      const profileByUserId = new Map<string, { name?: string; avatar_url?: string }>();
+      profiles?.forEach((p: any) => profileByUserId.set(p.user_id, { name: p.name, avatar_url: p.avatar_url }));
+
+      // 5) Merge all info and sort by last message time (fallback to updated_at)
+      const enriched: Conversation[] = convs.map((c: any) => {
+        const last = lastByConv.get(c.id);
+        const otherUserId = c.participant_1 === user.id ? c.participant_2 : c.participant_1;
+        const otherProfile = profileByUserId.get(otherUserId);
+        return {
+          id: c.id,
+          participant_1: c.participant_1,
+          participant_2: c.participant_2,
+          created_at: c.created_at,
+          updated_at: c.updated_at,
+          last_message_content: last?.content,
+          last_message_time: last?.created_at,
+          last_message_sender: last?.sender_id,
+          unread_count: unreadCountByConv.get(c.id) || 0,
+          participant_1_name: profileByUserId.get(c.participant_1)?.name,
+          participant_1_avatar: profileByUserId.get(c.participant_1)?.avatar_url,
+          participant_2_name: profileByUserId.get(c.participant_2)?.name,
+          participant_2_avatar: profileByUserId.get(c.participant_2)?.avatar_url,
+        };
+      }).sort((a, b) => {
+        const aTime = a.last_message_time ? new Date(a.last_message_time).getTime() : new Date(a.updated_at).getTime();
+        const bTime = b.last_message_time ? new Date(b.last_message_time).getTime() : new Date(b.updated_at).getTime();
+        return bTime - aTime;
+      });
+
+      setConversations(enriched);
+    } catch (err) {
+      console.error('Error loading conversations:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load conversations
   useEffect(() => {
     if (!user) return;
-
-    const loadConversations = async () => {
-      const { data, error } = await (supabase as any)
-        .rpc('get_conversations_with_last_message', { user_uuid: user.id });
-
-      if (error) {
-        console.error('Error loading conversations:', error);
-      } else {
-        setConversations((data as Conversation[]) || []);
-      }
-      setLoading(false);
-    };
-
-    loadConversations();
+    refreshConversations();
   }, [user]);
+
+  // Inbox realtime: refresh when any new message arrives for user's conversations
+  useEffect(() => {
+    if (!user || conversationId) return;
+
+    const channel = supabase
+      .channel('messages-inbox')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        async (payload) => {
+          try {
+            const msg = payload.new as Message;
+            const { data } = await supabase
+              .from('conversations')
+              .select('participant_1, participant_2')
+              .eq('id', msg.conversation_id)
+              .single();
+            if (data && (data.participant_1 === user.id || data.participant_2 === user.id)) {
+              await refreshConversations();
+            }
+          } catch (e) {
+            console.error('Error handling inbox realtime message:', e);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, conversationId]);
 
   // Load messages for specific conversation and mark as read
   useEffect(() => {
@@ -132,12 +247,7 @@ export const useRealtimeChat = (conversationId?: string) => {
             newConversation.participant_2 === user.id
           ) {
             // Reload conversations to get the full details
-            const { data } = await supabase.rpc('get_conversations_with_last_message', {
-              user_uuid: user.id
-            });
-            if (data) {
-              setConversations(data as Conversation[]);
-            }
+            await refreshConversations();
           }
         }
       )
@@ -155,12 +265,7 @@ export const useRealtimeChat = (conversationId?: string) => {
             updatedConversation.participant_2 === user.id
           ) {
             // Reload conversations to get the full details
-            const { data } = await supabase.rpc('get_conversations_with_last_message', {
-              user_uuid: user.id
-            });
-            if (data) {
-              setConversations(data as Conversation[]);
-            }
+            await refreshConversations();
           }
         }
       )
@@ -226,12 +331,7 @@ export const useRealtimeChat = (conversationId?: string) => {
         
       // Reload conversations to update the UI
       if (!conversationId) {
-        const { data } = await supabase.rpc('get_conversations_with_last_message', {
-          user_uuid: user.id
-        });
-        if (data) {
-          setConversations(data as Conversation[]);
-        }
+        await refreshConversations();
       }
     } catch (error) {
       console.error('Error sending message:', error);
