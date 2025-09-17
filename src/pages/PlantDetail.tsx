@@ -283,6 +283,35 @@ const PlantDetail = () => {
     setIsFavorite(!isFavorite);
   };
 
+  const handleReserve = async () => {
+    if (!plant) return;
+    
+    try {
+      const { error } = await supabase
+        .from('plants')
+        .update({ status: 'reserved' })
+        .eq('id', plant.id)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setPlant(prev => prev ? { ...prev, status: 'reserved' } : null);
+
+      toast({
+        title: "¡Reservado!",
+        description: "Tu planta ha sido marcada como reservada",
+      });
+    } catch (error) {
+      console.error('Error reserving plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo reservar la planta",
+        variant: "destructive"
+      });
+    }
+  };
+
   const mainImage = plant.images && plant.images.length > 0 ? plant.images[0] : '/placeholder.svg';
   const sellerName = seller?.name || `Usuario ${plant.user_id.slice(0, 8)}`;
   const isOwner = user?.id === plant.user_id;
@@ -411,7 +440,10 @@ const PlantDetail = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-400">Estado</div>
-                  <div className="font-medium text-white">{plant.status === 'active' ? 'Disponible' : 'No disponible'}</div>
+                  <div className="font-medium text-white">
+                    {plant.status === 'active' ? 'Disponible' : 
+                     plant.status === 'reserved' ? 'Reservado' : 'No disponible'}
+                  </div>
                 </div>
               </div>
               
@@ -491,6 +523,22 @@ const PlantDetail = () => {
             >
               <MessageCircle className="h-5 w-5 mr-2" />
               Contactar con {sellerName}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Reserve Button - Fixed at bottom - Only for owners */}
+      {isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
+          <div className="max-w-4xl mx-auto">
+            <Button 
+              onClick={handleReserve}
+              disabled={plant.status === 'reserved'}
+              className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold disabled:bg-gray-500 disabled:text-gray-300"
+              size="lg"
+            >
+              {plant.status === 'reserved' ? '✓ Reservado' : 'Reservar'}
             </Button>
           </div>
         </div>
