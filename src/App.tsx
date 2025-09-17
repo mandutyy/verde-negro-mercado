@@ -23,6 +23,7 @@ import PlantDetail from "./pages/PlantDetail";
 import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +120,9 @@ const AppContent = () => {
       
       {/* Mobile-optimized bottom navigation */}
       {shouldShowNavigation && <Navigation />}
+      
+      {/* Cookie consent banner */}
+      <CookieConsent />
     </div>
   );
 };
