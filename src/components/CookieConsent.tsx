@@ -29,16 +29,20 @@ const CookieConsent = () => {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-safe">
-      <Card className="bg-card/95 backdrop-blur-sm border-border shadow-lg">
-        <div className="p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Dark overlay */}
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+      
+      {/* Centered modal */}
+      <Card className="relative bg-card border-border shadow-2xl max-w-md w-full">
+        <div className="p-6">
           <div className="flex items-start gap-3 mb-4">
-            <Cookie className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+            <Cookie className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-foreground mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-3">
                 Uso de Cookies y Datos
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Utilizamos cookies esenciales para el funcionamiento de la aplicación, 
                 análisis de uso y mejorar tu experiencia. Al continuar navegando, 
                 aceptas nuestro uso de cookies según nuestra política de privacidad.
@@ -46,28 +50,23 @@ const CookieConsent = () => {
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2 justify-end">
+          <div className="flex flex-col gap-2">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReject}
-              className="text-xs"
+              onClick={handleAccept}
+              className="w-full bg-primary hover:bg-primary/90"
             >
-              Solo Esenciales
+              Aceptar Todas las Cookies
             </Button>
             <Button
-              size="sm"
-              onClick={handleAccept}
-              className="text-xs bg-primary hover:bg-primary/90"
+              variant="outline"
+              onClick={handleReject}
+              className="w-full"
             >
-              Aceptar Todas
+              Solo Cookies Esenciales
             </Button>
           </div>
         </div>
       </Card>
-      
-      {/* Overlay for mobile to ensure visibility */}
-      <div className="fixed inset-0 bg-background/20 backdrop-blur-[1px] -z-10 pointer-events-none" />
     </div>
   );
 };
