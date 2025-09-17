@@ -12,6 +12,7 @@ interface PlantCardProps {
   image: string;
   isFavorite?: boolean;
   saleType: string;
+  status?: string;
 }
 
 const PlantCard = memo(({ 
@@ -21,7 +22,8 @@ const PlantCard = memo(({
   location, 
   image, 
   isFavorite = false,
-  saleType 
+  saleType,
+  status = 'active'
 }: PlantCardProps) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const navigate = useNavigate();
@@ -87,14 +89,19 @@ const PlantCard = memo(({
           {title}
         </h3>
         
-        {/* Sale type badge */}
-        <div className="mb-3">
+        {/* Sale type badge and status */}
+        <div className="mb-3 flex gap-2">
           <span className={cn(
             "inline-block px-2 py-1 rounded-full text-xs font-bold",
             getSaleTypeDisplay(saleType).className
           )}>
             {getSaleTypeDisplay(saleType).text}
           </span>
+          {status === 'reserved' && (
+            <span className="inline-block px-2 py-1 rounded-full text-xs font-bold bg-orange-500 text-white">
+              RESERVADO
+            </span>
+          )}
         </div>
         
         <div className="flex justify-between items-end">

@@ -21,7 +21,7 @@ const Home = () => {
       let query = supabase
         .from('plants')
         .select('*')
-        .eq('status', 'active');
+        .in('status', ['active', 'reserved']);
 
       // Exclude user's own plants if authenticated
       if (user) {
@@ -180,6 +180,7 @@ const Home = () => {
                     image={plant.images && plant.images.length > 0 ? plant.images[0] : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400&h=400&fit=crop'}
                     saleType={plant.sale_type || 'sell'}
                     isFavorite={false}
+                    status={plant.status}
                   />
                 ))}
             </div>

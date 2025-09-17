@@ -41,7 +41,7 @@ const Search = () => {
         const { data, error } = await supabase
           .from('plants')
           .select('*')
-          .eq('status', 'active')
+          .in('status', ['active', 'reserved'])
           .order('created_at', { ascending: false });
 
         if (error) throw error;
