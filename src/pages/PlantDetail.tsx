@@ -115,17 +115,15 @@ const PlantDetail = () => {
 
   useEffect(() => {
     const fetchPlant = async () => {
-      if (!id) return;
+      if (!id || !user) return;
       
       setLoading(true);
       try {
-        // Fetch plant data - users can see their own plants regardless of status, 
-        // others can see active or reserved plants
+        // Fetch plant data relying on RLS: owners can see their own plants, others ven activas
         const { data: plantData, error: plantError } = await supabase
           .from('plants')
           .select('*')
           .eq('id', id)
-          .or(`status.in.(active,reserved),user_id.eq.${user?.id || 'null'}`)
           .maybeSingle();
 
         if (plantError) throw plantError;
@@ -150,7 +148,7 @@ const PlantDetail = () => {
           setSeller(profileData);
         }
 
-        // Increment view count
+        // Increment view count (ignored on failure due to RLS for non-owners)
         await supabase
           .from('plants')
           .update({ views_count: (plantData.views_count || 0) + 1 })
@@ -169,7 +167,7 @@ const PlantDetail = () => {
     };
 
     fetchPlant();
-  }, [id]);
+  }, [id, user]);
   
   if (loading) {
     return (
