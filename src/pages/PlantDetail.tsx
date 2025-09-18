@@ -56,6 +56,14 @@ const PlantDetail = () => {
     setEditDialogOpen(false);
   };
 
+  const handleBack = () => {
+    // If there is no meaningful history, go home
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
   const handleUpdatePlant = async (plantId: string, updates: Partial<Plant>) => {
     try {
       const { error } = await supabase
@@ -324,7 +332,7 @@ const PlantDetail = () => {
           <Button
             variant="ghost" 
             size="icon"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="text-white hover:bg-[#1b3124]"
           >
             <ArrowLeft className="h-5 w-5" />
