@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import EditPlantDialog from '@/components/EditPlantDialog';
 
@@ -393,9 +394,18 @@ const PlantDetail = () => {
         <div className="p-4 space-y-6">
           {/* Title and Price */}
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
-              {plant.title}
-            </h1>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl font-bold text-white">
+                {plant.title}
+              </h1>
+              {/* Icono de reservado para no-propietarios */}
+              {plant.status === 'reserved' && !isOwner && (
+                <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  <ClipboardList className="h-4 w-4" />
+                  RESERVADO
+                </div>
+              )}
+            </div>
             <div className="flex items-center justify-between">
               <div className="text-3xl font-bold text-[#38e07b]">
                 {getPlantTypeLabel(plant.sale_type, plant.price)}
@@ -517,11 +527,19 @@ const PlantDetail = () => {
           <div className="max-w-4xl mx-auto">
             <Button 
               onClick={handleContact}
-              className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold"
+              className={cn(
+                "w-full font-bold",
+                plant.status === 'reserved' 
+                  ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                  : "bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118]"
+              )}
               size="lg"
             >
               <MessageCircle className="h-5 w-5 mr-2" />
-              Contactar con {sellerName}
+              {plant.status === 'reserved' 
+                ? `Contactar (Reservado)` 
+                : `Contactar con ${sellerName}`
+              }
             </Button>
           </div>
         </div>
