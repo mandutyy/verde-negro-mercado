@@ -40,7 +40,7 @@ const Purchase = () => {
     if (id) {
       fetchPlant();
     }
-  }, [id]);
+  }, [id, user]);
 
   const fetchPlant = async () => {
     try {
@@ -48,8 +48,8 @@ const Purchase = () => {
         .from('plants')
         .select('*')
         .eq('id', id)
-        .eq('status', 'active')
-        .single();
+        .or(`status.in.(active,reserved),user_id.eq.${user?.id || 'null'}`)
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching plant:', error);
