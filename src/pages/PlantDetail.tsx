@@ -119,12 +119,13 @@ const PlantDetail = () => {
       
       setLoading(true);
       try {
-        // Fetch plant data
+        // Fetch plant data - users can see their own plants regardless of status, 
+        // others can see active or reserved plants
         const { data: plantData, error: plantError } = await supabase
           .from('plants')
           .select('*')
           .eq('id', id)
-          .eq('status', 'active')
+          .or(`status.in.(active,reserved),user_id.eq.${user?.id || 'null'}`)
           .maybeSingle();
 
         if (plantError) throw plantError;
