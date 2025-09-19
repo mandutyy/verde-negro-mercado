@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -406,11 +406,11 @@ const PlantDetail = () => {
               <h1 className="text-2xl font-bold text-white">
                 {plant.title}
               </h1>
-              {/* Icono de reservado para no-propietarios */}
+              {/* Badge de reservado para no-propietarios */}
               {plant.status === 'reserved' && !isOwner && (
-                <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  <ClipboardList className="h-4 w-4" />
-                  RESERVADO
+                <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                  <Bookmark className="h-4 w-4 fill-purple-600" />
+                  Reservado
                 </div>
               )}
             </div>
