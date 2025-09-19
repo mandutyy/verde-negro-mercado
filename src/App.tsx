@@ -42,7 +42,7 @@ const AppContent = () => {
                                location.pathname !== '/search';
   
   return (
-    <div className="min-h-screen bg-background w-full relative">
+    <div className="app-container bg-background w-full">
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/" element={
