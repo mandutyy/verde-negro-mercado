@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import defaultProfileIcon from '@/assets/default-profile-icon.png';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, ArrowLeft, Share2, Home, Plus, MessageCircle, User } from 'lucide-react';
 
 interface Plant {
   id: string;
@@ -184,15 +184,21 @@ const isOwner = user?.id === plant.user_id;
         <div className="relative">
           {/* Header Buttons */}
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-            <button 
+            <Button
               onClick={() => navigate(-1)}
-              className="text-white flex size-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+              variant="ghost"
+              size="icon"
+              className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
             >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-            <button className="text-white flex size-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
-              <span className="material-symbols-outlined">share</span>
-            </button>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
+            >
+              <Share2 className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Main Hero Image */}
@@ -281,34 +287,34 @@ const isOwner = user?.id === plant.user_id;
           </Button>
         </div>
         <div className="flex gap-2 border-t border-border px-4 pb-3 pt-2">
-          <a 
+          <button 
             onClick={goHome}
             className="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white cursor-pointer"
           >
-            <span className="material-symbols-outlined">home</span>
+            <Home className="h-5 w-5" />
             <span className="text-xs font-medium">Home</span>
-          </a>
-          <a 
+          </button>
+          <button 
             onClick={goToAdd}
             className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
           >
-            <span className="material-symbols-outlined">add_box</span>
+            <Plus className="h-5 w-5" />
             <span className="text-xs font-medium">Add</span>
-          </a>
-          <a 
+          </button>
+          <button 
             onClick={goToChat}
             className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
           >
-            <span className="material-symbols-outlined">chat_bubble</span>
+            <MessageCircle className="h-5 w-5" />
             <span className="text-xs font-medium">Chat</span>
-          </a>
-          <a 
+          </button>
+          <button 
             onClick={goToProfile}
             className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
           >
-            <span className="material-symbols-outlined">person</span>
+            <User className="h-5 w-5" />
             <span className="text-xs font-medium">Profile</span>
-          </a>
+          </button>
         </div>
       </div>
     </div>
