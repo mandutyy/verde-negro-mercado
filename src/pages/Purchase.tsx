@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import defaultProfileIcon from '@/assets/default-profile-icon.png';
+import { Bookmark } from 'lucide-react';
 
 interface Plant {
   id: string;
@@ -17,6 +18,7 @@ interface Plant {
   exchange_for: string | null;
   user_id: string;
   created_at: string;
+  status: string; // 'active' | 'reserved' | ...
 }
 
 interface Profile {
@@ -171,8 +173,9 @@ const Purchase = () => {
     );
   }
 
-  const canPurchase = plant.sale_type.includes('sell') && plant.price;
-  const canExchange = plant.sale_type.includes('exchange');
+const canPurchase = plant.sale_type.includes('sell') && plant.price;
+const canExchange = plant.sale_type.includes('exchange');
+const isOwner = user?.id === plant.user_id;
 
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-background font-spline justify-between overflow-x-hidden">
@@ -200,8 +203,16 @@ const Purchase = () => {
                   className="absolute inset-0 bg-center bg-no-repeat bg-cover" 
                   style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
-                
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent z-10"></div>
+
+                {plant.status === 'reserved' && !isOwner && (
+                  <div className="absolute top-4 left-4 z-20">
+                    <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                      <Bookmark className="h-4 w-4 fill-purple-600" />
+                      Reservado
+                    </div>
+                  </div>
+                )}
                 {/* Thumbnail Images */}
                 {plant.images.length > 1 && (
                   <div className="absolute bottom-4 right-4 flex gap-2">
