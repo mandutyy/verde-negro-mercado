@@ -206,7 +206,7 @@ const isOwner = user?.id === plant.user_id;
                 <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent z-10"></div>
 
                 {plant.status === 'reserved' && !isOwner && (
-                  <div className="absolute top-4 left-4 z-20">
+                  <div className="absolute bottom-4 right-4 z-20">
                     <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
                       <Bookmark className="h-4 w-4 fill-purple-600" />
                       Reservado
