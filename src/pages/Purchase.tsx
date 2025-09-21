@@ -65,16 +65,17 @@ const Purchase = () => {
 
       setPlant(data);
 
-      // Fetch seller profile
+      // Fetch seller profile using secure function
       if (data.user_id) {
         const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('name, avatar_url, bio')
-          .eq('user_id', data.user_id)
-          .single();
+          .rpc('get_public_profile', { profile_user_id: data.user_id });
 
-        if (!profileError && profileData) {
-          setSellerProfile(profileData);
+        if (!profileError && profileData && profileData.length > 0) {
+          setSellerProfile({
+            name: profileData[0].name,
+            avatar_url: profileData[0].avatar_url,
+            bio: null // Bio is not included in public profile data for security
+          });
         }
       }
     } catch (error) {
@@ -268,7 +269,7 @@ const isOwner = user?.id === plant.user_id;
                   {sellerProfile?.name || `Usuario ${plant.user_id.slice(-4)}`}
                 </p>
                 <p className="text-secondary text-base font-normal leading-normal">
-                  {sellerProfile?.bio || "Amante de las plantas"}
+                  {plant.location}
                 </p>
               </div>
             </div>

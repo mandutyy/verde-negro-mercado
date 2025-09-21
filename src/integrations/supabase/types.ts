@@ -242,6 +242,14 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_public_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar_url: string
+          name: string
+          user_id: string
+        }[]
+      }
       mark_messages_as_read: {
         Args: { conversation_uuid: string; user_uuid: string }
         Returns: undefined
