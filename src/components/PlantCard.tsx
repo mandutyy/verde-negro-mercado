@@ -3,6 +3,7 @@ import { Heart } from 'lucide-react';
 import { useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface PlantCardProps {
   id: string;
@@ -25,14 +26,14 @@ const PlantCard = memo(({
   saleType,
   status = 'active'
 }: PlantCardProps) => {
-  const [favorite, setFavorite] = useState(isFavorite);
   const navigate = useNavigate();
+  const { isFavorite: favorite, loading: favoriteLoading, toggleFavorite } = useFavorites(id);
 
-  const toggleFavorite = useCallback((e: React.MouseEvent) => {
+  const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorite(prev => !prev);
-  }, []);
+    toggleFavorite();
+  }, [toggleFavorite]);
 
   const handleCardClick = useCallback(() => {
     navigate(`/purchase/${id}`);
@@ -69,7 +70,8 @@ const PlantCard = memo(({
           loading="lazy"
         />
         <button
-          onClick={toggleFavorite}
+          onClick={handleFavoriteClick}
+          disabled={favoriteLoading}
           className={cn(
             "absolute top-3 right-3 p-2 rounded-full transition-all duration-200",
             favorite 

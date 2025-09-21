@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useFavorites } from '@/hooks/useFavorites';
 import EditPlantDialog from '@/components/EditPlantDialog';
 
 interface Plant {
@@ -41,7 +42,7 @@ const PlantDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, loading: favoriteLoading, toggleFavorite } = useFavorites(id);
   const [plant, setPlant] = useState<Plant | null>(null);
   const [seller, setSeller] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -287,8 +288,8 @@ const PlantDetail = () => {
     return categoryLabels[category] || category;
   };
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
+  const handleFavoriteClick = () => {
+    toggleFavorite();
   };
 
   const handleReserve = async () => {
@@ -352,7 +353,8 @@ const PlantDetail = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleFavorite}
+              onClick={handleFavoriteClick}
+              disabled={favoriteLoading}
               className="text-white hover:bg-[#1b3124]"
             >
               <Heart 
