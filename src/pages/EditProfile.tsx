@@ -59,7 +59,7 @@ const EditProfile = () => {
           bio: formData.bio,
           avatar_url: formData.avatar,
           coordinates: formData.coordinates
-        });
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
 
