@@ -39,15 +39,21 @@ const EditProfile = () => {
   const [locationSearch, setLocationSearch] = useState('');
   const [searchResults, setSearchResults] = useState<typeof spanishCities>([]);
   const handleSave = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para guardar los cambios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Generate a valid UUID for demo purposes since auth isn't implemented yet
-      const userId = crypto.randomUUID(); // This should be auth.uid() when authentication is added
-      
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          user_id: userId,
+          user_id: user.id,
           name: formData.name,
           location: formData.location,
           bio: formData.bio,
