@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useUserPlants, Plant } from '@/hooks/useUserPlants';
 import UserPlantCard from '@/components/UserPlantCard';
 import EditPlantDialog from '@/components/EditPlantDialog';
+import { supabase } from '@/integrations/supabase/client';
 const Profile = () => {
   const navigate = useNavigate();
   const {
@@ -20,6 +21,29 @@ const Profile = () => {
     updatePlant,
     deletePlant
   } = useUserPlants();
+
+  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string }>({});
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!cancelled) {
+        setProfile({
+          name: data?.name || undefined,
+          avatar_url: data?.avatar_url || undefined,
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
   const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const handleEditPlant = (plant: Plant) => {
@@ -123,10 +147,10 @@ const Profile = () => {
       {/* Profile Info */}
       <div className="flex flex-col items-center p-4">
         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 mb-4" style={{
-        backgroundImage: `url("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face")`
+        backgroundImage: `url("${profile.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'}")`
       }} />
         <p className="text-white text-xl font-bold leading-tight tracking-[-0.015em] text-center">
-          {user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario'}
+          {profile.name || user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario'}
         </p>
         <div className="flex items-center gap-1 text-[#96c5a9] text-sm mt-1">
           <Star size={16} className="text-[#f5d76e] fill-current" />
