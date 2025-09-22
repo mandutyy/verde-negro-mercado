@@ -13,9 +13,11 @@ import { useToast } from '@/hooks/use-toast';
 import { spanishCities, searchSpanishCities } from '@/data/spanishCities';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useAuth } from '@/hooks/useAuth';
 
 const EditProfile = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -107,11 +109,20 @@ const EditProfile = () => {
   };
 
   const uploadAvatar = async (file: File) => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para subir una foto.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `temp-user-id/${fileName}`; // Use auth.uid() when auth is implemented
+      const filePath = `${user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
