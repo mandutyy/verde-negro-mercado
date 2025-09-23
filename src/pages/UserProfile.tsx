@@ -16,6 +16,9 @@ const UserProfile = () => {
   
   const [profile, setProfile] = useState(null);
   const [plants, setPlants] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,6 +60,25 @@ const UserProfile = () => {
             .order('created_at', { ascending: false });
           
           setPlants(plantsData || []);
+
+          // Obtener las reseñas del usuario
+          const { data: reviewsData } = await supabase
+            .from('user_reviews')
+            .select(`
+              *,
+              reviewer_profile:profiles!user_reviews_reviewer_id_fkey(name, avatar_url)
+            `)
+            .eq('reviewed_user_id', userId)
+            .order('created_at', { ascending: false });
+
+          setReviews(reviewsData || []);
+
+          // Calcular rating promedio
+          if (reviewsData && reviewsData.length > 0) {
+            const totalRating = reviewsData.reduce((sum, review) => sum + review.rating, 0);
+            setAverageRating(Math.round((totalRating / reviewsData.length) * 10) / 10);
+            setReviewCount(reviewsData.length);
+          }
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -94,9 +116,9 @@ const UserProfile = () => {
 
   const stats = [
     { icon: Package, label: 'Publicadas', value: plants.length.toString() },
-    { icon: Star, label: 'Valoración', value: '4.8' },
+    { icon: Star, label: 'Valoración', value: averageRating > 0 ? averageRating.toString() : 'Sin valorar' },
     { icon: Heart, label: 'Favoritos', value: '15' },
-    { icon: MessageCircle, label: 'Intercambios', value: '6' }
+    { icon: MessageCircle, label: 'Reseñas', value: reviewCount.toString() }
   ];
 
   const handleContact = async () => {
@@ -151,9 +173,11 @@ const UserProfile = () => {
                 <h2 className="text-xl font-bold text-white">{profile.name || 'Usuario'}</h2>
                 <div className="flex items-center gap-1 mb-1">
                   <Star className="h-4 w-4 fill-[#f5d76e] text-[#f5d76e]" />
-                  <span className="text-sm font-medium text-white">4.8</span>
+                  <span className="text-sm font-medium text-white">
+                    {averageRating > 0 ? averageRating : 'Sin valorar'}
+                  </span>
                   <span className="text-sm text-[#96c5a9]">
-                    (24 valoraciones)
+                    ({reviewCount} {reviewCount === 1 ? 'valoración' : 'valoraciones'})
                   </span>
                 </div>
                 <p className="text-sm text-[#96c5a9]">
@@ -231,8 +255,80 @@ const UserProfile = () => {
                         <p className="text-base font-bold text-white">
                           €{plant.price}
                         </p>
-                      )}
+          )}
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Reseñas de {profile.name || 'este usuario'}
+          </h3>
+          
+          {reviews.length === 0 ? (
+            <Card className="bg-[#1b3124] border-[#366348] shadow-sm">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
+                  <Star className="text-[#38e07b] h-8 w-8" />
+                </div>
+                <h4 className="text-white text-lg font-bold mb-2">
+                  Sin reseñas aún
+                </h4>
+                <p className="text-[#96c5a9] text-sm">
+                  Este usuario aún no tiene reseñas de otros usuarios
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {reviews.slice(0, 3).map((review) => (
+                <Card key={review.id} className="bg-[#1b3124] border-[#366348] shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-10 h-10 bg-center bg-no-repeat bg-cover rounded-full" 
+                           style={{backgroundImage: `url("${review.reviewer_profile?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'}")`}}>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-white font-medium text-sm">
+                            {review.reviewer_profile?.name || 'Usuario anónimo'}
+                          </h4>
+                          <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`h-4 w-4 ${i < review.rating ? 'fill-[#f5d76e] text-[#f5d76e]' : 'text-[#366348]'}`} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        {review.comment && (
+                          <p className="text-[#96c5a9] text-sm">
+                            {review.comment}
+                          </p>
+                        )}
+                        <p className="text-[#96c5a9] text-xs mt-2">
+                          {new Date(review.created_at).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {reviews.length > 3 && (
+                <div className="text-center">
+                  <Button variant="outline" size="sm" className="border-[#366348] text-[#96c5a9] bg-[#1b3124] hover:bg-[#366348]">
+                    Ver todas las reseñas ({reviews.length})
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
                   </div>
                 </div>
               ))}
