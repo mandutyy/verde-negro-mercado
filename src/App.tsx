@@ -85,6 +85,11 @@ const AppContent = () => {
             <UserProfile />
           </ProtectedRoute>
         } />
+        <Route path="/user-profile/:id" element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } />
         <Route path="/edit-profile" element={
           <ProtectedRoute>
             <EditProfile />
