@@ -146,9 +146,15 @@ const Profile = () => {
 
       {/* Profile Info */}
       <div className="flex flex-col items-center p-4">
-        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 mb-4" style={{
-        backgroundImage: `url("${profile.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'}")`
-      }} />
+        {profile.avatar_url ? (
+          <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 mb-4" style={{
+            backgroundImage: `url("${profile.avatar_url}")`
+          }} />
+        ) : (
+          <div className="bg-[#366348] rounded-full size-24 mb-4 flex items-center justify-center">
+            <div className="text-[#38e07b] text-2xl">👤</div>
+          </div>
+        )}
         <p className="text-white text-xl font-bold leading-tight tracking-[-0.015em] text-center">
           {profile.name || user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario'}
         </p>
