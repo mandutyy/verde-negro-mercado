@@ -255,6 +255,20 @@ const UserProfile = () => {
                         <p className="text-base font-bold text-white">
                           €{plant.price}
                         </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {plants.length > 6 && (
+            <div className="text-center mt-4">
+              <Button variant="outline" size="sm" className="border-[#366348] text-[#96c5a9] bg-[#1b3124] hover:bg-[#366348]">
+                Ver todas ({plants.length})
+              </Button>
+            </div>
           )}
         </div>
 
@@ -326,20 +340,6 @@ const UserProfile = () => {
                   </Button>
                 </div>
               )}
-            </div>
-          )}
-        </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {plants.length > 6 && (
-            <div className="text-center mt-4">
-              <Button variant="outline" size="sm" className="border-[#366348] text-[#96c5a9] bg-[#1b3124] hover:bg-[#366348]">
-                Ver todas ({plants.length})
-              </Button>
             </div>
           )}
         </div>
