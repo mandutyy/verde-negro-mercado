@@ -10,7 +10,9 @@ const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('Todas');
   const [selectedStatus, setSelectedStatus] = useState('Todas');
-  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [priceTouched, setPriceTouched] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Todas');
   const [plants, setPlants] = useState<Plant[]>([]);
   const [filteredPlants, setFilteredPlants] = useState<Plant[]>([]);
@@ -49,11 +51,24 @@ const Search = () => {
 
         if (error) throw error;
         
-        console.log('Fetched plants:', data?.length || 0);
-        setPlants(data || []);
+        const items = data || [];
+        console.log('Fetched plants:', items.length);
+        setPlants(items);
+
+        // Compute dynamic max price
+        const prices = items
+          .map((p: any) => Number(p.price))
+          .filter((n: number) => !isNaN(n));
+        const computedMax = prices.length ? Math.ceil(Math.max(...prices) / 10) * 10 : 1000;
+        setMaxPrice(computedMax);
+        setPriceRange([0, computedMax]);
+        setPriceTouched(false);
       } catch (error) {
         console.error('Error fetching plants:', error);
         setPlants([]);
+        setMaxPrice(1000);
+        setPriceRange([0, 1000]);
+        setPriceTouched(false);
       } finally {
         setLoading(false);
       }
@@ -92,14 +107,13 @@ const Search = () => {
       });
     }
 
-    // Filter by price range (only apply if status includes selling)
-    if (selectedStatus === 'Todas' || selectedStatus === 'sell') {
+    // Filter by price range (apply only when user adjusts the slider)
+    if (priceTouched && (selectedStatus === 'Todas' || selectedStatus === 'sell')) {
       filtered = filtered.filter(plant => {
         // If plant doesn't have price (gift/exchange), include it
         if (!plant.price || plant.price === null) {
-          return selectedStatus === 'Todas' || selectedStatus !== 'sell';
+          return true;
         }
-        // If plant has price, check if it's in range
         const price = Number(plant.price);
         return price >= priceRange[0] && price <= priceRange[1];
       });
@@ -123,7 +137,7 @@ const Search = () => {
     });
 
     setFilteredPlants(filtered);
-  }, [plants, searchQuery, selectedType, selectedStatus, priceRange, selectedLocation]);
+  }, [plants, searchQuery, selectedType, selectedStatus, priceRange, selectedLocation, priceTouched]);
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -312,8 +326,12 @@ const Search = () => {
               <div className="px-2">
                 <Slider
                   value={priceRange}
-                  onValueChange={setPriceRange}
-                  max={200}
+                  onValueChange={(val) => {
+                    setPriceTouched(true);
+                    const next: [number, number] = [val[0] ?? 0, (val[1] ?? val[0] ?? maxPrice) as number];
+                    setPriceRange(next);
+                  }}
+                  max={maxPrice}
                   min={0}
                   step={5}
                   className="w-full"
