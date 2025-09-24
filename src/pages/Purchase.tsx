@@ -257,7 +257,10 @@ const isOwner = user?.id === plant.user_id;
 
           <div className="mt-8">
             <h3 className="text-white text-lg font-bold leading-tight tracking-tight mb-4">Información del vendedor</h3>
-            <div className="flex items-center gap-4">
+            <div 
+              className="flex items-center gap-4 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2 transition-colors"
+              onClick={() => navigate(`/user-profile/${plant.user_id}`)}
+            >
               <div 
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-4 border-primary bg-muted"
                 style={{ 
