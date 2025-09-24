@@ -34,7 +34,6 @@ const AppContent = () => {
   // Hide navigation on specific pages
   const shouldShowNavigation = user && 
                                location.pathname !== '/auth' && 
-                               !location.pathname.startsWith('/purchase') && 
                                !location.pathname.startsWith('/chat') && 
                                !location.pathname.startsWith('/plant/') &&
                                location.pathname !== '/settings' &&

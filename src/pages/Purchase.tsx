@@ -280,46 +280,14 @@ const isOwner = user?.id === plant.user_id;
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="sticky bottom-0 bg-card/80 backdrop-blur-lg">
-        <div className="p-4">
-          <Button 
-            onClick={handleContact}
-            className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
-          >
-            <span className="truncate">Contact Seller</span>
-          </Button>
-        </div>
-        <div className="flex gap-2 border-t border-border px-4 pb-3 pt-2">
-          <button 
-            onClick={goHome}
-            className="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white cursor-pointer"
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs font-medium">Home</span>
-          </button>
-          <button 
-            onClick={goToAdd}
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <Plus className="h-5 w-5" />
-            <span className="text-xs font-medium">Add</span>
-          </button>
-          <button 
-            onClick={goToChat}
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-xs font-medium">Chat</span>
-          </button>
-          <button 
-            onClick={goToProfile}
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary cursor-pointer"
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs font-medium">Profile</span>
-          </button>
-        </div>
+      {/* Contact Button */}
+      <div className="sticky bottom-20 p-4">
+        <Button 
+          onClick={handleContact}
+          className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
+        >
+          <span className="truncate">Contact Seller</span>
+        </Button>
       </div>
     </div>
   );
