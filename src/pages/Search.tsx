@@ -23,7 +23,10 @@ const Search = () => {
     { value: 'exterior', label: 'Exterior' },
     { value: 'suculentas', label: 'Suculentas' },
     { value: 'flores', label: 'Flores' },
-    { value: 'aromaticas', label: 'Aromáticas' }
+    { value: 'aromaticas', label: 'Aromáticas' },
+    { value: 'frutales', label: 'Frutales' },
+    { value: 'cactus', label: 'Cactus' },
+    { value: 'hierbas', label: 'Hierbas' }
   ];
   
   const statusOptions = [
@@ -41,13 +44,16 @@ const Search = () => {
         const { data, error } = await supabase
           .from('plants')
           .select('*')
-          .in('status', ['active', 'reserved'])
+          .eq('status', 'active') // Only show active plants in search
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        
+        console.log('Fetched plants:', data?.length || 0);
         setPlants(data || []);
       } catch (error) {
         console.error('Error fetching plants:', error);
+        setPlants([]);
       } finally {
         setLoading(false);
       }
@@ -58,39 +64,63 @@ const Search = () => {
 
   // Filter plants based on search criteria
   useEffect(() => {
-    let filtered = plants;
+    let filtered = [...plants];
 
     // Filter by search query
     if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(plant =>
-        plant.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        plant.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        plant.location.toLowerCase().includes(searchQuery.toLowerCase())
+        plant.title?.toLowerCase().includes(query) ||
+        plant.description?.toLowerCase().includes(query) ||
+        plant.location?.toLowerCase().includes(query) ||
+        plant.category?.toLowerCase().includes(query)
       );
     }
 
-    // Filter by type
+    // Filter by type/category
     if (selectedType !== 'Todas') {
       filtered = filtered.filter(plant => plant.category === selectedType);
     }
 
-    // Filter by status
+    // Filter by status/sale_type
     if (selectedStatus !== 'Todas') {
-      filtered = filtered.filter(plant => plant.sale_type === selectedStatus);
+      filtered = filtered.filter(plant => {
+        if (selectedStatus === 'sell') {
+          return plant.sale_type === 'sell' || plant.sale_type?.includes('sell');
+        }
+        return plant.sale_type === selectedStatus || plant.sale_type?.includes(selectedStatus);
+      });
     }
 
-    // Filter by price range
-    filtered = filtered.filter(plant => {
-      if (!plant.price) return true; // Include plants without price (gifts/exchange)
-      return plant.price >= priceRange[0] && plant.price <= priceRange[1];
-    });
+    // Filter by price range (only apply if status includes selling)
+    if (selectedStatus === 'Todas' || selectedStatus === 'sell') {
+      filtered = filtered.filter(plant => {
+        // If plant doesn't have price (gift/exchange), include it
+        if (!plant.price || plant.price === null) {
+          return selectedStatus === 'Todas' || selectedStatus !== 'sell';
+        }
+        // If plant has price, check if it's in range
+        const price = Number(plant.price);
+        return price >= priceRange[0] && price <= priceRange[1];
+      });
+    }
 
     // Filter by location (basic contains search)
     if (selectedLocation !== 'Todas' && selectedLocation.trim()) {
       filtered = filtered.filter(plant =>
-        plant.location.toLowerCase().includes(selectedLocation.toLowerCase())
+        plant.location?.toLowerCase().includes(selectedLocation.toLowerCase())
       );
     }
+
+    console.log('Filter results:', {
+      total: plants.length,
+      filtered: filtered.length,
+      searchQuery,
+      selectedType,
+      selectedStatus,
+      priceRange,
+      selectedLocation
+    });
 
     setFilteredPlants(filtered);
   }, [plants, searchQuery, selectedType, selectedStatus, priceRange, selectedLocation]);
