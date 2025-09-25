@@ -87,12 +87,12 @@ const Home = () => {
     <div className="relative flex size-full min-h-screen flex-col bg-background font-spline justify-between overflow-x-hidden">
       <div className="flex-grow">
         {/* Header */}
-        <div className="flex items-center bg-background p-4 pb-1 justify-center sticky top-0 z-10">
+        <div className="flex items-center bg-background p-4 pb-0 justify-center sticky top-0 z-10">
           <h1 className="text-white text-lg md:text-xl font-bold tracking-tight">Plantificar</h1>
         </div>
 
         {/* Search Bar */}
-        <div className="px-4 py-2 sticky top-[68px] z-10 bg-background">
+        <div className="px-4 pt-0 pb-2 sticky top-[64px] z-10 bg-background">
           <button 
             onClick={() => navigate('/search')}
             className="flex flex-col min-w-40 h-12 w-full"
@@ -109,7 +109,7 @@ const Home = () => {
         </div>
 
         {/* Category Filters */}
-        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[116px] z-10 bg-background">
+        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[112px] z-10 bg-background">
           {categories.map((category) => (
             <button 
               key={category.value}
