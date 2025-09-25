@@ -87,29 +87,26 @@ const Home = () => {
     <div className="relative flex size-full min-h-screen flex-col bg-background font-spline justify-between overflow-x-hidden">
       <div className="flex-grow">
         {/* Header */}
-        <div className="flex items-center bg-background px-4 py-4 justify-center sticky top-0 z-10">
+        <div className="flex items-center gap-3 bg-background px-4 py-3 sticky top-0 z-20">
           <h1 className="text-white text-lg md:text-xl font-bold tracking-tight">Plantificar</h1>
-        </div>
-
-        {/* Search Bar */}
-        <div className="px-4 pb-2 sticky top-[60px] z-10 bg-background">
           <button 
             onClick={() => navigate('/search')}
-            className="flex flex-col min-w-40 h-12 w-full"
+            className="ml-2 flex flex-1 min-w-0 h-10"
           >
-            <div className="flex w-full flex-1 items-stretch rounded-full h-full">
+            <div className="flex w-full items-stretch rounded-full h-full">
               <div className="text-secondary flex border-none bg-muted items-center justify-center pl-4 rounded-l-full border-r-0">
                 <span className="material-symbols-outlined">search</span>
               </div>
-              <div className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-full text-white focus:outline-0 focus:ring-0 border-none bg-muted h-full placeholder:text-secondary px-4 text-base font-normal leading-normal items-center">
+              <div className="form-input flex w-full min-w-0 flex-1 overflow-hidden rounded-r-full text-white focus:outline-0 focus:ring-0 border-none bg-muted h-full placeholder:text-secondary px-4 text-base font-normal leading-normal items-center">
                 <span className="text-secondary">Buscar plantas</span>
               </div>
             </div>
           </button>
         </div>
 
+
         {/* Category Filters */}
-        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[112px] z-10 bg-background">
+        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[64px] z-10 bg-background">
           {categories.map((category) => (
             <button 
               key={category.value}
