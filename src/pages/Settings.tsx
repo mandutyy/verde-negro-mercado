@@ -1,15 +1,59 @@
 import { ArrowLeft, ChevronRight, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const { hasPermission, requestPermission, isSupported } = useNotifications();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  // Sync local state with actual permission status
+  useEffect(() => {
+    if (isSupported) {
+      setNotificationsEnabled(hasPermission);
+    }
+  }, [hasPermission, isSupported]);
+
+  const handleNotificationToggle = async (checked: boolean) => {
+    if (!isSupported) {
+      toast({
+        title: "No soportado",
+        description: "Las notificaciones no están disponibles en este dispositivo",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (checked) {
+      const granted = await requestPermission();
+      if (granted) {
+        setNotificationsEnabled(true);
+        toast({
+          title: "¡Notificaciones activadas!",
+          description: "Ahora recibirás notificaciones de nuevos mensajes",
+        });
+      } else {
+        setNotificationsEnabled(false);
+        toast({
+          title: "Permisos denegados",
+          description: "No se pudieron activar las notificaciones. Puedes habilitarlas desde la configuración del navegador.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      setNotificationsEnabled(false);
+      toast({
+        title: "Notificaciones desactivadas",
+        description: "Ya no recibirás notificaciones de mensajes",
+      });
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -69,7 +113,8 @@ const Settings = () => {
                 <span className="text-white">Notificaciones</span>
                 <Switch
                   checked={notificationsEnabled}
-                  onCheckedChange={setNotificationsEnabled}
+                  onCheckedChange={handleNotificationToggle}
+                  disabled={!isSupported}
                 />
               </div>
               <button className="flex items-center justify-between w-full text-left p-4 hover:bg-[#264532] transition-colors rounded-b-lg">
