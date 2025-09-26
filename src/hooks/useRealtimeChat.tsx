@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useNotifications } from './useNotifications';
 
 interface Message {
   id: string;
@@ -32,6 +33,7 @@ interface Conversation {
 
 export const useRealtimeChat = (conversationId?: string) => {
   const { user } = useAuth();
+  const { showMessageNotification, hasPermission } = useNotifications();
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +159,20 @@ export const useRealtimeChat = (conversationId?: string) => {
               .single();
             if (data && (data.participant_1 === user.id || data.participant_2 === user.id)) {
               await refreshConversations();
+              
+              // Show notification if the message is from another user and we have permission
+              if (msg.sender_id !== user.id && hasPermission) {
+                // Get sender profile for notification
+                const { data: senderProfile } = await supabase
+                  .from('profiles')
+                  .select('name')
+                  .eq('user_id', msg.sender_id)
+                  .single();
+                
+                const senderName = senderProfile?.name || 'Usuario';
+                const messageContent = msg.image_url ? '📸 Imagen' : msg.content;
+                showMessageNotification(senderName, messageContent, msg.conversation_id);
+              }
             }
           } catch (e) {
             console.error('Error handling inbox realtime message:', e);

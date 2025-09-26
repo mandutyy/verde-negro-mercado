@@ -4,12 +4,19 @@ import { Heart, Home, MessageCircle, Upload, User, RefreshCw, DollarSign } from 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 const Navigation = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const { conversations } = useRealtimeChat();
+  
+  // Calculate total unread messages
+  const totalUnreadMessages = useMemo(() => {
+    return conversations.reduce((total, conv) => total + conv.unread_count, 0);
+  }, [conversations]);
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
@@ -79,13 +86,20 @@ const Navigation = memo(() => {
                 key={item.id}
                 to={item.path}
                 className={cn(
-                  "flex flex-1 flex-col items-center justify-center gap-1 transition-colors py-2 px-1 rounded-lg",
+                  "flex flex-1 flex-col items-center justify-center gap-1 transition-colors py-2 px-1 rounded-lg relative",
                   isActive 
                     ? "text-primary bg-primary/10" 
                     : "text-secondary hover:text-primary hover:bg-primary/5"
                 )}
               >
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                <div className="relative">
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                  {item.id === 'messages' && totalUnreadMessages > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+                      {totalUnreadMessages > 99 ? '99+' : totalUnreadMessages}
+                    </div>
+                  )}
+                </div>
                 <p className={cn(
                   "text-xs leading-tight tracking-wide",
                   isActive ? "font-semibold" : "font-medium"

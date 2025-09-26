@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import { NotificationPermission } from '@/components/NotificationPermission';
 
 const Messages = () => {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ const Messages = () => {
 
       {/* Search Bar */}
       <div className="px-4 py-3">
+        <NotificationPermission />
         <div className="flex w-full items-stretch rounded-xl h-12">
           <div className="flex border-none bg-muted items-center justify-center pl-4 rounded-l-xl border-r-0">
             <Search className="h-5 w-5 text-muted-foreground" />
