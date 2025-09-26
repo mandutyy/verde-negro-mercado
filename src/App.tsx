@@ -1,12 +1,13 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Suspense, useEffect } from 'react';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { AuthProvider, useAuth } from '@/hooks/useAuth';
+import Navigation from './components/Navigation';
+import { usePrefetchData } from '@/hooks/useApi';
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Navigation from "@/components/Navigation";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Purchase from "./pages/Purchase";
@@ -25,11 +26,18 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 
-const queryClient = new QueryClient();
-
 const AppContent = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const { prefetchPlants, prefetchUserData } = usePrefetchData();
+  
+  // Precargar datos cuando el usuario se autentica
+  useEffect(() => {
+    if (user) {
+      prefetchPlants();
+      prefetchUserData();
+    }
+  }, [user, prefetchPlants, prefetchUserData]);
   
   // Hide navigation on specific pages
   const shouldShowNavigation = user && 
@@ -132,17 +140,15 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </TooltipProvider>
+  </AuthProvider>
 );
 
 export default App;

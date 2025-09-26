@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { usePlants } from '@/hooks/useApi';
 import PlantCard from '@/components/PlantCard';
 
 const Home = () => {
@@ -9,39 +9,23 @@ const Home = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState("");
-  const [plants, setPlants] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Usar el nuevo hook con caché
+  const { data: plants = [], isLoading: loading, error } = usePlants({ 
+    excludeUserId: true,
+    category: activeCategory 
+  });
 
-  useEffect(() => {
-    fetchPlants();
-  }, [user]);
-
-  const fetchPlants = async () => {
-    try {
-      let query = supabase
-        .from('plants')
-        .select('*')
-        .in('status', ['active', 'reserved']);
-
-      // Exclude user's own plants if authenticated
-      if (user) {
-        query = query.neq('user_id', user.id);
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching plants:', error);
-        return;
-      }
-
-      setPlants(data || []);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filtrar plantas por búsqueda
+  const filteredPlants = useMemo(() => {
+    if (!searchQuery.trim()) return plants;
+    
+    return plants.filter(plant => 
+      plant.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plant.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plant.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [plants, searchQuery]);
 
   const categories = [
     { value: "all", label: "Todas" },
