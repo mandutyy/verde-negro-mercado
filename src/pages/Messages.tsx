@@ -85,6 +85,8 @@ const Messages = () => {
               const userName = otherUserName || `Usuario ${otherUserId.slice(-4)}`;
               const lastMessage = conversation.last_message_content || 'Conversación iniciada';
               const unreadCount = conversation.unread_count || 0;
+              const plantTitle = conversation.plant_title || 'Anuncio no disponible';
+              const plantImage = conversation.plant_image;
               
               // Format last message time
               let timeDisplay = '';
@@ -104,14 +106,32 @@ const Messages = () => {
               }
 
               return (
-                <div 
+                  <div 
                   key={conversation.id} 
-                  className="flex items-center gap-4 bg-background px-4 min-h-[72px] py-2 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer relative" 
+                  className="flex items-center gap-3 bg-background px-4 min-h-[80px] py-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer relative" 
                   onClick={() => navigate(`/chat/${conversation.id}`)}
                 >
-                  <Avatar className="h-14 w-14">
+                  {/* Plant Image */}
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                      {plantImage ? (
+                        <img 
+                          src={plantImage} 
+                          alt={plantTitle} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-primary text-xs">🌱</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* User Avatar */}
+                  <Avatar className="h-12 w-12">
                     <AvatarImage src={otherUserAvatar || ""} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
                       {userName.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -127,8 +147,11 @@ const Messages = () => {
                         </span>
                       )}
                     </div>
+                    <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 mb-1">
+                      Interesado en: <span className="font-medium">{plantTitle}</span>
+                    </p>
                     <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 flex-1">
+                      <p className="text-muted-foreground text-xs font-normal leading-normal line-clamp-1 flex-1">
                         {!conversation.last_message_content && conversation.last_message_sender ? (
                           <span className="flex items-center gap-1">
                             📷 Imagen

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, MessageCircle, Share, User, Pencil, Bookmark } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import EditPlantDialog from '@/components/EditPlantDialog';
+import ContactButton from '@/components/ContactButton';
 
 interface Plant {
   id: string;
@@ -225,22 +226,24 @@ const PlantDetail = () => {
         return;
       }
       
-      // Buscar conversación existente
+      // Check if a conversation already exists for this specific plant
       const { data: existingConversation } = await supabase
         .from('conversations')
         .select('id')
+        .eq('plant_id', plant.id)
         .or(`and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`)
         .maybeSingle();
       
       if (existingConversation) {
         navigate(`/chat/${existingConversation.id}`);
       } else {
-        // Crear nueva conversación
+        // Create new conversation with plant_id
         const { data: newConversation } = await supabase
           .from('conversations')
           .insert([{
             participant_1: user.id,
-            participant_2: plant.user_id
+            participant_2: plant.user_id,
+            plant_id: plant.id
           }])
           .select()
           .single();
@@ -535,22 +538,12 @@ const PlantDetail = () => {
       {!isOwner && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
           <div className="max-w-4xl mx-auto">
-            <Button 
-              onClick={handleContact}
-              className={cn(
-                "w-full font-bold",
-                plant.status === 'reserved' 
-                  ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                  : "bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118]"
-              )}
-              size="lg"
-            >
-              <MessageCircle className="h-5 w-5 mr-2" />
-              {plant.status === 'reserved' 
-                ? `Contactar (Reservado)` 
-                : `Contactar con ${sellerName}`
-              }
-            </Button>
+            <ContactButton
+              plantId={plant.id}
+              sellerId={plant.user_id}
+              sellerName={sellerName}
+              plantTitle={plant.title}
+            />
           </div>
         </div>
       )}

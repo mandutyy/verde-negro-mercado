@@ -20,6 +20,7 @@ export type Database = {
           id: string
           participant_1: string
           participant_2: string
+          plant_id: string | null
           updated_at: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           id?: string
           participant_1: string
           participant_2: string
+          plant_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -34,9 +36,18 @@ export type Database = {
           id?: string
           participant_1?: string
           participant_2?: string
+          plant_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       favorites: {
         Row: {
@@ -297,6 +308,9 @@ export type Database = {
           participant_2: string
           participant_2_avatar: string
           participant_2_name: string
+          plant_id: string
+          plant_image: string
+          plant_title: string
           unread_count: number
           updated_at: string
         }[]
