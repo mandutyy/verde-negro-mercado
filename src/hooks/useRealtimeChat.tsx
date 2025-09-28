@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -64,9 +64,9 @@ export const useRealtimeChat = (conversationId?: string) => {
   });
 
   // Helper para invalidar las conversaciones en caché
-  const refreshConversations = () => {
+  const refreshConversations = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['conversations', user?.id] });
-  };
+  }, [queryClient, user?.id]);
 
   // Inbox realtime: refresh when any new message arrives for user's conversations
   useEffect(() => {
