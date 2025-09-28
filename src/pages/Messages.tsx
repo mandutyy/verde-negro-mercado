@@ -114,17 +114,14 @@ const Messages = () => {
                   {/* Plant Image */}
                   <div className="relative">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
-                      {plantImage ? (
-                        <img 
-                          src={plantImage} 
-                          alt={plantTitle} 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-primary text-xs">🌱</span>
-                        </div>
-                      )}
+                      <img 
+                        src={plantImage || '/placeholder.svg'} 
+                        alt={plantTitle} 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
                     </div>
                   </div>
 
