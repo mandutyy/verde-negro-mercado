@@ -4,7 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Plant } from '@/hooks/useUserPlants';
+// Interface for Plant type
+interface Plant {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number | null;
+  exchange_for: string | null;
+  location: string;
+  sale_type: string;
+  images: string[];
+  status: string;
+  views_count: number;
+  favorites_count: number;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
 import { cn } from '@/lib/utils';
 
 interface UserPlantCardProps {

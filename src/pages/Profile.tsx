@@ -5,22 +5,109 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { useUserPlants, Plant } from '@/hooks/useUserPlants';
+import { useUserPlants } from '@/hooks/useApi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import UserPlantCard from '@/components/UserPlantCard';
 import EditPlantDialog from '@/components/EditPlantDialog';
 import { supabase } from '@/integrations/supabase/client';
+interface Plant {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number | null;
+  exchange_for: string | null;
+  location: string;
+  sale_type: string;
+  images: string[];
+  status: string;
+  views_count: number;
+  favorites_count: number;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
+
 const Profile = () => {
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('publicaciones');
-  const {
-    plants,
-    loading,
-    updatePlant,
-    deletePlant
-  } = useUserPlants();
+  const { data: plants = [], isLoading: loading } = useUserPlants();
+
+  // Mutation para actualizar planta
+  const updatePlantMutation = useMutation({
+    mutationFn: async ({ plantId, updates }: { plantId: string; updates: Partial<Plant> }) => {
+      const { error } = await supabase
+        .from('plants')
+        .update(updates)
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userPlants', user?.id] });
+      toast({
+        title: "¡Actualizado!",
+        description: "Los cambios se han guardado correctamente",
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la planta",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation para eliminar planta
+  const deletePlantMutation = useMutation({
+    mutationFn: async (plantId: string) => {
+      const { error } = await supabase
+        .from('plants')
+        .delete()
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userPlants', user?.id] });
+      toast({
+        title: "¡Eliminado!",
+        description: "La planta ha sido eliminada correctamente",
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la planta",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updatePlant = async (plantId: string, updates: Partial<Plant>): Promise<boolean> => {
+    try {
+      await updatePlantMutation.mutateAsync({ plantId, updates });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const deletePlant = async (plantId: string): Promise<boolean> => {
+    try {
+      await deletePlantMutation.mutateAsync(plantId);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const [profile, setProfile] = useState<{ name?: string; avatar_url?: string }>({});
 

@@ -7,7 +7,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Trash2, Edit } from 'lucide-react';
-import { Plant } from '@/hooks/useUserPlants';
+// Interface for Plant type
+interface Plant {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number | null;
+  exchange_for: string | null;
+  location: string;
+  sale_type: string;
+  images: string[];
+  status: string;
+  views_count: number;
+  favorites_count: number;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
 
 interface EditPlantDialogProps {
   plant: Plant | null;

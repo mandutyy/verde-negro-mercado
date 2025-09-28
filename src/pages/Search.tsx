@@ -3,7 +3,24 @@ import { ArrowLeft, Search as SearchIcon, X, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
-import { Plant } from '@/hooks/useUserPlants';
+// Interface for Plant type
+interface Plant {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number | null;
+  exchange_for: string | null;
+  location: string;
+  sale_type: string;
+  images: string[];
+  status: string;
+  views_count: number;
+  favorites_count: number;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
 
 const Search = () => {
   const navigate = useNavigate();

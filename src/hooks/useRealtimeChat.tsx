@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useNotifications } from './useNotifications';
@@ -37,37 +38,35 @@ interface Conversation {
 export const useRealtimeChat = (conversationId?: string) => {
   const { user } = useAuth();
   const { showMessageNotification, hasPermission } = useNotifications();
+  const queryClient = useQueryClient();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Helper to refresh conversations with last message, unread count, and profiles
-  const refreshConversations = async () => {
-    if (!user) return;
-    try {
-      // Use the updated function that includes plant information
+  // Hook para obtener conversaciones con caché
+  const { data: conversations = [], isLoading: loading } = useQuery({
+    queryKey: ['conversations', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
       const { data: enrichedConversations, error } = await supabase
         .rpc('get_conversations_with_last_message', { user_uuid: user.id });
 
       if (error) {
         console.error('Error loading conversations:', error);
-        setLoading(false);
-        return;
+        throw error;
       }
 
-      setConversations(enrichedConversations || []);
-    } catch (err) {
-      console.error('Error loading conversations:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return enrichedConversations || [];
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutos
+    gcTime: 5 * 60 * 1000, // 5 minutos en caché
+    refetchOnWindowFocus: false,
+    enabled: !!user
+  });
 
-  // Load conversations
-  useEffect(() => {
-    if (!user) return;
-    refreshConversations();
-  }, [user]);
+  // Helper para invalidar las conversaciones en caché
+  const refreshConversations = () => {
+    queryClient.invalidateQueries({ queryKey: ['conversations', user?.id] });
+  };
 
   // Inbox realtime: refresh when any new message arrives for user's conversations
   useEffect(() => {
@@ -87,7 +86,7 @@ export const useRealtimeChat = (conversationId?: string) => {
               .eq('id', msg.conversation_id)
               .single();
             if (data && (data.participant_1 === user.id || data.participant_2 === user.id)) {
-              await refreshConversations();
+              refreshConversations();
               
               // Show notification if the message is from another user and we have permission
               if (msg.sender_id !== user.id && hasPermission) {
@@ -113,7 +112,7 @@ export const useRealtimeChat = (conversationId?: string) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, conversationId]);
+  }, [user, conversationId, refreshConversations, hasPermission, showMessageNotification]);
 
   // Load messages for specific conversation and mark as read
   useEffect(() => {
@@ -193,7 +192,7 @@ export const useRealtimeChat = (conversationId?: string) => {
             newConversation.participant_2 === user.id
           ) {
             // Reload conversations to get the full details
-            await refreshConversations();
+            refreshConversations();
           }
         }
       )
@@ -211,7 +210,7 @@ export const useRealtimeChat = (conversationId?: string) => {
             updatedConversation.participant_2 === user.id
           ) {
             // Reload conversations to get the full details
-            await refreshConversations();
+            refreshConversations();
           }
         }
       )
@@ -327,7 +326,7 @@ export const useRealtimeChat = (conversationId?: string) => {
         
       // Reload conversations to update the UI
       if (!conversationId) {
-        await refreshConversations();
+        refreshConversations();
       }
     } catch (error) {
       console.error('Error sending message:', error);

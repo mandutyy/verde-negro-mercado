@@ -2,13 +2,13 @@
 import { ArrowLeft, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserFavorites, useFavorites } from '@/hooks/useFavorites';
+import { useUserFavorites, useFavorites } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
 
 const Favorites = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { favorites, loading } = useUserFavorites();
+  const { data: favorites = [], isLoading: loading } = useUserFavorites();
 
 const FavoritePlantCard = ({ plant }: { plant: any }) => {
   const navigate = useNavigate();

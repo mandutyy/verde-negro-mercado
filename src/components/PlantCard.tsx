@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react';
 import { useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useFavorites } from '@/hooks/useApi';
 
 interface PlantCardProps {
   id: string;

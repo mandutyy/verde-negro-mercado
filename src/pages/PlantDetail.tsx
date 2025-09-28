@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useFavorites } from '@/hooks/useApi';
 import EditPlantDialog from '@/components/EditPlantDialog';
 import ContactButton from '@/components/ContactButton';
 
