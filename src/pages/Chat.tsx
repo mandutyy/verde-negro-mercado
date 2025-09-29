@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import ReservationButton from '@/components/ReservationButton';
 
 const Chat = () => {
   const { conversationId } = useParams();
@@ -19,6 +20,8 @@ const Chat = () => {
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<any>(null);
+  const [plant, setPlant] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,9 +53,9 @@ const Chat = () => {
     const loadOtherUser = async () => {
       try {
         // Get conversation details
-        const { data: conversation, error: convError } = await supabase
+        const { data: conversationData, error: convError } = await supabase
           .from('conversations')
-          .select('participant_1, participant_2')
+          .select('participant_1, participant_2, plant_id')
           .eq('id', conversationId)
           .single();
 
@@ -61,10 +64,12 @@ const Chat = () => {
           return;
         }
 
+        setConversation(conversationData);
+
         // Determine the other user's ID
-        const otherUserId = conversation.participant_1 === user.id 
-          ? conversation.participant_2 
-          : conversation.participant_1;
+        const otherUserId = conversationData.participant_1 === user.id 
+          ? conversationData.participant_2 
+          : conversationData.participant_1;
 
         // Get other user's profile
         const { data: profile, error: profileError } = await supabase
@@ -81,6 +86,17 @@ const Chat = () => {
             name: profile.name || 'Usuario',
             avatar_url: profile.avatar_url
           });
+        }
+
+        // Fetch plant information if this conversation is about a specific plant
+        if (conversationData.plant_id) {
+          const { data: plantData } = await supabase
+            .from('plants')
+            .select('*')
+            .eq('id', conversationData.plant_id)
+            .maybeSingle();
+          
+          setPlant(plantData);
         }
       } catch (error) {
         console.error('Error loading other user:', error);
@@ -184,7 +200,16 @@ const Chat = () => {
             </h2>
           </div>
           
-          <div className="w-10 h-10"></div>
+          <div className="flex gap-2 items-center">
+            {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
+              <ReservationButton
+                plantId={plant.id}
+                sellerId={plant.user_id}
+                sellerName={otherUser?.name}
+                plantTitle={plant.title}
+              />
+            )}
+          </div>
         </div>
 
         {/* Messages */}
