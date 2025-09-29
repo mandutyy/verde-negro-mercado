@@ -113,13 +113,15 @@ const Messages = () => {
                 >
                   {/* Plant Image */}
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted border border-border/50">
                       <img 
                         src={plantImage || '/placeholder.svg'} 
-                        alt={plantTitle} 
+                        alt={`Foto de ${plantTitle}`} 
                         className="w-full h-full object-cover"
+                        loading="lazy"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder.svg';
+                          e.currentTarget.alt = 'Imagen no disponible';
                         }}
                       />
                     </div>
