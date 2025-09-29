@@ -146,13 +146,11 @@ const Messages = () => {
                         </span>
                       )}
                     </div>
-                    <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 mb-1">
-                      {plantTitle !== 'Anuncio no disponible' ? (
-                        <>Interesado en: <span className="font-medium">{plantTitle}</span></>
-                      ) : (
-                        <span className="font-medium">Conversación general</span>
-                      )}
-                    </p>
+                    {plantTitle !== 'Anuncio no disponible' && (
+                      <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 mb-1">
+                        Interesado en: <span className="font-medium">{plantTitle}</span>
+                      </p>
+                    )}
                     <div className="flex items-center justify-between">
                       <p className="text-muted-foreground text-xs font-normal leading-normal line-clamp-1 flex-1">
                         {!conversation.last_message_content && conversation.last_message_sender ? (
