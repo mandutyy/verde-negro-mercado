@@ -106,10 +106,11 @@ const Purchase = () => {
     }
 
     try {
-      // Check if conversation exists
+      // Check if conversation already exists for this plant
       const { data: existingConversation } = await supabase
         .from('conversations')
         .select('*')
+        .eq('plant_id', plant.id)
         .or(
           `and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`
         )
@@ -119,13 +120,14 @@ const Purchase = () => {
         // Navigate to existing conversation
         navigate(`/chat/${existingConversation.id}`);
       } else {
-        // Create new conversation
+        // Create new conversation with plant_id
         const { data: newConversation, error } = await supabase
           .from('conversations')
           .insert([
             {
               participant_1: user.id,
               participant_2: plant.user_id,
+              plant_id: plant.id,
             },
           ])
           .select()

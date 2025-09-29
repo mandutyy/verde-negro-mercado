@@ -128,22 +128,24 @@ const UserProfile = () => {
         return;
       }
       
-      // Buscar conversación existente
+      // Buscar conversación existente (sin plant_id específico desde perfil de usuario)
       const { data: existingConversation } = await supabase
         .from('conversations')
         .select('id')
         .or(`and(participant_1.eq.${currentUser.id},participant_2.eq.${profile.user_id}),and(participant_1.eq.${profile.user_id},participant_2.eq.${currentUser.id})`)
+        .is('plant_id', null)
         .maybeSingle();
       
       if (existingConversation) {
         navigate(`/chat/${existingConversation.id}`);
       } else {
-        // Crear nueva conversación
+        // Crear nueva conversación general (sin plant_id específico)
         const { data: newConversation } = await supabase
           .from('conversations')
           .insert([{
             participant_1: currentUser.id,
-            participant_2: profile.user_id
+            participant_2: profile.user_id,
+            plant_id: null
           }])
           .select()
           .single();
