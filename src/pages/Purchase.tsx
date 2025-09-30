@@ -186,7 +186,7 @@ const isOwner = user?.id === plant.user_id;
         {/* Hero Image Section */}
         <div className="relative">
           {/* Header Buttons */}
-          <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
+          <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-4">
             <Button
               onClick={() => navigate(-1)}
               variant="ghost"
