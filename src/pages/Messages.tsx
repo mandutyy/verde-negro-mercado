@@ -117,7 +117,7 @@ const Messages = () => {
                       <img 
                         src={plantImage || '/placeholder.svg'} 
                         alt={`Foto de ${plantTitle}`} 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         loading="lazy"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder.svg';
