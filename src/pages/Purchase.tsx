@@ -146,6 +146,66 @@ const Purchase = () => {
     }
   };
 
+  const handleReserve = async () => {
+    if (!user || !plant) {
+      navigate('/auth');
+      return;
+    }
+
+    if (user.id === plant.user_id) {
+      toast({
+        title: "No puedes reservar tu propia planta",
+        description: "Esta es tu planta",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Check if reservation already exists
+      const { data: existingReservation } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('plant_id', plant.id)
+        .eq('requester_id', user.id)
+        .maybeSingle();
+
+      if (existingReservation) {
+        toast({
+          title: "Ya has enviado una solicitud",
+          description: "Ya tienes una reserva pendiente para esta planta",
+        });
+        return;
+      }
+
+      // Create reservation request
+      const { error } = await supabase
+        .from('reservations')
+        .insert([
+          {
+            plant_id: plant.id,
+            requester_id: user.id,
+            seller_id: plant.user_id,
+            status: 'pending',
+          },
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Solicitud enviada",
+        description: "El vendedor recibirá tu solicitud de reserva",
+      });
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+      toast({
+        title: "Error al crear reserva",
+        description: "Hubo un problema al enviar la solicitud",
+        variant: "destructive"
+      });
+    }
+  };
+
   const goHome = () => navigate('/');
   const goToAdd = () => navigate('/upload');
   const goToChat = () => navigate('/messages');
@@ -296,7 +356,7 @@ const isOwner = user?.id === plant.user_id;
           ) : (
             <>
               <Button 
-                onClick={handleContact}
+                onClick={handleReserve}
                 className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
               >
                 <span className="truncate">Reservar</span>
