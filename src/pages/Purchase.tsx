@@ -212,19 +212,20 @@ const isOwner = user?.id === plant.user_id;
                   className="absolute inset-0 bg-center bg-no-repeat bg-cover" 
                   style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
 
                 {plant.status === 'reserved' && !isOwner && (
-                  <div className="absolute bottom-4 right-4 z-20">
+                  <div className="absolute top-20 right-4 z-20">
                     <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
                       <Bookmark className="h-4 w-4 fill-purple-600" />
                       Reservado
                     </div>
                   </div>
                 )}
+
                 {/* Thumbnail Images */}
                 {plant.images.length > 1 && (
-                  <div className="absolute bottom-4 right-4 flex gap-2">
+                  <div className="absolute bottom-4 right-4 flex gap-2 z-10">
                     {plant.images.slice(0, 3).map((image, index) => (
                       <div 
                         key={index}
@@ -247,13 +248,13 @@ const isOwner = user?.id === plant.user_id;
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-white text-3xl font-bold leading-tight tracking-tight">{plant.title}</h1>
-              <span className="text-3xl font-bold text-primary mt-2 inline-block">
+              <p className="text-lg font-bold text-primary mt-2">
                 {canPurchase ? `€${plant.price}` : canExchange ? 'Intercambio' : 'Disponible'}
-              </span>
+              </p>
             </div>
           </div>
 
-          <p className="text-muted-foreground text-base font-normal leading-relaxed mt-4">
+          <p className="text-gray-300 text-base font-normal leading-relaxed mt-4">
             {plant.description}
           </p>
 
@@ -282,14 +283,65 @@ const isOwner = user?.id === plant.user_id;
         </div>
       </div>
 
-      {/* Contact Button */}
-      <div className="sticky bottom-20 p-4">
-        <Button 
-          onClick={handleContact}
-          className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
-        >
-          <span className="truncate">Contact Seller</span>
-        </Button>
+      {/* Action Buttons */}
+      <div className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-border">
+        <div className="p-4 flex gap-4">
+          {isOwner ? (
+            <Button 
+              onClick={() => navigate(`/plant/${plant.id}`)}
+              className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
+            >
+              <span className="truncate">Editar</span>
+            </Button>
+          ) : (
+            <>
+              <Button 
+                onClick={handleContact}
+                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
+              >
+                <span className="truncate">Reservar</span>
+              </Button>
+              <Button 
+                onClick={handleContact}
+                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-white/10 text-white text-lg font-bold border border-white/20 hover:bg-white/20"
+              >
+                <span className="truncate">Contactar</span>
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="flex gap-2 border-t border-border px-4 pb-3 pt-2">
+          <button 
+            onClick={goHome}
+            className="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white"
+          >
+            <Home className="h-5 w-5" />
+            <span className="text-xs font-medium">Home</span>
+          </button>
+          <button 
+            onClick={goToAdd}
+            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-xs font-medium">Add</span>
+          </button>
+          <button 
+            onClick={goToChat}
+            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary"
+          >
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-xs font-medium">Chat</span>
+          </button>
+          <button 
+            onClick={goToProfile}
+            className="flex flex-1 flex-col items-center justify-end gap-1 text-secondary"
+          >
+            <User className="h-5 w-5" />
+            <span className="text-xs font-medium">Profile</span>
+          </button>
+        </div>
       </div>
     </div>
   );
