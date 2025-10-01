@@ -106,36 +106,49 @@ const Purchase = () => {
     }
 
     try {
-      // Check if conversation already exists for this plant
-      const { data: existingConversation } = await supabase
+      // Check if conversation already exists between these two users
+      const { data: existingConversations } = await supabase
         .from('conversations')
         .select('*')
-        .eq('plant_id', plant.id)
-        .or(
-          `and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`
-        )
-        .maybeSingle();
+        .or(`and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`);
 
-      if (existingConversation) {
+      if (existingConversations && existingConversations.length > 0) {
         // Navigate to existing conversation
-        navigate(`/chat/${existingConversation.id}`);
-      } else {
-        // Create new conversation with plant_id
-        const { data: newConversation, error } = await supabase
-          .from('conversations')
-          .insert([
-            {
-              participant_1: user.id,
-              participant_2: plant.user_id,
-              plant_id: plant.id,
-            },
-          ])
-          .select()
-          .single();
-
-        if (error) throw error;
-        navigate(`/chat/${newConversation.id}`);
+        navigate(`/chat/${existingConversations[0].id}`);
+        return;
       }
+
+      // Try to create new conversation
+      const { data: newConversation, error } = await supabase
+        .from('conversations')
+        .insert([
+          {
+            participant_1: user.id,
+            participant_2: plant.user_id,
+            plant_id: plant.id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        // If duplicate error, fetch the existing conversation
+        if (error.code === '23505') {
+          const { data: existingConv } = await supabase
+            .from('conversations')
+            .select('*')
+            .or(`and(participant_1.eq.${user.id},participant_2.eq.${plant.user_id}),and(participant_1.eq.${plant.user_id},participant_2.eq.${user.id})`)
+            .single();
+          
+          if (existingConv) {
+            navigate(`/chat/${existingConv.id}`);
+            return;
+          }
+        }
+        throw error;
+      }
+
+      navigate(`/chat/${newConversation.id}`);
     } catch (error) {
       console.error('Error opening chat:', error);
       toast({
