@@ -25,6 +25,9 @@ import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import CookiesPolicy from "./pages/CookiesPolicy";
 
 const AppContent = () => {
   const { user } = useAuth();
@@ -127,6 +130,9 @@ const AppContent = () => {
             <PlantDetail />
           </ProtectedRoute>
         } />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/cookies-policy" element={<CookiesPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       

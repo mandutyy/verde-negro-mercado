@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { X, Cookie } from 'lucide-react';
+import { Cookie } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user has already consented
@@ -40,12 +42,45 @@ const CookieConsent = () => {
             <Cookie className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <h3 className="text-lg font-semibold text-foreground mb-3">
-                Uso de Cookies y Datos
+                Uso de Cookies y Datos - PLANTHAUSE
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                 Utilizamos cookies esenciales para el funcionamiento de la aplicación, 
                 análisis de uso y mejorar tu experiencia. Al continuar navegando, 
-                aceptas nuestro uso de cookies según nuestra política de privacidad.
+                aceptas nuestro uso de cookies.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Consulta nuestra{" "}
+                <button
+                  onClick={() => {
+                    navigate('/privacy-policy');
+                    setShowBanner(false);
+                  }}
+                  className="text-primary underline hover:text-primary/80"
+                >
+                  Política de Privacidad
+                </button>
+                ,{" "}
+                <button
+                  onClick={() => {
+                    navigate('/terms-and-conditions');
+                    setShowBanner(false);
+                  }}
+                  className="text-primary underline hover:text-primary/80"
+                >
+                  Términos y Condiciones
+                </button>
+                {" "}y{" "}
+                <button
+                  onClick={() => {
+                    navigate('/cookies-policy');
+                    setShowBanner(false);
+                  }}
+                  className="text-primary underline hover:text-primary/80"
+                >
+                  Política de Cookies
+                </button>
+                .
               </p>
             </div>
           </div>
