@@ -188,17 +188,46 @@ const Chat = () => {
             <ArrowLeft size={24} />
           </Button>
           
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={otherUser?.avatar_url || ""} />
-              <AvatarFallback className="bg-[#264532] text-white">
-                {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-              {otherUser?.name || 'Usuario'}
-            </h2>
-          </div>
+          {plant ? (
+            <div 
+              className="flex items-center gap-3 flex-1 mx-4 cursor-pointer hover:bg-white/5 rounded-lg p-2 transition-colors"
+              onClick={() => navigate(`/plant/${plant.id}`)}
+            >
+              <div className="h-12 w-12 rounded-lg overflow-hidden bg-[#264532] flex-shrink-0">
+                {plant.images && plant.images.length > 0 ? (
+                  <img 
+                    src={plant.images[0]} 
+                    alt={plant.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-[#96c5a9]">
+                    🌿
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-white text-base font-bold leading-tight tracking-[-0.015em] truncate">
+                  {plant.title}
+                </h2>
+                <p className="text-[#96c5a9] text-sm truncate">
+                  {plant.price ? `€${plant.price}` : 'Intercambio'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 flex-1 mx-4">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={otherUser?.avatar_url || ""} />
+                <AvatarFallback className="bg-[#264532] text-white">
+                  {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+                {otherUser?.name || 'Usuario'}
+              </h2>
+            </div>
+          )}
           
           <div className="flex gap-2 items-center">
             {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
