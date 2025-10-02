@@ -178,67 +178,68 @@ const Chat = () => {
     <div className="relative flex h-screen w-full flex-col bg-[#122118] justify-between">
       <div className="flex-grow">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
+        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between gap-4">
+          <button
             onClick={() => navigate('/messages')}
-            className="text-white flex size-10 items-center justify-center p-0 hover:bg-white/10"
+            className="text-white flex size-10 items-center justify-center"
           >
             <ArrowLeft size={24} />
-          </Button>
+          </button>
           
-          {plant ? (
-            <div 
-              className="flex items-center gap-3 flex-1 mx-4 cursor-pointer hover:bg-white/5 rounded-lg p-2 transition-colors"
-              onClick={() => navigate(`/plant/${plant.id}`)}
-            >
-              <div className="h-12 w-12 rounded-lg overflow-hidden bg-[#264532] flex-shrink-0">
-                {plant.images && plant.images.length > 0 ? (
-                  <img 
-                    src={plant.images[0]} 
-                    alt={plant.title}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center text-[#96c5a9]">
+          <div className="flex items-center gap-3 mr-auto w-full">
+            <div className="flex items-center gap-3 w-full">
+              {/* Foto del producto - cuadrada */}
+              <div 
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-10 h-10 shrink-0 cursor-pointer"
+                style={{
+                  backgroundImage: plant?.images?.[0] 
+                    ? `url("${plant.images[0]}")` 
+                    : 'none',
+                  backgroundColor: !plant?.images?.[0] ? '#264532' : undefined
+                }}
+                onClick={() => plant?.id && navigate(`/plant/${plant.id}`)}
+              >
+                {!plant?.images?.[0] && (
+                  <div className="w-full h-full flex items-center justify-center text-xl">
                     🌿
                   </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
+              
+              {/* Nombre del anuncio */}
+              <div 
+                className="flex-grow cursor-pointer"
+                onClick={() => plant?.id && navigate(`/plant/${plant.id}`)}
+              >
                 <h2 className="text-white text-base font-bold leading-tight tracking-[-0.015em] truncate">
-                  {plant.title}
+                  {plant?.title || otherUser?.name || 'Conversación'}
                 </h2>
-                <p className="text-[#96c5a9] text-sm truncate">
-                  {plant.price ? `€${plant.price}` : 'Intercambio'}
-                </p>
+              </div>
+              
+              {/* Avatar del usuario - circular */}
+              <div 
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 shrink-0"
+                style={{
+                  backgroundImage: otherUser?.avatar_url 
+                    ? `url("${otherUser.avatar_url}")` 
+                    : 'none',
+                  backgroundColor: !otherUser?.avatar_url ? '#264532' : undefined
+                }}
+              >
+                {!otherUser?.avatar_url && (
+                  <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-full bg-[#264532]">
+                    {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                )}
               </div>
             </div>
-          ) : (
-            <div className="flex items-center gap-3 flex-1 mx-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={otherUser?.avatar_url || ""} />
-                <AvatarFallback className="bg-[#264532] text-white">
-                  {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-                {otherUser?.name || 'Usuario'}
-              </h2>
-            </div>
-          )}
-          
-          <div className="flex gap-2 items-center">
-            {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
-              <ReservationButton
-                plantId={plant.id}
-                sellerId={plant.user_id}
-                sellerName={otherUser?.name}
-                plantTitle={plant.title}
-              />
-            )}
           </div>
+          
+          {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
+            <button className="text-base font-bold text-[#122118] bg-[#38e07b] rounded-full px-4 py-2 whitespace-nowrap hidden">
+              Solicitar Reserva
+            </button>
+          )}
         </div>
 
         {/* Messages */}
@@ -262,12 +263,21 @@ const Chat = () => {
                   } max-w-[80%]`}
                 >
                   {!isOwnMessage && (
-                    <Avatar className="w-10 h-10 shrink-0">
-                      <AvatarImage src={otherUser?.avatar_url || ""} />
-                      <AvatarFallback className="bg-[#264532] text-white">
-                        {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div 
+                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 shrink-0"
+                      style={{
+                        backgroundImage: otherUser?.avatar_url 
+                          ? `url("${otherUser.avatar_url}")` 
+                          : 'none',
+                        backgroundColor: !otherUser?.avatar_url ? '#264532' : undefined
+                      }}
+                    >
+                      {!otherUser?.avatar_url && (
+                        <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-full bg-[#264532]">
+                          {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                      )}
+                    </div>
                   )}
                   
                   <div className={`flex flex-1 flex-col gap-1.5 ${
