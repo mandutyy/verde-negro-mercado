@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useApi';
 import EditPlantDialog from '@/components/EditPlantDialog';
-import ContactButton from '@/components/ContactButton';
+import ReservationButton from '@/components/ReservationButton';
 
 interface Plant {
   id: string;
@@ -459,14 +459,12 @@ const PlantDetail = () => {
             </>
           ) : (
             <>
-              <Button 
-                onClick={handleFavoriteClick}
-                disabled={favoriteLoading}
-                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
-              >
-                <Heart className={`h-5 w-5 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-                <span className="truncate">{isFavorite ? 'Guardado' : 'Guardar'}</span>
-              </Button>
+              <ReservationButton
+                plantId={plant.id}
+                sellerId={plant.user_id}
+                sellerName={sellerName}
+                plantTitle={plant.title}
+              />
               <Button 
                 onClick={handleContact}
                 className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-white/10 text-white text-lg font-bold border border-white/20 hover:bg-white/20"

@@ -236,9 +236,14 @@ const Chat = () => {
           </div>
           
           {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
-            <button className="text-base font-bold text-[#122118] bg-[#38e07b] rounded-full px-4 py-2 whitespace-nowrap hidden">
-              Solicitar Reserva
-            </button>
+            <div className="flex-shrink-0">
+              <ReservationButton
+                plantId={plant.id}
+                sellerId={plant.user_id}
+                sellerName={otherUser?.name}
+                plantTitle={plant.title}
+              />
+            </div>
           )}
         </div>
 

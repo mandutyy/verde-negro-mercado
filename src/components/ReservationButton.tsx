@@ -94,11 +94,8 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
     <Button 
       onClick={handleReservation}
       disabled={isLoading || isDisabled}
-      variant="outline"
-      className="w-full"
-      size="lg"
+      className="text-base font-bold text-[#122118] bg-[#38e07b] rounded-full px-4 py-2 whitespace-nowrap hover:bg-[#38e07b]/90"
     >
-      <Calendar className="mr-2 h-4 w-4" />
       {isLoading ? 'Enviando...' : 'Solicitar Reserva'}
     </Button>
   );
