@@ -106,68 +106,58 @@ const Messages = () => {
               }
 
               return (
-                  <div 
+                <div 
                   key={conversation.id} 
-                  className="flex items-center gap-3 bg-background px-4 min-h-[80px] py-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer relative" 
+                  className="flex items-center gap-3 bg-background px-4 py-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer" 
                   onClick={() => navigate(`/chat/${conversation.id}`)}
                 >
-                  {/* Plant Image */}
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted border border-border/50">
+                  {/* Plant Image - Izquierda */}
+                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted border border-border/50 flex-shrink-0">
+                    {plantImage ? (
                       <img 
-                        src={plantImage || '/placeholder.svg'} 
-                        alt={`Foto de ${plantTitle}`} 
-                        className="w-full h-full object-contain"
+                        src={plantImage} 
+                        alt={plantTitle} 
+                        className="w-full h-full object-cover"
                         loading="lazy"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder.svg';
-                          e.currentTarget.alt = 'Imagen no disponible';
                         }}
                       />
-                    </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        🌿
+                      </div>
+                    )}
                   </div>
 
-                  {/* User Avatar */}
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={otherUserAvatar || ""} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
-                      {userName.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex flex-col justify-center flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                        {userName}
-                      </p>
-                      {timeDisplay && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          {timeDisplay}
-                        </span>
-                      )}
-                    </div>
-                    {plantTitle !== 'Anuncio no disponible' && (
-                      <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-1 mb-1">
-                        Interesado en: <span className="font-medium">{plantTitle}</span>
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-xs font-normal leading-normal line-clamp-1 flex-1">
+                  {/* Nombre del anuncio y último mensaje - Centro */}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-foreground text-base font-bold leading-tight tracking-[-0.015em] truncate">
+                      {plantTitle !== 'Anuncio no disponible' ? plantTitle : 'Conversación'}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-muted-foreground text-sm font-normal leading-normal truncate flex-1">
                         {!conversation.last_message_content && conversation.last_message_sender ? (
-                          <span className="flex items-center gap-1">
-                            📷 Imagen
-                          </span>
+                          <span>📷 Imagen</span>
                         ) : (
                           lastMessage
                         )}
                       </p>
                       {unreadCount > 0 && (
-                        <div className="bg-primary text-primary-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium ml-2">
+                        <div className="bg-primary text-primary-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium">
                           {unreadCount > 99 ? '99+' : unreadCount}
                         </div>
                       )}
                     </div>
                   </div>
+
+                  {/* Avatar del usuario - Derecha */}
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    <AvatarImage src={otherUserAvatar || ""} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
+                      {userName.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
               );
             })}
