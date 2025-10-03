@@ -215,6 +215,18 @@ const Chat = () => {
                   {plant?.title || otherUser?.name || 'Conversación'}
                 </h2>
               </div>
+
+              {conversation?.plant_id && plant && user?.id !== plant.user_id && (plant.status === 'active' || plant.status === 'reserved') && (
+                <div className="flex-shrink-0">
+                  <ReservationButton
+                    plantId={plant.id}
+                    sellerId={plant.user_id}
+                    sellerName={otherUser?.name}
+                    plantTitle={plant.title}
+                    isDisabled={plant.status === 'reserved'}
+                  />
+                </div>
+              )}
               
               {/* Avatar del usuario - circular */}
               <div 
@@ -235,17 +247,6 @@ const Chat = () => {
             </div>
           </div>
           
-          {conversation?.plant_id && plant && user?.id !== plant.user_id && (plant.status === 'active' || plant.status === 'reserved') && (
-            <div className="flex-shrink-0">
-              <ReservationButton
-                plantId={plant.id}
-                sellerId={plant.user_id}
-                sellerName={otherUser?.name}
-                plantTitle={plant.title}
-                isDisabled={plant.status === 'reserved'}
-              />
-            </div>
-          )}
         </div>
 
         {/* Messages */}
