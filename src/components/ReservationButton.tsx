@@ -62,16 +62,59 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
       }
 
       // Create reservation request
-      const { error } = await supabase
+      const { data: reservationData, error: reservationError } = await supabase
         .from('reservations')
         .insert({
           plant_id: plantId,
           requester_id: user.id,
           seller_id: sellerId,
           message: `Solicitud de reserva para "${plantTitle || 'esta planta'}"`
+        })
+        .select()
+        .single();
+
+      if (reservationError) throw reservationError;
+
+      // Get or create conversation
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('plant_id', plantId)
+        .or(`and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`)
+        .maybeSingle();
+
+      let conversationId = existingConversation?.id;
+
+      if (!conversationId) {
+        const { data: newConversation, error: conversationError } = await supabase
+          .from('conversations')
+          .insert({
+            participant_1: user.id,
+            participant_2: sellerId,
+            plant_id: plantId
+          })
+          .select()
+          .single();
+
+        if (conversationError) throw conversationError;
+        conversationId = newConversation.id;
+      }
+
+      // Send special reservation message in the chat
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: JSON.stringify({
+            type: 'reservation_request',
+            reservation_id: reservationData.id,
+            plant_id: plantId,
+            plant_title: plantTitle || 'esta planta'
+          })
         });
 
-      if (error) throw error;
+      if (messageError) throw messageError;
 
       toast({
         title: "Solicitud enviada",

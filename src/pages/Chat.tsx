@@ -9,6 +9,7 @@ import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ReservationButton from '@/components/ReservationButton';
+import ReservationNotificationMessage from '@/components/ReservationNotificationMessage';
 
 const Chat = () => {
   const { conversationId } = useParams();
@@ -262,6 +263,34 @@ const Chat = () => {
           ) : (
             messages.map((message) => {
               const isOwnMessage = message.sender_id === user.id;
+              
+              // Check if this is a reservation notification message
+              let reservationData = null;
+              try {
+                const parsed = JSON.parse(message.content);
+                if (parsed.type === 'reservation_request') {
+                  reservationData = parsed;
+                }
+              } catch (e) {
+                // Not a JSON message, treat as regular message
+              }
+
+              // Render reservation notification
+              if (reservationData) {
+                return (
+                  <div key={message.id}>
+                    <ReservationNotificationMessage
+                      reservationId={reservationData.reservation_id}
+                      plantId={reservationData.plant_id}
+                      plantTitle={reservationData.plant_title}
+                      plantImage={plant?.images?.[0]}
+                      senderId={message.sender_id}
+                    />
+                  </div>
+                );
+              }
+
+              // Render regular message
               return (
                 <div
                   key={message.id}
