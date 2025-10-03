@@ -216,7 +216,7 @@ const Chat = () => {
                 </h2>
               </div>
 
-              {conversation?.plant_id && plant && user?.id !== plant.user_id && (plant.status === 'active' || plant.status === 'reserved') && (
+              {conversation?.plant_id && plant && user?.id !== plant.user_id && (
                 <div className="flex-shrink-0">
                   <ReservationButton
                     plantId={plant.id}
