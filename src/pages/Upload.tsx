@@ -15,6 +15,7 @@ const Upload = () => {
     location: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     toast
   } = useToast();
@@ -118,7 +119,11 @@ const Upload = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     if (validateForm()) {
+      setIsSubmitting(true);
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data: { user } } = await supabase.auth.getUser();
@@ -162,6 +167,7 @@ const Upload = () => {
             description: "Hubo un problema al guardar tu planta. Inténtalo de nuevo.",
             variant: "destructive"
           });
+          setIsSubmitting(false);
           return;
         }
 
@@ -184,6 +190,7 @@ const Upload = () => {
           description: "Hubo un problema al publicar tu planta",
           variant: "destructive"
         });
+        setIsSubmitting(false);
       }
     }
   };
@@ -385,9 +392,17 @@ const Upload = () => {
             <div className="mt-6">
               <button 
                 type="submit"
-                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
+                disabled={isSubmitting}
+                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Publicar
+                {isSubmitting ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin">refresh</span>
+                    Creando anuncio...
+                  </>
+                ) : (
+                  'Publicar'
+                )}
               </button>
             </div>
           </div>
