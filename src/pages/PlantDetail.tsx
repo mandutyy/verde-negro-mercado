@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -49,6 +50,7 @@ const PlantDetail = () => {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const handleEditPlant = () => {
     setEditDialogOpen(true);
@@ -357,10 +359,11 @@ const PlantDetail = () => {
             {plant.images && plant.images.length > 0 && (
               <>
                 <div 
-                  className="absolute inset-0 bg-center bg-no-repeat bg-cover" 
+                  className="absolute inset-0 bg-center bg-no-repeat bg-cover cursor-pointer" 
                   style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
+                  onClick={() => setImageModalOpen(true)}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
 
                 {plant.status === 'reserved' && !isOwner && (
                   <div className="absolute top-20 right-4 z-20">
@@ -483,6 +486,27 @@ const PlantDetail = () => {
         onUpdate={handleUpdatePlant}
         onDelete={handleDeletePlant}
       />
+
+      {/* Image Modal */}
+      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-0 bg-transparent">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Button
+              onClick={() => setImageModalOpen(false)}
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 z-50 text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <img 
+              src={plant.images[currentImageIndex]} 
+              alt={plant.title}
+              className="max-w-full max-h-[95vh] object-contain rounded-lg"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
