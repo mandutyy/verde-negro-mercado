@@ -46,7 +46,6 @@ const AppContent = () => {
   const shouldShowNavigation = user && 
                                location.pathname !== '/auth' && 
                                !location.pathname.startsWith('/chat') && 
-                               !location.pathname.startsWith('/plant/') &&
                                location.pathname !== '/settings' &&
                                location.pathname !== '/edit-profile' &&
                                location.pathname !== '/search';
