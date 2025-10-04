@@ -357,7 +357,7 @@ const Chat = () => {
                       {isOwnMessage && (
                         <div className="flex items-center ml-1">
                           {message.status === 'read' ? (
-                            <CheckCheck size={12} className="text-[#38e07b]" />
+                            <CheckCheck size={12} className="text-[#34b7f1]" />
                           ) : message.status === 'delivered' ? (
                             <CheckCheck size={12} className="text-[#96c5a9]" />
                           ) : (
