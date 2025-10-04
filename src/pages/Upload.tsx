@@ -149,9 +149,11 @@ const Upload = () => {
             : null
         };
 
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('plants')
-          .insert(plantData);
+          .insert(plantData)
+          .select()
+          .single();
 
         if (error) {
           console.error('Error saving plant:', error);
@@ -170,18 +172,10 @@ const Upload = () => {
           variant: "default"
         });
 
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          category: '',
-          price: '',
-          exchangeFor: '',
-          location: ''
-        });
-        setImages([]);
-        setSaleType('sell');
-        setSelectedOption(null);
+        // Redirect to plant detail page
+        if (data?.id) {
+          navigate(`/plant/${data.id}`);
+        }
         
       } catch (error) {
         console.error('Error:', error);
