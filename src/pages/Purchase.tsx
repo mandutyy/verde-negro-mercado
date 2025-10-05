@@ -289,7 +289,6 @@ const isOwner = user?.id === plant.user_id;
                   style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
                   onClick={() => setImageModalOpen(true)}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
 
                 {plant.status === 'reserved' && !isOwner && (
                   <div className="absolute top-20 right-4 z-20">
