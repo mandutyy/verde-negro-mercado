@@ -5,7 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import defaultProfileIcon from '@/assets/default-profile-icon.png';
-import { Bookmark, ArrowLeft, Share2, Home, Plus, MessageCircle, User } from 'lucide-react';
+import { Bookmark, ArrowLeft, Share2, Home, Plus, MessageCircle, User, X } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface Plant {
   id: string;
@@ -37,6 +38,7 @@ const Purchase = () => {
   const [sellerProfile, setSellerProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -282,10 +284,11 @@ const isOwner = user?.id === plant.user_id;
             {plant.images && plant.images.length > 0 && (
               <>
                 <div 
-                  className="absolute inset-0 bg-center bg-no-repeat bg-cover" 
+                  className="absolute inset-0 bg-center bg-no-repeat bg-cover cursor-pointer" 
                   style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
+                  onClick={() => setImageModalOpen(true)}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
 
                 {plant.status === 'reserved' && !isOwner && (
                   <div className="absolute top-20 right-4 z-20">
@@ -416,6 +419,25 @@ const isOwner = user?.id === plant.user_id;
           </button>
         </div>
       </div>
+
+      {/* Image Modal */}
+      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-0">
+          <button
+            onClick={() => setImageModalOpen(false)}
+            className="absolute right-4 top-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          {plant?.images && (
+            <img
+              src={plant.images[currentImageIndex]}
+              alt={plant.title}
+              className="w-full h-full object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
