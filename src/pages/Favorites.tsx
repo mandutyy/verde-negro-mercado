@@ -25,7 +25,7 @@ const FavoritePlantCard = ({ plant }: { plant: any }) => {
   };
 
   const handlePlantClick = () => {
-    navigate(`/plant/${plant.plants.id}`);
+    navigate(`/purchase/${plant.plants.id}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
