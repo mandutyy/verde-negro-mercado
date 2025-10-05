@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -499,11 +500,26 @@ const PlantDetail = () => {
             >
               <X className="h-5 w-5" />
             </Button>
-            <img 
-              src={plant.images[currentImageIndex]} 
-              alt={plant.title}
-              className="max-w-full max-h-[95vh] object-contain rounded-lg"
-            />
+            <TransformWrapper
+              initialScale={1}
+              minScale={0.5}
+              maxScale={4}
+              centerOnInit
+              wheel={{ smoothStep: 0.01 }}
+              pinch={{ step: 5 }}
+              doubleClick={{ disabled: false, step: 0.7 }}
+            >
+              <TransformComponent
+                wrapperClass="!w-full !h-full"
+                contentClass="!w-full !h-full flex items-center justify-center"
+              >
+                <img 
+                  src={plant.images[currentImageIndex]} 
+                  alt={plant.title}
+                  className="max-w-full max-h-[95vh] object-contain rounded-lg"
+                />
+              </TransformComponent>
+            </TransformWrapper>
           </div>
         </DialogContent>
       </Dialog>

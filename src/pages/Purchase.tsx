@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import defaultProfileIcon from '@/assets/default-profile-icon.png';
 import { Bookmark, ArrowLeft, Share2, Home, Plus, MessageCircle, User, X } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 interface Plant {
   id: string;
@@ -430,11 +431,26 @@ const isOwner = user?.id === plant.user_id;
             <X className="h-6 w-6" />
           </button>
           {plant?.images && (
-            <img
-              src={plant.images[currentImageIndex]}
-              alt={plant.title}
-              className="w-full h-full object-contain"
-            />
+            <TransformWrapper
+              initialScale={1}
+              minScale={0.5}
+              maxScale={4}
+              centerOnInit
+              wheel={{ smoothStep: 0.01 }}
+              pinch={{ step: 5 }}
+              doubleClick={{ disabled: false, step: 0.7 }}
+            >
+              <TransformComponent
+                wrapperClass="!w-full !h-full"
+                contentClass="!w-full !h-full flex items-center justify-center"
+              >
+                <img
+                  src={plant.images[currentImageIndex]}
+                  alt={plant.title}
+                  className="w-full h-full object-contain"
+                />
+              </TransformComponent>
+            </TransformWrapper>
           )}
         </DialogContent>
       </Dialog>
