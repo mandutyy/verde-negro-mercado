@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +25,46 @@ const ReservationNotificationMessage: React.FC<ReservationNotificationMessagePro
   const [status, setStatus] = useState<'pending' | 'accepted' | 'declined'>('pending');
   const [isLoading, setIsLoading] = useState(false);
   const isSeller = user?.id !== senderId;
+
+  // Load current reservation status
+  useEffect(() => {
+    const loadReservationStatus = async () => {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select('status')
+        .eq('id', reservationId)
+        .maybeSingle();
+
+      if (!error && data) {
+        setStatus(data.status as 'pending' | 'accepted' | 'declined');
+      }
+    };
+
+    loadReservationStatus();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('reservation-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'reservations',
+          filter: `id=eq.${reservationId}`
+        },
+        (payload) => {
+          if (payload.new && 'status' in payload.new) {
+            setStatus(payload.new.status as 'pending' | 'accepted' | 'declined');
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [reservationId]);
 
   const handleStatusUpdate = async (newStatus: 'accepted' | 'declined') => {
     if (!isSeller) return;
