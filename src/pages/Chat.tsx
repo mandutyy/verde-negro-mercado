@@ -285,6 +285,17 @@ const Chat = () => {
                       plantTitle={reservationData.plant_title}
                       plantImage={plant?.images?.[0]}
                       senderId={message.sender_id}
+                      onStatusChange={() => {
+                        // Refresh plant data when reservation status changes
+                        if (conversation?.plant_id) {
+                          supabase
+                            .from('plants')
+                            .select('*')
+                            .eq('id', conversation.plant_id)
+                            .maybeSingle()
+                            .then(({ data }) => setPlant(data));
+                        }
+                      }}
                     />
                   </div>
                 );
