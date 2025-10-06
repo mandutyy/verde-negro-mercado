@@ -12,6 +12,7 @@ interface ReservationButtonProps {
   sellerName?: string;
   plantTitle?: string;
   isDisabled?: boolean;
+  onReservationCreated?: () => void;
 }
 
 const ReservationButton: React.FC<ReservationButtonProps> = ({ 
@@ -19,7 +20,8 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
   sellerId, 
   sellerName,
   plantTitle,
-  isDisabled = false
+  isDisabled = false,
+  onReservationCreated
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -120,6 +122,9 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
         title: "Solicitud enviada",
         description: `Tu solicitud de reserva ha sido enviada a ${sellerName || 'el vendedor'}`,
       });
+
+      // Notify parent component that reservation was created
+      onReservationCreated?.();
       
     } catch (error) {
       console.error('Error creating reservation:', error);

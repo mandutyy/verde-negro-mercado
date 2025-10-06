@@ -15,7 +15,7 @@ const Chat = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { messages, sendMessage, markMessagesAsRead } = useRealtimeChat(conversationId);
+  const { messages, sendMessage, markMessagesAsRead, reloadMessages } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
@@ -23,6 +23,7 @@ const Chat = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any>(null);
   const [plant, setPlant] = useState<any>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -106,7 +107,7 @@ const Chat = () => {
     };
 
     loadOtherUser();
-  }, [user, conversationId]);
+  }, [user, conversationId, refreshKey]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,6 +226,12 @@ const Chat = () => {
                     sellerName={otherUser?.name}
                     plantTitle={plant.title}
                     isDisabled={false}
+                    onReservationCreated={() => {
+                      // Reload messages to show the new reservation notification
+                      setTimeout(() => {
+                        reloadMessages();
+                      }, 500);
+                    }}
                   />
                 </div>
               )}

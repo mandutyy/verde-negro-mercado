@@ -41,6 +41,27 @@ export const useRealtimeChat = (conversationId?: string) => {
   const queryClient = useQueryClient();
   const [messages, setMessages] = useState<Message[]>([]);
 
+  // Function to reload messages
+  const reloadMessages = useCallback(async () => {
+    if (!user || !conversationId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error reloading messages:', error);
+      } else {
+        setMessages((data as Message[]) || []);
+      }
+    } catch (error) {
+      console.error('Error in reloadMessages:', error);
+    }
+  }, [user, conversationId]);
+
   // Hook para obtener conversaciones con caché
   const { data: conversations = [], isLoading: loading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -353,5 +374,6 @@ export const useRealtimeChat = (conversationId?: string) => {
     loading,
     sendMessage,
     markMessagesAsRead,
+    reloadMessages,
   };
 };
