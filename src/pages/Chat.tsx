@@ -192,7 +192,7 @@ const Chat = () => {
             <div className="flex items-center gap-3 w-full">
               {/* Foto del producto - cuadrada */}
               <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-10 h-10 shrink-0 cursor-pointer"
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-10 h-10 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                 style={{
                   backgroundImage: plant?.images?.[0] 
                     ? `url("${plant.images[0]}")` 
@@ -202,7 +202,7 @@ const Chat = () => {
                 onClick={() => plant?.id && navigate(`/plant/${plant.id}`)}
               >
                 {!plant?.images?.[0] && (
-                  <div className="w-full h-full flex items-center justify-center text-xl">
+                  <div className="w-full h-full flex items-center justify-center text-xl cursor-pointer">
                     🌿
                   </div>
                 )}
