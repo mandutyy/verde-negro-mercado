@@ -24,6 +24,7 @@ const Chat = () => {
   const [conversation, setConversation] = useState<any>(null);
   const [plant, setPlant] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [existingReservation, setExistingReservation] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -99,6 +100,17 @@ const Chat = () => {
             .maybeSingle();
           
           setPlant(plantData);
+
+          // Check if there's already a reservation request from this user
+          const { data: reservationData } = await supabase
+            .from('reservations')
+            .select('*')
+            .eq('plant_id', conversationData.plant_id)
+            .eq('requester_id', user.id)
+            .in('status', ['pending', 'accepted'])
+            .maybeSingle();
+          
+          setExistingReservation(reservationData);
         }
       } catch (error) {
         console.error('Error loading other user:', error);
@@ -108,6 +120,40 @@ const Chat = () => {
 
     loadOtherUser();
   }, [user, conversationId, refreshKey]);
+
+  // Real-time subscription for reservation status changes
+  useEffect(() => {
+    if (!plant?.id || !user?.id) return;
+
+    const channel = supabase
+      .channel('reservation-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reservations',
+          filter: `plant_id=eq.${plant.id}`
+        },
+        (payload) => {
+          console.log('Reservation change detected:', payload);
+          // Refetch reservation status
+          supabase
+            .from('reservations')
+            .select('*')
+            .eq('plant_id', plant.id)
+            .eq('requester_id', user.id)
+            .in('status', ['pending', 'accepted'])
+            .maybeSingle()
+            .then(({ data }) => setExistingReservation(data));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [plant?.id, user?.id]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,21 +264,40 @@ const Chat = () => {
                 </h2>
               </div>
 
+              {/* Botón de reserva - siempre visible si hay planta y no es el dueño */}
               {plant && user?.id !== plant.user_id && (
                 <div className="flex-shrink-0">
-                  <ReservationButton
-                    plantId={plant.id}
-                    sellerId={plant.user_id}
-                    sellerName={otherUser?.name}
-                    plantTitle={plant.title}
-                    isDisabled={false}
-                    onReservationCreated={() => {
-                      // Reload messages to show the new reservation notification
-                      setTimeout(() => {
-                        reloadMessages();
-                      }, 500);
-                    }}
-                  />
+                  {existingReservation ? (
+                    <Button 
+                      disabled
+                      className="text-sm font-bold text-[#122118] bg-gray-400 rounded-full px-4 py-2 whitespace-nowrap cursor-not-allowed opacity-60"
+                    >
+                      {existingReservation.status === 'accepted' ? 'Reserva Aceptada' : 'Solicitud Enviada'}
+                    </Button>
+                  ) : (
+                    <ReservationButton
+                      plantId={plant.id}
+                      sellerId={plant.user_id}
+                      sellerName={otherUser?.name}
+                      plantTitle={plant.title}
+                      isDisabled={false}
+                      onReservationCreated={() => {
+                        // Reload messages to show the new reservation notification
+                        setTimeout(() => {
+                          reloadMessages();
+                          // Refetch reservation status
+                          supabase
+                            .from('reservations')
+                            .select('*')
+                            .eq('plant_id', plant.id)
+                            .eq('requester_id', user.id)
+                            .in('status', ['pending', 'accepted'])
+                            .maybeSingle()
+                            .then(({ data }) => setExistingReservation(data));
+                        }, 500);
+                      }}
+                    />
+                  )}
                 </div>
               )}
               
