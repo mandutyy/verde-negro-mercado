@@ -21,6 +21,7 @@ import Search from "./pages/Search";
 import MyPlants from "./pages/MyPlants";
 import MyReviews from "./pages/MyReviews";
 import PlantDetail from "./pages/PlantDetail";
+import EditPlant from "./pages/EditPlant";
 import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -48,6 +49,7 @@ const AppContent = () => {
                                !location.pathname.startsWith('/chat') && 
                                location.pathname !== '/settings' &&
                                location.pathname !== '/edit-profile' &&
+                               !location.pathname.startsWith('/edit-plant') &&
                                location.pathname !== '/search';
   
   return (
@@ -127,6 +129,11 @@ const AppContent = () => {
         <Route path="/plant/:id" element={
           <ProtectedRoute>
             <PlantDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/edit-plant/:id" element={
+          <ProtectedRoute>
+            <EditPlant />
           </ProtectedRoute>
         } />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

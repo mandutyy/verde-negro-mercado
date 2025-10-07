@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark, X } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark, X, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,8 +13,13 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useApi';
-import EditPlantDialog from '@/components/EditPlantDialog';
 import ReservationButton from '@/components/ReservationButton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Plant {
   id: string;
@@ -50,15 +55,10 @@ const PlantDetail = () => {
   const [seller, setSeller] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const handleEditPlant = () => {
-    setEditDialogOpen(true);
-  };
-
-  const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
+    navigate(`/edit-plant/${plant?.id}`);
   };
 
   const handleBack = () => {
@@ -67,63 +67,6 @@ const PlantDetail = () => {
       navigate(-1);
     } else {
       navigate('/');
-    }
-  };
-  const handleUpdatePlant = async (plantId: string, updates: Partial<Plant>) => {
-    try {
-      const { error } = await supabase
-        .from('plants')
-        .update(updates)
-        .eq('id', plantId)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-      
-      // Update local state
-      setPlant(prev => prev ? { ...prev, ...updates } : null);
-
-      toast({
-        title: "¡Actualizado!",
-        description: "Los cambios se han guardado correctamente",
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Error updating plant:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo actualizar la planta",
-        variant: "destructive"
-      });
-      return false;
-    }
-  };
-
-  const handleDeletePlant = async (plantId: string) => {
-    try {
-      const { error } = await supabase
-        .from('plants')
-        .delete()
-        .eq('id', plantId)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "¡Eliminado!",
-        description: "La planta ha sido eliminada correctamente",
-      });
-
-      navigate('/profile');
-      return true;
-    } catch (error) {
-      console.error('Error deleting plant:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la planta",
-        variant: "destructive"
-      });
-      return false;
     }
   };
 
@@ -346,13 +289,34 @@ const PlantDetail = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
-            >
-              <Share className="h-5 w-5" />
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
+              >
+                <Share className="h-5 w-5" />
+              </Button>
+              {isOwner && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
+                    >
+                      <MoreVertical className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-card border-border z-50">
+                    <DropdownMenuItem onClick={handleEditPlant} className="cursor-pointer">
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Editar anuncio
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
 
           {/* Main Hero Image */}
@@ -445,21 +409,13 @@ const PlantDetail = () => {
       <div className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-border">
         <div className="p-4 flex gap-4">
           {isOwner ? (
-            <>
-              <Button 
-                onClick={handleEditPlant}
-                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90"
-              >
-                <span className="truncate">Editar</span>
-              </Button>
-              <Button 
-                onClick={handleReserve}
-                disabled={plant.status === 'reserved'}
-                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-white/10 text-white text-lg font-bold border border-white/20 hover:bg-white/20 disabled:opacity-50"
-              >
-                <span className="truncate">{plant.status === 'reserved' ? '✓ Reservado' : 'Reservar'}</span>
-              </Button>
-            </>
+            <Button 
+              onClick={handleReserve}
+              disabled={plant.status === 'reserved'}
+              className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90 disabled:opacity-50"
+            >
+              <span className="truncate">{plant.status === 'reserved' ? '✓ Reservado' : 'Marcar como reservado'}</span>
+            </Button>
           ) : (
             <>
               <ReservationButton
@@ -478,14 +434,6 @@ const PlantDetail = () => {
           )}
         </div>
       </div>
-
-      <EditPlantDialog
-        plant={plant}
-        isOpen={editDialogOpen}
-        onClose={handleCloseEditDialog}
-        onUpdate={handleUpdatePlant}
-        onDelete={handleDeletePlant}
-      />
 
       {/* Image Modal */}
       <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
