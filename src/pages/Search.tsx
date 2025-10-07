@@ -381,7 +381,7 @@ const Search = () => {
             className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 bg-[#38e07b] text-[#122118] text-lg font-bold tracking-wide hover:bg-[#32c970] transition-colors"
           >
             <span className="truncate">
-              {loading ? 'Cargando...' : `Mostrar ${filteredPlants.length} resultado${filteredPlants.length !== 1 ? 's' : ''}`}
+              {loading ? 'Cargando...' : 'Buscar'}
             </span>
           </button>
         </div>
