@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import { NotificationPermission } from '@/components/NotificationPermission';
 
 
 const Messages = () => {
@@ -56,6 +57,11 @@ const Messages = () => {
         <h2 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           Mensajes
         </h2>
+      </div>
+
+      {/* Notification Permission */}
+      <div className="px-4 pt-3">
+        <NotificationPermission />
       </div>
 
       {/* Search Bar */}
