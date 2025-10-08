@@ -1,1 +1,7 @@
 project_id = "qxyngdiehpsaublqlnkq"
+
+[functions.send-push-notification]
+verify_jwt = false
+
+[functions.on-new-message]
+verify_jwt = false
