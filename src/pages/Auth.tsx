@@ -182,12 +182,10 @@ const Auth = () => {
             </button>
           </div>
         </form>
-      </div>
-      
-      {/* Footer */}
-      <div>
+        
+        {/* Toggle between sign in and sign up */}
         <p 
-          className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer"
+          className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-3 px-4 text-center underline cursor-pointer"
           onClick={() => {
             setIsSignUp(!isSignUp);
             setEmail('');
@@ -197,6 +195,10 @@ const Auth = () => {
         >
           {isSignUp ? '¿Ya tienes cuenta? Iniciar sesión' : '¿No tienes cuenta? Registrarse'}
         </p>
+      </div>
+      
+      {/* Footer spacer */}
+      <div>
         <div className="h-5 bg-[#122118]"></div>
       </div>
     </div>
