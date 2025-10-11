@@ -15,7 +15,6 @@ const Upload = () => {
     location: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     toast
   } = useToast();
@@ -119,11 +118,7 @@ const Upload = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (isSubmitting) return; // Prevent multiple submissions
-    
     if (validateForm()) {
-      setIsSubmitting(true);
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data: { user } } = await supabase.auth.getUser();
@@ -154,11 +149,9 @@ const Upload = () => {
             : null
         };
 
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('plants')
-          .insert(plantData)
-          .select()
-          .single();
+          .insert(plantData);
 
         if (error) {
           console.error('Error saving plant:', error);
@@ -167,7 +160,6 @@ const Upload = () => {
             description: "Hubo un problema al guardar tu planta. Inténtalo de nuevo.",
             variant: "destructive"
           });
-          setIsSubmitting(false);
           return;
         }
 
@@ -178,10 +170,18 @@ const Upload = () => {
           variant: "default"
         });
 
-        // Redirect to plant detail page
-        if (data?.id) {
-          navigate(`/plant/${data.id}`);
-        }
+        // Reset form
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          price: '',
+          exchangeFor: '',
+          location: ''
+        });
+        setImages([]);
+        setSaleType('sell');
+        setSelectedOption(null);
         
       } catch (error) {
         console.error('Error:', error);
@@ -190,7 +190,6 @@ const Upload = () => {
           description: "Hubo un problema al publicar tu planta",
           variant: "destructive"
         });
-        setIsSubmitting(false);
       }
     }
   };
@@ -392,17 +391,9 @@ const Upload = () => {
             <div className="mt-6">
               <button 
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full rounded-full bg-[#38e07b] py-4 text-center font-bold text-[#122118] hover:bg-[#32c970] transition-colors shadow-lg"
               >
-                {isSubmitting ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin">refresh</span>
-                    Creando anuncio...
-                  </>
-                ) : (
-                  'Publicar'
-                )}
+                Publicar
               </button>
             </div>
           </div>

@@ -10,7 +10,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -85,6 +85,25 @@ const Auth = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -183,9 +202,31 @@ const Auth = () => {
           </div>
         </form>
         
-        {/* Toggle between sign in and sign up */}
+        {/* Social login - only show for login */}
+        {!isSignUp && (
+          <>
+            <p className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
+              O inicia sesión con
+            </p>
+            <div className="flex justify-center">
+              <div className="flex flex-1 gap-3 flex-wrap px-4 py-3 max-w-[480px] justify-center">
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#264532] text-white text-sm font-bold leading-normal tracking-[0.015em] grow"
+                >
+                  <span className="truncate">Google</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      
+      {/* Footer */}
+      <div>
         <p 
-          className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-3 px-4 text-center underline cursor-pointer"
+          className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer"
           onClick={() => {
             setIsSignUp(!isSignUp);
             setEmail('');
@@ -195,10 +236,6 @@ const Auth = () => {
         >
           {isSignUp ? '¿Ya tienes cuenta? Iniciar sesión' : '¿No tienes cuenta? Registrarse'}
         </p>
-      </div>
-      
-      {/* Footer spacer */}
-      <div>
         <div className="h-5 bg-[#122118]"></div>
       </div>
     </div>

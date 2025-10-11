@@ -1,25 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark, X, MoreVertical } from 'lucide-react';
+import { ArrowLeft, Heart, MapPin, Eye, Clock, Star, Share, User, Pencil, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useApi';
-import ReservationButton from '@/components/ReservationButton';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import EditPlantDialog from '@/components/EditPlantDialog';
+import ContactButton from '@/components/ContactButton';
 
 interface Plant {
   id: string;
@@ -55,10 +48,14 @@ const PlantDetail = () => {
   const [seller, setSeller] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleEditPlant = () => {
-    navigate(`/edit-plant/${plant?.id}`);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
   };
 
   const handleBack = () => {
@@ -67,6 +64,63 @@ const PlantDetail = () => {
       navigate(-1);
     } else {
       navigate('/');
+    }
+  };
+  const handleUpdatePlant = async (plantId: string, updates: Partial<Plant>) => {
+    try {
+      const { error } = await supabase
+        .from('plants')
+        .update(updates)
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setPlant(prev => prev ? { ...prev, ...updates } : null);
+
+      toast({
+        title: "¡Actualizado!",
+        description: "Los cambios se han guardado correctamente",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error updating plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la planta",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const handleDeletePlant = async (plantId: string) => {
+    try {
+      const { error } = await supabase
+        .from('plants')
+        .delete()
+        .eq('id', plantId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "¡Eliminado!",
+        description: "La planta ha sido eliminada correctamente",
+      });
+
+      navigate('/profile');
+      return true;
+    } catch (error) {
+      console.error('Error deleting plant:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la planta",
+        variant: "destructive"
+      });
+      return false;
     }
   };
 
@@ -275,201 +329,248 @@ const PlantDetail = () => {
   const isOwner = user?.id === plant.user_id;
 
   return (
-    <div className="relative flex size-full min-h-screen flex-col bg-background font-spline justify-between overflow-x-hidden">
-      <div className="flex-grow">
-        {/* Hero Image Section */}
-        <div className="relative">
-          {/* Header Buttons */}
-          <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-4">
-            <Button
-              onClick={handleBack}
-              variant="ghost"
-              size="icon"
-              className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex gap-2">
+    <div className="min-h-screen bg-[#122118] text-white">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-[#122118]/95 backdrop-blur border-b border-[#366348]">
+        <div className="flex items-center justify-between p-4">
+          <Button
+            variant="ghost" 
+            size="icon"
+            onClick={handleBack}
+            className="text-white hover:bg-[#1b3124]"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            {isOwner && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
+                onClick={handleEditPlant}
+                className="text-white hover:bg-[#1b3124]"
               >
-                <Share className="h-5 w-5" />
+                <Pencil className="h-5 w-5" />
               </Button>
-              {isOwner && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
-                    >
-                      <MoreVertical className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-card border-border z-50">
-                    <DropdownMenuItem onClick={handleEditPlant} className="cursor-pointer">
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Editar anuncio
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
-
-          {/* Main Hero Image */}
-          <div className="relative h-[400px] w-full">
-            {plant.images && plant.images.length > 0 && (
-              <>
-                <div 
-                  className="absolute inset-0 bg-center bg-no-repeat bg-cover cursor-pointer" 
-                  style={{ backgroundImage: `url("${plant.images[currentImageIndex]}")` }}
-                  onClick={() => setImageModalOpen(true)}
-                ></div>
-
-                {plant.status === 'reserved' && !isOwner && (
-                  <div className="absolute top-20 right-4 z-20">
-                    <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-                      <Bookmark className="h-4 w-4 fill-purple-600" />
-                      Reservado
-                    </div>
-                  </div>
-                )}
-
-                {/* Thumbnail Images */}
-                {plant.images.length > 1 && (
-                  <div className="absolute bottom-4 right-4 flex gap-2 z-10">
-                    {plant.images.slice(0, 3).map((image, index) => (
-                      <div 
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`h-16 w-16 bg-center bg-no-repeat bg-cover rounded-lg cursor-pointer ${
-                          currentImageIndex === index ? 'border-2 border-primary' : 'border-2 border-white'
-                        }`}
-                        style={{ backgroundImage: `url("${image}")` }}
-                      ></div>
-                    ))}
-                  </div>
-                )}
-              </>
             )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleFavoriteClick}
+              disabled={favoriteLoading}
+              className="text-white hover:bg-[#1b3124]"
+            >
+              <Heart 
+                className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`}
+              />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="text-white hover:bg-[#1b3124]"
+            >
+              <Share className="h-5 w-5" />
+            </Button>
           </div>
         </div>
+      </div>
 
-        {/* Content Section */}
-        <div className="p-6 pb-32">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-white text-3xl font-bold leading-tight tracking-tight">{plant.title}</h1>
-              <p className="text-lg font-bold text-primary mt-2">
-                {getPlantTypeLabel(plant.sale_type, plant.price)}
-              </p>
-            </div>
+      <div className="max-w-4xl mx-auto pb-32">
+        {/* Image Gallery */}
+        <div className="relative">
+          <div className="aspect-[4/3] overflow-hidden">
+            <img 
+              src={mainImage}
+              alt={plant.title}
+              className="w-full h-full object-cover"
+            />
           </div>
-
-          <p className="text-gray-300 text-base font-normal leading-relaxed mt-4">
-            {plant.description}
-          </p>
-
-          {plant.exchange_for && (
-            <div className="mt-4">
-              <h3 className="text-white text-sm font-bold mb-2">Busca a cambio:</h3>
-              <p className="text-gray-300 text-sm">{plant.exchange_for}</p>
+          
+          {/* Image indicators */}
+          {plant.images && plant.images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+              <div className="flex gap-2">
+                {plant.images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-2 h-2 rounded-full ${
+                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           )}
+        </div>
 
-          <div className="mt-8">
-            <h3 className="text-white text-lg font-bold leading-tight tracking-tight mb-4">Información del vendedor</h3>
-            <div 
-              className="flex items-center gap-4 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2 transition-colors"
-              onClick={() => navigate(`/user-profile/${plant.user_id}`)}
-            >
-              <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 border-4 border-primary bg-muted"
-                style={{ 
-                  backgroundImage: `url("${seller?.avatar_url || '/placeholder.svg'}")` 
-                }}
-              ></div>
-              <div>
-                <p className="text-white text-lg font-semibold leading-normal">
-                  {sellerName}
-                </p>
-                <p className="text-secondary text-base font-normal leading-normal">
-                  {plant.location}
-                </p>
+        <div className="p-4 space-y-6">
+          {/* Title and Price */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl font-bold text-white">
+                {plant.title}
+              </h1>
+              {/* Badge de reservado para no-propietarios */}
+              {plant.status === 'reserved' && !isOwner && (
+                <div className="flex items-center gap-1 bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                  <Bookmark className="h-4 w-4 fill-purple-600" />
+                  Reservado
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold text-[#38e07b]">
+                {getPlantTypeLabel(plant.sale_type, plant.price)}
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  {plant.views_count || 0}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {new Date(plant.created_at).toLocaleDateString('es-ES')}
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-2 text-gray-300">
+            <MapPin className="h-4 w-4" />
+            <span>{plant.location}</span>
+          </div>
+
+          {/* Category Badge */}
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="bg-[#264532] text-[#38e07b] border-[#366348]">
+              {getCategoryLabel(plant.category)}
+            </Badge>
+          </div>
+
+          {/* Plant Details */}
+          <Card className="bg-[#1b3124] border-[#366348]">
+            <CardHeader>
+              <CardTitle className="text-white">Detalles de la planta</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-gray-400">Categoría</div>
+                  <div className="font-medium text-white">{getCategoryLabel(plant.category)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Estado</div>
+                  <div className="font-medium text-white">
+                    {plant.status === 'active' ? 'Disponible' : 
+                     plant.status === 'reserved' ? 'Reservado' : 'No disponible'}
+                  </div>
+                </div>
+              </div>
+              
+              <Separator className="bg-[#366348]" />
+              
+              <div>
+                <div className="text-sm text-gray-400 mb-2">Descripción</div>
+                <p className="text-white leading-relaxed">
+                  {plant.description}
+                </p>
+              </div>
+
+              {plant.exchange_for && (
+                <>
+                  <Separator className="bg-[#366348]" />
+                  <div>
+                    <div className="text-sm text-gray-400 mb-2">Busca a cambio</div>
+                    <p className="text-white leading-relaxed">
+                      {plant.exchange_for}
+                    </p>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Seller Info */}
+          <Card className="bg-[#1b3124] border-[#366348]">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src={seller?.avatar_url || ''} />
+                  <AvatarFallback className="bg-[#264532] text-white">
+                    <User className="h-6 w-6" />
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">
+                    {sellerName}
+                  </h3>
+                  <div className="flex items-center gap-1 mb-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-medium text-white">4.8</span>
+                    <span className="text-sm text-gray-400">
+                      (125 valoraciones)
+                    </span>
+                  </div>
+                  <div className="space-y-1 text-sm text-gray-400">
+                    <div>Miembro desde {new Date(plant.created_at).toLocaleDateString('es-ES')}</div>
+                    <div>Responde rápidamente</div>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#366348] text-white hover:bg-[#264532]"
+                  onClick={() => navigate(`/user-profile/${plant.user_id}`)}
+                >
+                  Ver perfil
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-border">
-        <div className="p-4 flex gap-4">
-          {isOwner ? (
+      {/* Contact Button - Fixed at bottom */}
+      {!isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
+          <div className="max-w-4xl mx-auto">
+            <ContactButton
+              plantId={plant.id}
+              sellerId={plant.user_id}
+              sellerName={sellerName}
+              plantTitle={plant.title}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Reserve Button - Fixed at bottom - Only for owners */}
+      {isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#122118] border-t border-[#366348]">
+          <div className="max-w-4xl mx-auto">
             <Button 
               onClick={handleReserve}
               disabled={plant.status === 'reserved'}
-              className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-primary text-primary-foreground text-lg font-bold hover:bg-primary/90 disabled:opacity-50"
+              className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold disabled:bg-gray-500 disabled:text-gray-300"
+              size="lg"
             >
-              <span className="truncate">{plant.status === 'reserved' ? '✓ Reservado' : 'Marcar como reservado'}</span>
+              {plant.status === 'reserved' ? '✓ Reservado' : 'Reservar'}
             </Button>
-          ) : (
-            <>
-              <ReservationButton
-                plantId={plant.id}
-                sellerId={plant.user_id}
-                sellerName={sellerName}
-                plantTitle={plant.title}
-              />
-              <Button 
-                onClick={handleContact}
-                className="flex w-full items-center justify-center rounded-full h-14 px-6 bg-white/10 text-white text-lg font-bold border border-white/20 hover:bg-white/20"
-              >
-                <span className="truncate">Contactar</span>
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Image Modal */}
-      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-0 bg-transparent">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <Button
-              onClick={() => setImageModalOpen(false)}
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 z-50 text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-            <TransformWrapper
-              initialScale={1}
-              minScale={0.5}
-              maxScale={4}
-              centerOnInit
-              wheel={{ smoothStep: 0.01 }}
-              pinch={{ step: 5 }}
-              doubleClick={{ disabled: false, step: 0.7 }}
-            >
-              <TransformComponent
-                wrapperClass="!w-full !h-full"
-                contentClass="!w-full !h-full flex items-center justify-center"
-              >
-                <img 
-                  src={plant.images[currentImageIndex]} 
-                  alt={plant.title}
-                  className="max-w-full max-h-[95vh] object-contain rounded-lg"
-                />
-              </TransformComponent>
-            </TransformWrapper>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
+
+      <EditPlantDialog
+        plant={plant}
+        isOpen={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        onUpdate={handleUpdatePlant}
+        onDelete={handleDeletePlant}
+      />
     </div>
   );
 };

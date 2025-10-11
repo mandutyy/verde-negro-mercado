@@ -12,7 +12,6 @@ interface ReservationButtonProps {
   sellerName?: string;
   plantTitle?: string;
   isDisabled?: boolean;
-  onReservationCreated?: () => void;
 }
 
 const ReservationButton: React.FC<ReservationButtonProps> = ({ 
@@ -20,8 +19,7 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
   sellerId, 
   sellerName,
   plantTitle,
-  isDisabled = false,
-  onReservationCreated
+  isDisabled = false
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -64,67 +62,21 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
       }
 
       // Create reservation request
-      const { data: reservationData, error: reservationError } = await supabase
+      const { error } = await supabase
         .from('reservations')
         .insert({
           plant_id: plantId,
           requester_id: user.id,
           seller_id: sellerId,
           message: `Solicitud de reserva para "${plantTitle || 'esta planta'}"`
-        })
-        .select()
-        .single();
-
-      if (reservationError) throw reservationError;
-
-      // Get or create conversation
-      const { data: existingConversation } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('plant_id', plantId)
-        .or(`and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`)
-        .maybeSingle();
-
-      let conversationId = existingConversation?.id;
-
-      if (!conversationId) {
-        const { data: newConversation, error: conversationError } = await supabase
-          .from('conversations')
-          .insert({
-            participant_1: user.id,
-            participant_2: sellerId,
-            plant_id: plantId
-          })
-          .select()
-          .single();
-
-        if (conversationError) throw conversationError;
-        conversationId = newConversation.id;
-      }
-
-      // Send special reservation message in the chat
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: conversationId,
-          sender_id: user.id,
-          content: JSON.stringify({
-            type: 'reservation_request',
-            reservation_id: reservationData.id,
-            plant_id: plantId,
-            plant_title: plantTitle || 'esta planta'
-          })
         });
 
-      if (messageError) throw messageError;
+      if (error) throw error;
 
       toast({
         title: "Solicitud enviada",
         description: `Tu solicitud de reserva ha sido enviada a ${sellerName || 'el vendedor'}`,
       });
-
-      // Notify parent component that reservation was created
-      onReservationCreated?.();
       
     } catch (error) {
       console.error('Error creating reservation:', error);
@@ -142,8 +94,11 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
     <Button 
       onClick={handleReservation}
       disabled={isLoading || isDisabled}
-      className="text-base font-bold text-[#122118] bg-[#38e07b] rounded-full px-4 py-2 whitespace-nowrap hover:bg-[#38e07b]/90"
+      variant="outline"
+      className="w-full"
+      size="lg"
     >
+      <Calendar className="mr-2 h-4 w-4" />
       {isLoading ? 'Enviando...' : 'Solicitar Reserva'}
     </Button>
   );

@@ -9,13 +9,12 @@ import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ReservationButton from '@/components/ReservationButton';
-import ReservationNotificationMessage from '@/components/ReservationNotificationMessage';
 
 const Chat = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { messages, sendMessage, markMessagesAsRead, reloadMessages } = useRealtimeChat(conversationId);
+  const { messages, sendMessage, markMessagesAsRead } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
@@ -23,8 +22,6 @@ const Chat = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any>(null);
   const [plant, setPlant] = useState<any>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [existingReservation, setExistingReservation] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -100,17 +97,6 @@ const Chat = () => {
             .maybeSingle();
           
           setPlant(plantData);
-
-          // Check if there's already a reservation request from this user
-          const { data: reservationData } = await supabase
-            .from('reservations')
-            .select('*')
-            .eq('plant_id', conversationData.plant_id)
-            .eq('requester_id', user.id)
-            .in('status', ['pending', 'accepted'])
-            .maybeSingle();
-          
-          setExistingReservation(reservationData);
         }
       } catch (error) {
         console.error('Error loading other user:', error);
@@ -119,41 +105,7 @@ const Chat = () => {
     };
 
     loadOtherUser();
-  }, [user, conversationId, refreshKey]);
-
-  // Real-time subscription for reservation status changes
-  useEffect(() => {
-    if (!plant?.id || !user?.id) return;
-
-    const channel = supabase
-      .channel('reservation-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'reservations',
-          filter: `plant_id=eq.${plant.id}`
-        },
-        (payload) => {
-          console.log('Reservation change detected:', payload);
-          // Refetch reservation status
-          supabase
-            .from('reservations')
-            .select('*')
-            .eq('plant_id', plant.id)
-            .eq('requester_id', user.id)
-            .in('status', ['pending', 'accepted'])
-            .maybeSingle()
-            .then(({ data }) => setExistingReservation(data));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [plant?.id, user?.id]);
+  }, [user, conversationId]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -226,100 +178,38 @@ const Chat = () => {
     <div className="relative flex h-screen w-full flex-col bg-[#122118] justify-between">
       <div className="flex-grow">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between gap-4">
-          <button
+        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate('/messages')}
-            className="text-white flex size-10 items-center justify-center"
+            className="text-white flex size-10 items-center justify-center p-0 hover:bg-white/10"
           >
             <ArrowLeft size={24} />
-          </button>
+          </Button>
           
-          <div className="flex items-center gap-3 mr-auto w-full">
-            <div className="flex items-center gap-3 w-full">
-              {/* Foto del producto - cuadrada */}
-              <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-10 h-10 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                style={{
-                  backgroundImage: plant?.images?.[0] 
-                    ? `url("${plant.images[0]}")` 
-                    : 'none',
-                  backgroundColor: !plant?.images?.[0] ? '#264532' : undefined
-                }}
-                onClick={() => plant?.id && navigate(`/plant/${plant.id}`)}
-              >
-                {!plant?.images?.[0] && (
-                  <div className="w-full h-full flex items-center justify-center text-xl cursor-pointer">
-                    🌿
-                  </div>
-                )}
-              </div>
-              
-              {/* Nombre del anuncio */}
-              <div 
-                className="flex-grow cursor-pointer"
-                onClick={() => plant?.id && navigate(`/plant/${plant.id}`)}
-              >
-                <h2 className="text-white text-base font-bold leading-tight tracking-[-0.015em] truncate">
-                  {plant?.title || otherUser?.name || 'Conversación'}
-                </h2>
-              </div>
-
-              {/* Botón de reserva - siempre visible si hay planta y no es el dueño */}
-              {plant && user?.id !== plant.user_id && (
-                <div className="flex-shrink-0">
-                  {existingReservation ? (
-                    <Button 
-                      disabled
-                      className="text-sm font-bold text-[#122118] bg-gray-400 rounded-full px-4 py-2 whitespace-nowrap cursor-not-allowed opacity-60"
-                    >
-                      {existingReservation.status === 'accepted' ? 'Reserva Aceptada' : 'Solicitud Enviada'}
-                    </Button>
-                  ) : (
-                    <ReservationButton
-                      plantId={plant.id}
-                      sellerId={plant.user_id}
-                      sellerName={otherUser?.name}
-                      plantTitle={plant.title}
-                      isDisabled={false}
-                      onReservationCreated={() => {
-                        // Reload messages to show the new reservation notification
-                        setTimeout(() => {
-                          reloadMessages();
-                          // Refetch reservation status
-                          supabase
-                            .from('reservations')
-                            .select('*')
-                            .eq('plant_id', plant.id)
-                            .eq('requester_id', user.id)
-                            .in('status', ['pending', 'accepted'])
-                            .maybeSingle()
-                            .then(({ data }) => setExistingReservation(data));
-                        }, 500);
-                      }}
-                    />
-                  )}
-                </div>
-              )}
-              
-              {/* Avatar del usuario - circular */}
-              <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 shrink-0"
-                style={{
-                  backgroundImage: otherUser?.avatar_url 
-                    ? `url("${otherUser.avatar_url}")` 
-                    : 'none',
-                  backgroundColor: !otherUser?.avatar_url ? '#264532' : undefined
-                }}
-              >
-                {!otherUser?.avatar_url && (
-                  <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-full bg-[#264532]">
-                    {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={otherUser?.avatar_url || ""} />
+              <AvatarFallback className="bg-[#264532] text-white">
+                {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+              {otherUser?.name || 'Usuario'}
+            </h2>
           </div>
           
+          <div className="flex gap-2 items-center">
+            {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
+              <ReservationButton
+                plantId={plant.id}
+                sellerId={plant.user_id}
+                sellerName={otherUser?.name}
+                plantTitle={plant.title}
+              />
+            )}
+          </div>
         </div>
 
         {/* Messages */}
@@ -335,45 +225,6 @@ const Chat = () => {
           ) : (
             messages.map((message) => {
               const isOwnMessage = message.sender_id === user.id;
-              
-              // Check if this is a reservation notification message
-              let reservationData = null;
-              try {
-                const parsed = JSON.parse(message.content);
-                if (parsed.type === 'reservation_request') {
-                  reservationData = parsed;
-                }
-              } catch (e) {
-                // Not a JSON message, treat as regular message
-              }
-
-              // Render reservation notification
-              if (reservationData) {
-                return (
-                  <div key={message.id}>
-                    <ReservationNotificationMessage
-                      reservationId={reservationData.reservation_id}
-                      plantId={reservationData.plant_id}
-                      plantTitle={reservationData.plant_title}
-                      plantImage={plant?.images?.[0]}
-                      senderId={message.sender_id}
-                      onStatusChange={() => {
-                        // Refresh plant data when reservation status changes
-                        if (conversation?.plant_id) {
-                          supabase
-                            .from('plants')
-                            .select('*')
-                            .eq('id', conversation.plant_id)
-                            .maybeSingle()
-                            .then(({ data }) => setPlant(data));
-                        }
-                      }}
-                    />
-                  </div>
-                );
-              }
-
-              // Render regular message
               return (
                 <div
                   key={message.id}
@@ -382,21 +233,12 @@ const Chat = () => {
                   } max-w-[80%]`}
                 >
                   {!isOwnMessage && (
-                    <div 
-                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 shrink-0"
-                      style={{
-                        backgroundImage: otherUser?.avatar_url 
-                          ? `url("${otherUser.avatar_url}")` 
-                          : 'none',
-                        backgroundColor: !otherUser?.avatar_url ? '#264532' : undefined
-                      }}
-                    >
-                      {!otherUser?.avatar_url && (
-                        <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-full bg-[#264532]">
-                          {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-                        </div>
-                      )}
-                    </div>
+                    <Avatar className="w-10 h-10 shrink-0">
+                      <AvatarImage src={otherUser?.avatar_url || ""} />
+                      <AvatarFallback className="bg-[#264532] text-white">
+                        {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
                   )}
                   
                   <div className={`flex flex-1 flex-col gap-1.5 ${
@@ -440,7 +282,7 @@ const Chat = () => {
                       {isOwnMessage && (
                         <div className="flex items-center ml-1">
                           {message.status === 'read' ? (
-                            <CheckCheck size={12} className="text-[#34b7f1]" />
+                            <CheckCheck size={12} className="text-[#38e07b]" />
                           ) : message.status === 'delivered' ? (
                             <CheckCheck size={12} className="text-[#96c5a9]" />
                           ) : (

@@ -21,14 +21,10 @@ import Search from "./pages/Search";
 import MyPlants from "./pages/MyPlants";
 import MyReviews from "./pages/MyReviews";
 import PlantDetail from "./pages/PlantDetail";
-import EditPlant from "./pages/EditPlant";
 import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsAndConditions from "./pages/TermsAndConditions";
-import CookiesPolicy from "./pages/CookiesPolicy";
 
 const AppContent = () => {
   const { user } = useAuth();
@@ -47,9 +43,9 @@ const AppContent = () => {
   const shouldShowNavigation = user && 
                                location.pathname !== '/auth' && 
                                !location.pathname.startsWith('/chat') && 
+                               !location.pathname.startsWith('/plant/') &&
                                location.pathname !== '/settings' &&
                                location.pathname !== '/edit-profile' &&
-                               !location.pathname.startsWith('/edit-plant') &&
                                location.pathname !== '/search';
   
   return (
@@ -131,14 +127,6 @@ const AppContent = () => {
             <PlantDetail />
           </ProtectedRoute>
         } />
-        <Route path="/edit-plant/:id" element={
-          <ProtectedRoute>
-            <EditPlant />
-          </ProtectedRoute>
-        } />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-        <Route path="/cookies-policy" element={<CookiesPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
