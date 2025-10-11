@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.tsx';
@@ -27,9 +28,11 @@ try {
     const root = createRoot(rootElement);
     console.log('Rendering App...');
     root.render(
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
+      <StrictMode>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </StrictMode>
     );
     console.log('App rendered successfully');
   } else {
