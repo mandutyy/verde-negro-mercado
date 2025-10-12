@@ -226,7 +226,7 @@ const Auth = () => {
       {/* Footer */}
       <div>
         <p 
-          className="text-[#96c5a9] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer"
+          className="text-[#96c5a9] text-sm font-normal leading-normal pb-1 pt-1 px-4 text-center underline cursor-pointer"
           onClick={() => {
             setIsSignUp(!isSignUp);
             setEmail('');
