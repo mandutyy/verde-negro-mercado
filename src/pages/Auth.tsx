@@ -202,6 +202,19 @@ const Auth = () => {
           </div>
         </form>
         
+        {/* Toggle between sign up and sign in */}
+        <p 
+          className="text-[#96c5a9] text-sm font-normal leading-normal py-3 px-4 text-center underline cursor-pointer"
+          onClick={() => {
+            setIsSignUp(!isSignUp);
+            setEmail('');
+            setPassword('');
+            setName('');
+          }}
+        >
+          {isSignUp ? '¿Ya tienes cuenta? Iniciar sesión' : '¿No tienes cuenta? Registrarse'}
+        </p>
+        
         {/* Social login - only show for login */}
         {!isSignUp && (
           <>
@@ -225,17 +238,6 @@ const Auth = () => {
       
       {/* Footer */}
       <div>
-        <p 
-          className="text-[#96c5a9] text-sm font-normal leading-normal pb-1 pt-1 px-4 text-center underline cursor-pointer"
-          onClick={() => {
-            setIsSignUp(!isSignUp);
-            setEmail('');
-            setPassword('');
-            setName('');
-          }}
-        >
-          {isSignUp ? '¿Ya tienes cuenta? Iniciar sesión' : '¿No tienes cuenta? Registrarse'}
-        </p>
         <div className="h-5 bg-[#122118]"></div>
       </div>
     </div>
