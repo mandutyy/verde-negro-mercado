@@ -92,6 +92,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.error('Error in profile creation:', error);
             }
           }, 100);
+
+          // Send login confirmation email (non-blocking)
+          setTimeout(async () => {
+            try {
+              await supabase.functions.invoke('send-login-email', {
+                body: {
+                  email: session.user?.email ?? '',
+                  name: session.user?.user_metadata?.name || session.user?.email?.split('@')[0] || ''
+                }
+              });
+            } catch (error) {
+              console.error('Error sending login email:', error);
+            }
+          }, 150);
         }
       }
     );

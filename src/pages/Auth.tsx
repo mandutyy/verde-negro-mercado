@@ -46,7 +46,7 @@ const Auth = () => {
 
       toast({
         title: "¡Cuenta creada!",
-        description: "Revisa tu email para confirmar tu cuenta.",
+        description: "Cuenta creada correctamente. Ya puedes iniciar sesión.",
       });
     } catch (error: any) {
       toast({
