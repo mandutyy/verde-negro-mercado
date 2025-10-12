@@ -10,7 +10,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -186,7 +186,7 @@ const Auth = () => {
           )}
           
           {/* Submit button */}
-          <div className="flex px-4 py-3">
+          <div className="flex px-4 py-1">
             <button
               type="submit"
               disabled={loading}
