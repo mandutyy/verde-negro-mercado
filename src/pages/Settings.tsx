@@ -87,7 +87,18 @@ const Settings = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.functions.invoke('delete-user');
+      // Get the current session to pass the auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No hay sesión activa');
+      }
+
+      const { error } = await supabase.functions.invoke('delete-user', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
       
       if (error) throw error;
 
