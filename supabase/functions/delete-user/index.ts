@@ -12,18 +12,31 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Get the JWT token from the Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('No Authorization header provided')
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - No token provided' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      )
+    }
+
     // Create a Supabase client with the Auth context of the logged in user
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     )
 
-    // Get the user from the Authorization header
+    // Get the user from the JWT token
     const {
       data: { user },
       error: userError,
@@ -32,7 +45,7 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       console.error('Error getting user:', userError)
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401,
