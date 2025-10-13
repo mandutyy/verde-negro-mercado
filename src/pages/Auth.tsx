@@ -31,7 +31,7 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -44,10 +44,24 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // Check if user already exists
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        toast({
+          title: "Usuario ya existe",
+          description: "Esta cuenta ya está registrada. Por favor, inicia sesión.",
+          variant: "destructive",
+        });
+        setIsSignUp(false); // Switch to login view
+        return;
+      }
+
       toast({
         title: "¡Cuenta creada!",
         description: "Cuenta creada correctamente. Ya puedes iniciar sesión.",
       });
+      
+      // Switch to login view after successful signup
+      setIsSignUp(false);
     } catch (error: any) {
       toast({
         title: "Error",

@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setLoading(false);
         }
 
-        // Create or update profile when user signs in (non-blocking)
+        // Create or update profile when user signs in
         if (event === 'SIGNED_IN' && session?.user) {
           setTimeout(async () => {
             try {
@@ -93,19 +93,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           }, 100);
 
-          // Send login confirmation email (non-blocking)
-          setTimeout(async () => {
-            try {
-              await supabase.functions.invoke('send-login-email', {
-                body: {
-                  email: session.user?.email ?? '',
-                  name: session.user?.user_metadata?.name || session.user?.email?.split('@')[0] || ''
-                }
-              });
-            } catch (error) {
-              console.error('Error sending login email:', error);
-            }
-          }, 150);
+          // Only send login email if user is logging in (not signing up)
+          // Check if this is a login by verifying the user already had a confirmed_at date
+          if (session.user.confirmed_at && new Date(session.user.confirmed_at) < new Date(Date.now() - 5000)) {
+            setTimeout(async () => {
+              try {
+                await supabase.functions.invoke('send-login-email', {
+                  body: {
+                    email: session.user?.email ?? '',
+                    name: session.user?.user_metadata?.name || session.user?.email?.split('@')[0] || ''
+                  }
+                });
+              } catch (error) {
+                console.error('Error sending login email:', error);
+              }
+            }, 150);
+          }
         }
       }
     );
