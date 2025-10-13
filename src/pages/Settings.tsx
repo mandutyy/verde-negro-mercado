@@ -87,7 +87,7 @@ const Settings = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.rpc('delete_user');
+      const { error } = await supabase.functions.invoke('delete-user');
       
       if (error) throw error;
 
