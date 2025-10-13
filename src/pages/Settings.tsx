@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight, LogOut } from 'lucide-react';
+import { ArrowLeft, ChevronRight, LogOut, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { useState, useEffect } from 'react';
@@ -6,12 +6,23 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { hasPermission, requestPermission, isSupported } = useNotifications();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Sync local state with actual permission status
   useEffect(() => {
@@ -67,6 +78,31 @@ const Settings = () => {
       toast({
         title: "Error",
         description: "No se pudo cerrar la sesión",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase.rpc('delete_user');
+      
+      if (error) throw error;
+
+      await signOut();
+      
+      toast({
+        title: "Cuenta eliminada",
+        description: "Tu cuenta ha sido eliminada permanentemente",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo eliminar la cuenta",
         variant: "destructive",
       });
     }
@@ -134,15 +170,44 @@ const Settings = () => {
               </button>
               <button 
                 onClick={handleSignOut}
-                className="flex items-center justify-between w-full text-left p-4 hover:bg-[#264532] transition-colors rounded-b-lg"
+                className="flex items-center justify-between w-full text-left p-4 border-b border-[#264532] hover:bg-[#264532] transition-colors"
               >
                 <span className="text-red-500">Cerrar Sesión</span>
                 <LogOut size={20} className="text-red-500" />
+              </button>
+              <button 
+                onClick={() => setShowDeleteDialog(true)}
+                className="flex items-center justify-between w-full text-left p-4 hover:bg-[#264532] transition-colors rounded-b-lg"
+              >
+                <span className="text-red-500">Eliminar Cuenta</span>
+                <Trash2 size={20} className="text-red-500" />
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Tu cuenta será eliminada permanentemente 
+              del sistema junto con todos tus datos, plantas, mensajes y favoritos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteAccount}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar Cuenta
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
