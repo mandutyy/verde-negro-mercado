@@ -47,6 +47,13 @@ export type Database = {
             referencedRelation: "plants"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "conversations_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       favorites: {
@@ -74,6 +81,13 @@ export type Database = {
             columns: ["plant_id"]
             isOneToOne: false
             referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants_public"
             referencedColumns: ["id"]
           },
         ]
@@ -165,6 +179,13 @@ export type Database = {
             columns: ["plant_id"]
             isOneToOne: false
             referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants_public"
             referencedColumns: ["id"]
           },
         ]
@@ -354,7 +375,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      plants_public: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          exchange_for: string | null
+          favorites_count: number | null
+          id: string | null
+          images: string[] | null
+          location: string | null
+          price: number | null
+          sale_type: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          exchange_for?: string | null
+          favorites_count?: number | null
+          id?: string | null
+          images?: string[] | null
+          location?: string | null
+          price?: number | null
+          sale_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          exchange_for?: string | null
+          favorites_count?: number | null
+          id?: string | null
+          images?: string[] | null
+          location?: string | null
+          price?: number | null
+          sale_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_user: {
