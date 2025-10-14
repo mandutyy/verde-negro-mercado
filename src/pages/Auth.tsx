@@ -3,6 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { z } from 'zod';
+
+// Strong password schema for signup
+const passwordSchema = z.string()
+  .min(12, 'La contraseña debe tener al menos 12 caracteres')
+  .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula')
+  .regex(/[a-z]/, 'Debe contener al menos una letra minúscula')
+  .regex(/[0-9]/, 'Debe contener al menos un número')
+  .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial');
+
+const validatePassword = (pwd: string) => {
+  const result = passwordSchema.safeParse(pwd);
+  if (!result.success) {
+    return result.error.errors[0]?.message ?? 'Contraseña inválida';
+  }
+  return null;
+};
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -26,6 +43,20 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side strong password validation for signup
+    if (isSignUp) {
+      const pwdError = validatePassword(password);
+      if (pwdError) {
+        toast({
+          title: 'Contraseña débil',
+          description: pwdError,
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -175,11 +206,11 @@ const Auth = () => {
             <label className="flex flex-col min-w-40 flex-1 relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder={isSignUp ? "Contraseña (mínimo 6 caracteres)" : "Password"}
+                placeholder={isSignUp ? "Contraseña (mín. 12, mayús., minús., número y símbolo)" : "Password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={isSignUp ? 6 : undefined}
+                minLength={isSignUp ? 12 : undefined}
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#264532] focus:border-none h-14 placeholder:text-[#96c5a9] p-4 pr-12 text-base font-normal leading-normal"
               />
               <button
