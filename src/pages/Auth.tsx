@@ -5,13 +5,10 @@ import { toast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 
-// Strong password schema for signup
+// Simple password schema - only requires one uppercase letter
 const passwordSchema = z.string()
-  .min(12, 'La contraseña debe tener al menos 12 caracteres')
-  .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula')
-  .regex(/[a-z]/, 'Debe contener al menos una letra minúscula')
-  .regex(/[0-9]/, 'Debe contener al menos un número')
-  .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial');
+  .min(6, 'La contraseña debe tener al menos 6 caracteres')
+  .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula');
 
 const validatePassword = (pwd: string) => {
   const result = passwordSchema.safeParse(pwd);
@@ -88,11 +85,11 @@ const Auth = () => {
 
       toast({
         title: "¡Cuenta creada!",
-        description: "Cuenta creada correctamente. Ya puedes iniciar sesión.",
+        description: "Iniciando sesión automáticamente...",
       });
       
-      // Switch to login view after successful signup
-      setIsSignUp(false);
+      // Auto login after successful signup
+      navigate('/');
     } catch (error: any) {
       toast({
         title: "Error",
@@ -206,11 +203,11 @@ const Auth = () => {
             <label className="flex flex-col min-w-40 flex-1 relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder={isSignUp ? "Contraseña (mín. 12, mayús., minús., número y símbolo)" : "Password"}
+                placeholder={isSignUp ? "Contraseña (mín. 6 caracteres, 1 mayúscula)" : "Contraseña"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={isSignUp ? 12 : undefined}
+                minLength={isSignUp ? 6 : undefined}
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#264532] focus:border-none h-14 placeholder:text-[#96c5a9] p-4 pr-12 text-base font-normal leading-normal"
               />
               <button
