@@ -43,12 +43,20 @@ Deno.serve(async (req) => {
       </div>
     `;
 
+    console.log('Sending login email to:', email);
+    
     const { error } = await resend.emails.send({
       from: "Plantify <onboarding@resend.dev>",
       to: [email],
       subject: "Inicio de sesión en Plantify",
       html,
     });
+    
+    if (error) {
+      console.error('Resend error:', error);
+    } else {
+      console.log('Login email sent successfully to:', email);
+    }
 
     if (error) {
       throw error;
