@@ -25,6 +25,8 @@ Deno.serve(async (req) => {
       )
     }
 
+    console.log('Delete user request received');
+
     // Create a Supabase client with the Auth context of the logged in user
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -36,40 +38,15 @@ Deno.serve(async (req) => {
       }
     )
 
-    // Get the user from the JWT token
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseClient.auth.getUser()
-
-    if (userError || !user) {
-      console.error('Error getting user:', userError)
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401,
-        }
-      )
-    }
-
-    console.log('Deleting user:', user.id)
-
-    // Create an admin client to delete the user
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
-    // Delete the user - this will cascade to all related tables
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+    // Call the database function that uses SECURITY DEFINER to get auth.uid()
+    const { error: deleteError } = await supabaseClient.rpc('delete_user')
 
     if (deleteError) {
       console.error('Error deleting user:', deleteError)
       throw deleteError
     }
 
-    console.log('User deleted successfully:', user.id)
+    console.log('User deleted successfully')
 
     return new Response(
       JSON.stringify({ message: 'User deleted successfully' }),
