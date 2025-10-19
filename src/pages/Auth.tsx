@@ -61,9 +61,8 @@ const Auth = () => {
         email,
         password,
         options: {
-          data: {
-            name
-          }
+          emailRedirectTo: `${window.location.origin}/`,
+          data: { name }
         }
       });
 
@@ -80,13 +79,18 @@ const Auth = () => {
         return;
       }
 
-      toast({
-        title: "¡Cuenta creada!",
-        description: "Iniciando sesión automáticamente...",
-      });
-      
-      // Auto login after successful signup
-      navigate('/');
+      if (data.session) {
+        toast({
+          title: "¡Cuenta creada!",
+          description: "Sesión iniciada automáticamente.",
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "¡Cuenta creada!",
+          description: "Revisa tu email para confirmar la cuenta. Si quieres que el alta sea automática, desactiva la confirmación por email en Supabase.",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Error",
