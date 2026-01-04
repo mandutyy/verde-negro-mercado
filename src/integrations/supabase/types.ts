@@ -357,10 +357,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_user: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      delete_user: { Args: never; Returns: undefined }
       get_conversations_with_last_message: {
         Args: { user_uuid: string }
         Returns: {
