@@ -9,8 +9,8 @@ const corsHeaders = {
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 
 const SUPABASE_URL = "https://qxyngdiehpsaublqlnkq.supabase.co";
-// URL de la app de producción - cambia esto a tu dominio de producción cuando lo tengas
-const APP_URL = Deno.env.get("APP_URL") || "https://plantify.lovable.app";
+// URL de la app - cambia esto a tu dominio de producción cuando lo tengas
+const APP_URL = Deno.env.get("APP_URL") || "https://preview--verde-negro-mercado.lovable.app";
 
 const hookSecretRaw =
   Deno.env.get("SEND_AUTH_EMAIL_HOOK_SECRET") ?? Deno.env.get("SEND_EMAIL_HOOK_SECRET") ?? "";
