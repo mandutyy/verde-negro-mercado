@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 
 // Simple password schema - only requires one uppercase letter
@@ -20,62 +20,12 @@ const validatePassword = (pwd: string) => {
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [resendingEmail, setResendingEmail] = useState(false);
-
-  // Check for auth errors in URL params
-  const errorCode = searchParams.get('error_code');
-  const errorDescription = searchParams.get('error_description');
-
-  const getErrorMessage = () => {
-    if (errorCode === 'otp_expired') {
-      return 'El enlace de verificación ha expirado o ya fue usado. Si ya verificaste tu cuenta, inicia sesión. Si no, solicita un nuevo enlace.';
-    }
-    if (errorDescription) {
-      return decodeURIComponent(errorDescription.replace(/\+/g, ' '));
-    }
-    return null;
-  };
-
-  const handleResendVerification = async () => {
-    if (!email) {
-      toast({
-        title: 'Email requerido',
-        description: 'Ingresa tu email para reenviar el enlace de verificación.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setResendingEmail(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Email enviado',
-        description: 'Revisa tu bandeja de entrada para el nuevo enlace de verificación.',
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setResendingEmail(false);
-    }
-  };
 
   useEffect(() => {
     // Check if user is already logged in
@@ -217,24 +167,6 @@ const Auth = () => {
         <h1 className="text-white text-[28px] font-bold leading-tight tracking-[-0.015em] px-4 text-center pb-3 pt-8">
           {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
         </h1>
-
-        {/* Error message from URL */}
-        {getErrorMessage() && (
-          <div className="mx-4 mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl flex items-start gap-3">
-            <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={20} />
-            <div className="flex-1">
-              <p className="text-red-300 text-sm">{getErrorMessage()}</p>
-              <button
-                type="button"
-                onClick={handleResendVerification}
-                disabled={resendingEmail}
-                className="mt-2 text-[#38e07b] text-sm underline hover:text-[#2bc366] disabled:opacity-50"
-              >
-                {resendingEmail ? 'Enviando...' : 'Reenviar email de verificación'}
-              </button>
-            </div>
-          </div>
-        )}
         
         <form onSubmit={isSignUp ? handleSignUp : handleSignIn}>
           {/* Name field - only show for signup */}
