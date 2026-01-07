@@ -9,6 +9,8 @@ const corsHeaders = {
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 
 const SUPABASE_URL = "https://qxyngdiehpsaublqlnkq.supabase.co";
+// URL de la app de producción - cambia esto a tu dominio de producción cuando lo tengas
+const APP_URL = Deno.env.get("APP_URL") || "https://plantify.lovable.app";
 
 const hookSecretRaw =
   Deno.env.get("SEND_AUTH_EMAIL_HOOK_SECRET") ?? Deno.env.get("SEND_EMAIL_HOOK_SECRET") ?? "";
@@ -31,10 +33,11 @@ type HookPayload = {
   };
 };
 
-function buildVerifyLink(params: { tokenHash: string; type: string; redirectTo: string }) {
+function buildVerifyLink(params: { tokenHash: string; type: string }) {
   const token = encodeURIComponent(params.tokenHash);
   const type = encodeURIComponent(params.type);
-  const redirect = encodeURIComponent(params.redirectTo);
+  // Siempre redirigir a la app, ignorando el redirect_to original
+  const redirect = encodeURIComponent(APP_URL);
   return `${SUPABASE_URL}/auth/v1/verify?token=${token}&type=${type}&redirect_to=${redirect}`;
 }
 
@@ -126,7 +129,6 @@ Deno.serve(async (req) => {
       const link = buildVerifyLink({
         tokenHash: email_data.token_hash,
         type: actionType,
-        redirectTo: email_data.redirect_to,
       });
 
       await sendEmail(user.email, actionType, link);
@@ -139,7 +141,6 @@ Deno.serve(async (req) => {
         const linkCurrent = buildVerifyLink({
           tokenHash: email_data.token_hash_new,
           type: actionType,
-          redirectTo: email_data.redirect_to,
         });
         await sendEmail(currentEmail, actionType, linkCurrent);
       }
@@ -148,7 +149,6 @@ Deno.serve(async (req) => {
         const linkNew = buildVerifyLink({
           tokenHash: email_data.token_hash,
           type: actionType,
-          redirectTo: email_data.redirect_to,
         });
         await sendEmail(newEmail, actionType, linkNew);
       }
@@ -158,7 +158,6 @@ Deno.serve(async (req) => {
         const fallbackLink = buildVerifyLink({
           tokenHash: email_data.token_hash || email_data.token_hash_new,
           type: actionType,
-          redirectTo: email_data.redirect_to,
         });
         await sendEmail(currentEmail, actionType, fallbackLink);
       }
