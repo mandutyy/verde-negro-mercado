@@ -29,25 +29,12 @@ const Navigation = memo(() => {
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.id === 'upload') {
       setIsSheetOpen(true);
-      setSelectedOptions([]);
     }
   };
 
-  const toggleOption = (option: string) => {
-    setSelectedOptions(current => 
-      current.includes(option)
-        ? current.filter(item => item !== option)
-        : [...current, option]
-    );
-  };
-
-  const handleContinue = () => {
-    if (selectedOptions.length > 0) {
-      const typesParam = selectedOptions.join(',');
-      navigate(`/upload?type=${typesParam}`);
-      setIsSheetOpen(false);
-      setSelectedOptions([]);
-    }
+  const handleOptionSelect = (option: string) => {
+    navigate(`/upload?type=${option}`);
+    setIsSheetOpen(false);
   };
 
   return (
