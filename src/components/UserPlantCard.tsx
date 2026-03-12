@@ -1,10 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-// Interface for Plant type
+import { cn } from '@/lib/utils';
+
 interface Plant {
   id: string;
   title: string;
@@ -22,7 +20,6 @@ interface Plant {
   updated_at: string;
   user_id: string;
 }
-import { cn } from '@/lib/utils';
 
 interface UserPlantCardProps {
   plant: Plant;
@@ -32,130 +29,97 @@ interface UserPlantCardProps {
 const UserPlantCard: React.FC<UserPlantCardProps> = ({ plant, onEdit }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/plant/${plant.id}`);
-  };
+  const handleCardClick = () => navigate(`/plant/${plant.id}`);
 
   const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation when clicking edit button
+    e.stopPropagation();
     onEdit(plant);
   };
+
   const getSaleTypeDisplay = (saleType: string) => {
     switch (saleType) {
-      case 'gift':
-        return { text: 'REGALO', className: 'bg-green-500 text-white' };
-      case 'sell':
-        return { text: 'VENTA', className: 'bg-blue-500 text-white' };
-      case 'exchange':
-        return { text: 'INTERCAMBIO', className: 'bg-yellow-500 text-black' };
-      case 'all':
-        return { 
-          text: 'TODO', 
-          className: 'bg-gradient-to-r from-green-500 via-blue-500 to-yellow-500 text-white animate-pulse' 
-        };
-      default:
-        return { text: 'VENTA', className: 'bg-blue-500 text-white' };
-    }
-  };
-
-  const getPlantTypeLabel = (saleType: string, price: number | null) => {
-    switch (saleType) {
-      case 'sell':
-        return price ? `€${price}` : 'Venta';
-      case 'exchange':
-        return 'Intercambio';
-      case 'gift':
-        return 'Regalo';
-      case 'all':
-        return price ? `€${price} · Intercambio · Regalo` : 'Todas las opciones';
-      default:
-        return 'Venta';
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge variant="default" className="bg-green-600 text-white">Activo</Badge>;
-      case 'sold':
-        return <Badge variant="secondary" className="bg-gray-600 text-white">Vendido</Badge>;
-      case 'inactive':
-        return <Badge variant="outline" className="border-gray-600 text-gray-400">Inactivo</Badge>;
-      default:
-        return null;
+      case 'gift': return { text: 'Regalo', className: 'bg-emerald-500/90 text-white' };
+      case 'sell': return { text: 'Venta', className: 'bg-blue-500/90 text-white' };
+      case 'exchange': return { text: 'Cambio', className: 'bg-amber-500/90 text-white' };
+      case 'all': return { text: 'Todo', className: 'bg-gradient-to-r from-emerald-500 via-blue-500 to-amber-500 text-white' };
+      default: return { text: 'Venta', className: 'bg-blue-500/90 text-white' };
     }
   };
 
   const mainImage = plant.images && plant.images.length > 0 ? plant.images[0] : '/placeholder.svg';
+  const saleDisplay = getSaleTypeDisplay(plant.sale_type);
 
   return (
-    <Card 
-      className="bg-[#1b3124] border-[#366348] overflow-hidden cursor-pointer hover:bg-[#264532] transition-colors"
+    <div
       onClick={handleCardClick}
+      className="plant-card-hover bg-card rounded-xl overflow-hidden cursor-pointer border border-border/40 shadow-sm"
     >
+      {/* Image */}
       <div className="relative">
-        <div 
-          className="w-full h-48 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${mainImage})` }}
+        <img
+          src={mainImage}
+          alt={plant.title}
+          className="w-full aspect-square object-cover"
+          loading="lazy"
         />
-        <div className="absolute top-2 right-2">
-          {getStatusBadge(plant.status)}
-        </div>
-        <div className="absolute top-2 left-2 flex gap-2">
-          <div className="flex items-center gap-1 bg-black/50 rounded-full px-2 py-1">
-            <Eye size={12} className="text-white" />
-            <span className="text-white text-xs">{plant.views_count || 0}</span>
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/50 to-transparent" />
+
+        {/* Stats overlay top-left */}
+        <div className="absolute top-1.5 left-1.5 flex gap-1">
+          <div className="flex items-center gap-0.5 bg-black/40 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+            <Eye size={10} className="text-white/80" />
+            <span className="text-white text-[9px] font-medium">{plant.views_count || 0}</span>
           </div>
-          <div className="flex items-center gap-1 bg-black/50 rounded-full px-2 py-1">
-            <Heart size={12} className="text-white" />
-            <span className="text-white text-xs">{plant.favorites_count || 0}</span>
+          <div className="flex items-center gap-0.5 bg-black/40 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+            <Heart size={10} className="text-white/80" />
+            <span className="text-white text-[9px] font-medium">{plant.favorites_count || 0}</span>
           </div>
         </div>
+
+        {/* Edit button top-right */}
+        <button
+          onClick={handleEditClick}
+          className="absolute top-1.5 right-1.5 h-7 w-7 rounded-lg bg-primary/90 text-primary-foreground flex items-center justify-center backdrop-blur-sm shadow-sm"
+        >
+          <Edit size={12} />
+        </button>
+
+        {/* Status badge */}
+        {plant.status !== 'active' && (
+          <span className={cn(
+            "absolute top-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md text-[9px] font-bold backdrop-blur-sm",
+            plant.status === 'reserved' ? "bg-orange-500/90 text-white" :
+            plant.status === 'sold' ? "bg-muted/80 text-foreground" :
+            "bg-muted/60 text-muted-foreground"
+          )}>
+            {plant.status === 'reserved' ? 'Reservado' : plant.status === 'sold' ? 'Vendido' : 'Inactivo'}
+          </span>
+        )}
+
+        {/* Sale type badge bottom-left */}
+        <span className={cn(
+          "absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide backdrop-blur-sm",
+          saleDisplay.className
+        )}>
+          {saleDisplay.text}
+        </span>
       </div>
 
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-white font-bold text-base mb-1 truncate">{plant.title}</h3>
-            
-            {/* Sale type badge */}
-            <div className="mb-2">
-              <span className={cn(
-                "inline-block px-2 py-1 rounded-full text-xs font-bold",
-                getSaleTypeDisplay(plant.sale_type).className
-              )}>
-                {getSaleTypeDisplay(plant.sale_type).text}
-              </span>
-            </div>
-            
-            <p className="text-gray-400 text-xs truncate">{plant.location}</p>
-          </div>
-          <Button
-            onClick={handleEditClick}
-            size="sm"
-            className="ml-2 bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] flex-shrink-0"
-          >
-            <Edit size={14} className="mr-1" />
-            Editar
-          </Button>
-        </div>
-
-        <div className="flex justify-between items-end mb-3">
-          <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed flex-1">
-            {plant.description}
-          </p>
-          {plant.price && (
-            <span className="text-lg font-bold text-[#38e07b] ml-2">
-              €{plant.price}
-            </span>
+      {/* Content */}
+      <div className="p-2">
+        <h3 className="font-medium text-foreground text-[11px] leading-tight line-clamp-1">{plant.title}</h3>
+        <div className="flex justify-between items-center mt-0.5">
+          <span className="text-[9px] text-muted-foreground line-clamp-1 flex-1 mr-1">
+            {plant.location}
+          </span>
+          {plant.price != null && plant.price > 0 && (
+            <span className="text-[11px] font-bold text-primary shrink-0">{plant.price}€</span>
           )}
         </div>
-
-        <div className="text-xs text-gray-500">
-          Publicado: {new Date(plant.created_at).toLocaleDateString('es-ES')}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

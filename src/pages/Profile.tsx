@@ -1,6 +1,5 @@
-import { Settings, Star, LogIn, Share, ArrowLeft } from 'lucide-react';
+import { Settings, Star, LogIn, Share, Pencil, Leaf, ShoppingBag, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect, useCallback } from 'react';
@@ -10,6 +9,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import UserPlantCard from '@/components/UserPlantCard';
 import EditPlantDialog from '@/components/EditPlantDialog';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
+
 interface Plant {
   id: string;
   title: string;
@@ -35,7 +36,6 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('publicaciones');
   const { data: plants = [], isLoading: loading } = useUserPlants();
 
-  // Mutation para actualizar planta
   const updatePlantMutation = useMutation({
     mutationFn: async ({ plantId, updates }: { plantId: string; updates: Partial<Plant> }) => {
       const { error } = await supabase
@@ -43,27 +43,17 @@ const Profile = () => {
         .update(updates)
         .eq('id', plantId)
         .eq('user_id', user?.id);
-
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userPlants', user?.id] });
-      toast({
-        title: "¡Actualizado!",
-        description: "Los cambios se han guardado correctamente",
-      });
+      toast({ title: "¡Actualizado!", description: "Los cambios se han guardado correctamente" });
     },
-    onError: (error) => {
-      console.error('Error updating plant:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo actualizar la planta",
-        variant: "destructive"
-      });
+    onError: () => {
+      toast({ title: "Error", description: "No se pudo actualizar la planta", variant: "destructive" });
     }
   });
 
-  // Mutation para eliminar planta
   const deletePlantMutation = useMutation({
     mutationFn: async (plantId: string) => {
       const { error } = await supabase
@@ -71,261 +61,291 @@ const Profile = () => {
         .delete()
         .eq('id', plantId)
         .eq('user_id', user?.id);
-
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userPlants', user?.id] });
-      toast({
-        title: "¡Eliminado!",
-        description: "La planta ha sido eliminada correctamente",
-      });
+      toast({ title: "¡Eliminado!", description: "La planta ha sido eliminada correctamente" });
     },
-    onError: (error) => {
-      console.error('Error deleting plant:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la planta",
-        variant: "destructive"
-      });
+    onError: () => {
+      toast({ title: "Error", description: "No se pudo eliminar la planta", variant: "destructive" });
     }
   });
 
   const updatePlant = async (plantId: string, updates: Partial<Plant>): Promise<boolean> => {
-    try {
-      await updatePlantMutation.mutateAsync({ plantId, updates });
-      return true;
-    } catch {
-      return false;
-    }
+    try { await updatePlantMutation.mutateAsync({ plantId, updates }); return true; } catch { return false; }
   };
 
   const deletePlant = async (plantId: string): Promise<boolean> => {
-    try {
-      await deletePlantMutation.mutateAsync(plantId);
-      return true;
-    } catch {
-      return false;
-    }
+    try { await deletePlantMutation.mutateAsync(plantId); return true; } catch { return false; }
   };
 
-  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string }>({});
+  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string; bio?: string; location?: string }>({});
   const location = useLocation();
 
   const fetchProfile = useCallback(async () => {
     if (!user?.id) return;
     const { data } = await supabase
       .from('profiles')
-      .select('name, avatar_url')
+      .select('name, avatar_url, bio, location')
       .eq('user_id', user.id)
       .maybeSingle();
     if (data) {
       setProfile({
         name: data.name || undefined,
         avatar_url: data.avatar_url || undefined,
+        bio: data.bio || undefined,
+        location: data.location || undefined,
       });
     }
   }, [user?.id]);
 
-  // Refetch profile every time we navigate to this page
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile, location.key]);
+
   const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const handleEditPlant = (plant: Plant) => {
-    setEditingPlant(plant);
-    setEditDialogOpen(true);
-  };
-  const handleCloseEditDialog = () => {
-    setEditingPlant(null);
-    setEditDialogOpen(false);
-  };
+  const handleEditPlant = (plant: Plant) => { setEditingPlant(plant); setEditDialogOpen(true); };
+  const handleCloseEditDialog = () => { setEditingPlant(null); setEditDialogOpen(false); };
+
   const handleShareApp = async () => {
     const shareData = {
-      title: 'Plantify - Compra y vende plantas',
-      text: '¡Descubre Plantify! La mejor app para comprar, vender e intercambiar plantas. ¡Únete a nuestra comunidad verde!',
-      url: 'https://preview--verde-negro-mercado.lovable.app'
+      title: 'Plantificar - Compra y vende plantas',
+      text: '¡Descubre Plantificar! La mejor app para comprar, vender e intercambiar plantas.',
+      url: window.location.origin
     };
     try {
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
         return;
       }
-    } catch (error) {
-      console.log('Web Share API failed, using fallback');
-    }
-
-    // Fallback: copiar al portapapeles
+    } catch { /* fallback */ }
     try {
       await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-      toast({
-        title: "¡Enlace copiado!",
-        description: "El enlace de la app se ha copiado al portapapeles. Compártelo con tus amigos."
-      });
-    } catch (clipboardError) {
-      // Si también falla el portapapeles, mostrar el enlace en un toast
-      toast({
-        title: "Comparte Plantify",
-        description: `Copia este enlace: ${window.location.origin}`
-      });
+      toast({ title: "¡Enlace copiado!", description: "Compártelo con tus amigos." });
+    } catch {
+      toast({ title: "Comparte Plantificar", description: `Copia este enlace: ${window.location.origin}` });
     }
   };
+
   if (!user) {
-    return <div className="min-h-screen bg-[#122118]">
-        <header className="flex items-center justify-between p-4 pb-2">
-          <div className="flex w-12 items-center justify-start">
-            <button onClick={() => navigate(-1)} className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors">
-              <ArrowLeft size={24} />
-            </button>
-          </div>
-          <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Perfil</h1>
-          <div className="w-12"></div>
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="flex items-center justify-center p-4 pb-2 glass-strong sticky top-0 z-10">
+          <h1 className="text-foreground text-base font-bold">Perfil</h1>
         </header>
-        
-        <div className="px-4 py-8 flex flex-col items-center justify-center">
-          <Card className="bg-[#1b3124] border-[#366348] shadow-sm w-full max-w-sm">
-            <CardContent className="p-8 text-center">
-              <div className="mb-6">
-                <div className="w-20 h-20 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
-                  <LogIn size={32} className="text-[#38e07b]" />
-                </div>
-                <h2 className="text-xl font-bold text-white mb-2">
-                  Inicia sesión
-                </h2>
-                <p className="text-[#96c5a9] text-sm">
-                  Accede a tu cuenta para ver tu perfil y gestionar tus plantas
-                </p>
-              </div>
-              
-              <Button className="w-full bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold" onClick={() => navigate('/auth')}>
-                <LogIn size={16} className="mr-2" />
-                Iniciar sesión
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="bg-card border border-border/50 rounded-2xl p-8 text-center w-full max-w-sm">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center mb-4">
+              <LogIn size={28} className="text-primary" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground mb-2">Inicia sesión</h2>
+            <p className="text-muted-foreground text-sm mb-6">Accede a tu cuenta para ver tu perfil</p>
+            <Button onClick={() => navigate('/auth')} className="w-full bg-primary text-primary-foreground font-bold rounded-xl h-11">
+              <LogIn size={16} className="mr-2" />
+              Iniciar sesión
+            </Button>
+          </div>
         </div>
-      </div>;
+      </div>
+    );
   }
-  const tabs = [{
-    id: 'publicaciones',
-    label: 'Publicaciones'
-  }, {
-    id: 'ventas',
-    label: 'Ventas'
-  }, {
-    id: 'compras',
-    label: 'Compras'
-  }];
-  return <div className="min-h-screen bg-[#122118] text-white font-[Spline_Sans,Noto_Sans,sans-serif]">
+
+  const tabs = [
+    { id: 'publicaciones', label: 'Plantas', icon: Leaf, count: plants.length },
+    { id: 'ventas', label: 'Ventas', icon: TrendingUp },
+    { id: 'compras', label: 'Compras', icon: ShoppingBag },
+  ];
+
+  const displayName = profile.name || user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario';
+
+  return (
+    <div className="min-h-screen bg-background text-foreground font-spline">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 pb-2">
-        <div className="w-12"></div>
-        <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-          Perfil
-        </h1>
-        <div className="flex w-12 items-center justify-end">
-          <button className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white hover:bg-[#1b3124] transition-colors" onClick={() => navigate('/settings')}>
-            <Settings size={24} />
-          </button>
-        </div>
+      <header className="flex items-center justify-between px-4 py-3 glass-strong sticky top-0 z-10">
+        <div className="w-10" />
+        <h1 className="text-foreground text-base font-bold">Perfil</h1>
+        <button
+          onClick={() => navigate('/settings')}
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors"
+        >
+          <Settings size={20} />
+        </button>
       </header>
 
-      {/* Profile Info */}
-      <div className="flex flex-col items-center p-4">
-        {profile.avatar_url ? (
-          <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 mb-4" style={{
-            backgroundImage: `url("${profile.avatar_url}")`
-          }} />
-        ) : (
-          <div className="bg-[#366348] rounded-full size-24 mb-4 flex items-center justify-center">
-            <div className="text-[#38e07b] text-2xl">👤</div>
+      {/* Profile Hero */}
+      <div className="relative px-4 pt-4 pb-6">
+        {/* Avatar + Edit */}
+        <div className="flex flex-col items-center">
+          <div className="relative mb-3">
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={displayName}
+                className="w-24 h-24 rounded-2xl object-cover border-2 border-primary/30 shadow-lg shadow-primary/10"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-2xl bg-muted border-2 border-border flex items-center justify-center">
+                <Leaf size={32} className="text-primary/50" />
+              </div>
+            )}
+            <button
+              onClick={() => navigate('/edit-profile')}
+              className="absolute -bottom-1.5 -right-1.5 h-7 w-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-md"
+            >
+              <Pencil size={12} />
+            </button>
           </div>
-        )}
-        <p className="text-white text-xl font-bold leading-tight tracking-[-0.015em] text-center">
-          {profile.name || user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario'}
-        </p>
-        <div className="flex items-center gap-1 text-[#96c5a9] text-sm mt-1">
-          <Star size={16} className="text-[#f5d76e] fill-current" />
-          <p className="font-bold">4.8 <span className="font-normal">(125)</span></p>
-        </div>
-        <p className="text-[#96c5a9] text-sm font-normal leading-normal text-center mt-2">
-          120 seguidores · 100 seguidos
-        </p>
-        
-        {/* Share App Button */}
-        <div className="mt-4 w-full max-w-xs">
-          <Button onClick={handleShareApp} className="w-full bg-[#264532] hover:bg-[#366348] text-white border border-[#38e07b] font-medium">
-            <Share size={16} className="mr-2" />
-            Compartir app con un amigo
-          </Button>
+
+          <h2 className="text-lg font-bold text-foreground">{displayName}</h2>
+
+          {profile.location && (
+            <p className="text-muted-foreground text-xs mt-0.5">{profile.location}</p>
+          )}
+
+          {profile.bio && (
+            <p className="text-muted-foreground text-xs text-center mt-2 max-w-[260px] leading-relaxed line-clamp-2">
+              {profile.bio}
+            </p>
+          )}
+
+          {/* Stats row */}
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex flex-col items-center">
+              <span className="text-foreground text-sm font-bold">{plants.length}</span>
+              <span className="text-muted-foreground text-[10px]">Plantas</span>
+            </div>
+            <div className="w-px h-6 bg-border" />
+            <div className="flex items-center gap-1">
+              <Star size={13} className="text-amber-400 fill-amber-400" />
+              <span className="text-foreground text-sm font-bold">4.8</span>
+              <span className="text-muted-foreground text-[10px]">(125)</span>
+            </div>
+            <div className="w-px h-6 bg-border" />
+            <div className="flex flex-col items-center">
+              <span className="text-foreground text-sm font-bold">120</span>
+              <span className="text-muted-foreground text-[10px]">Seguidores</span>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2 mt-4 w-full max-w-xs">
+            <Button
+              onClick={() => navigate('/edit-profile')}
+              variant="outline"
+              className="flex-1 h-9 rounded-xl border-border bg-muted/50 text-foreground text-xs font-semibold hover:bg-muted"
+            >
+              <Pencil size={13} className="mr-1.5" />
+              Editar perfil
+            </Button>
+            <Button
+              onClick={handleShareApp}
+              variant="outline"
+              className="flex-1 h-9 rounded-xl border-border bg-muted/50 text-foreground text-xs font-semibold hover:bg-muted"
+            >
+              <Share size={13} className="mr-1.5" />
+              Compartir
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="pb-3">
-        <div className="flex border-b border-[#366348] px-4 justify-around">
-          {tabs.map(tab => <button key={tab.id} className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${activeTab === tab.id ? 'border-b-[#38e07b] text-white' : 'border-b-transparent text-[#96c5a9] hover:text-white'}`} onClick={() => setActiveTab(tab.id)}>
-              <p className="text-sm font-bold leading-normal tracking-[0.015em]">
+      <div className="px-4">
+        <div className="flex bg-muted/40 rounded-xl p-1 gap-1">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all",
+                  isActive
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon size={14} />
                 {tab.label}
-              </p>
-            </button>)}
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                    isActive ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                  )}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 pb-32">
-        {activeTab === 'publicaciones' && <>
-            {loading ? <div className="flex justify-center py-8">
-                <div className="text-[#96c5a9]">Cargando tus plantas...</div>
-              </div> : plants.length === 0 ? <div className="flex flex-col items-center justify-center py-8">
-                <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
-                  <div className="text-[#38e07b] text-2xl">🌱</div>
+      <div className="p-4 pb-28">
+        {activeTab === 'publicaciones' && (
+          <>
+            {loading ? (
+              <div className="grid grid-cols-2 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="rounded-xl overflow-hidden bg-card border border-border/30 animate-pulse">
+                    <div className="aspect-square bg-muted" />
+                    <div className="p-2.5 space-y-2">
+                      <div className="h-3 bg-muted rounded-full w-3/4" />
+                      <div className="h-2.5 bg-muted rounded-full w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : plants.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                  <Leaf size={28} className="text-primary/60" />
                 </div>
-                <h3 className="text-white text-lg font-bold mb-2 text-center">
-                  No hay publicaciones aún
-                </h3>
-                <p className="text-[#96c5a9] text-sm mb-6 text-center">
-                  Cuando publiques plantas, aparecerán aquí
-                </p>
-                <Button onClick={() => navigate('/upload')} className="bg-[#38e07b] hover:bg-[#2dc76a] text-[#122118] font-bold">
-                  Publicar tu primera planta
+                <h3 className="text-foreground text-sm font-bold mb-1">No hay publicaciones aún</h3>
+                <p className="text-muted-foreground text-xs mb-5 text-center">Publica tu primera planta</p>
+                <Button
+                  onClick={() => navigate('/upload')}
+                  className="bg-primary text-primary-foreground font-bold rounded-xl h-10 px-5 text-sm"
+                >
+                  Publicar planta
                 </Button>
-              </div> : <div className="grid gap-4">
-                {plants.map(plant => <UserPlantCard key={plant.id} plant={plant} onEdit={handleEditPlant} />)}
-              </div>}
-          </>}
-        
-        {activeTab === 'ventas' && <div className="flex flex-col items-center justify-center py-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
-                <div className="text-[#38e07b] text-2xl">💰</div>
               </div>
-              <h3 className="text-white text-lg font-bold mb-2">
-                Historial de ventas
-              </h3>
-              <p className="text-[#96c5a9] text-sm">
-                Aquí verás el historial de tus ventas completadas
-              </p>
-            </div>
-          </div>}
-        
-        {activeTab === 'compras' && <div className="flex flex-col items-center justify-center py-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#366348] rounded-full mx-auto flex items-center justify-center mb-4">
-                <div className="text-[#38e07b] text-2xl">🛒</div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {plants.map(plant => (
+                  <UserPlantCard key={plant.id} plant={plant} onEdit={handleEditPlant} />
+                ))}
               </div>
-              <h3 className="text-white text-lg font-bold mb-2">
-                Historial de compras
-              </h3>
-              <p className="text-[#96c5a9] text-sm">
-                Aquí verás el historial de tus compras realizadas
-              </p>
-            </div>
-          </div>}
+            )}
+          </>
+        )}
+
+        {activeTab === 'ventas' && (
+          <EmptyTab icon="💰" title="Historial de ventas" description="Aquí verás tus ventas completadas" />
+        )}
+
+        {activeTab === 'compras' && (
+          <EmptyTab icon="🛒" title="Historial de compras" description="Aquí verás tus compras realizadas" />
+        )}
       </div>
 
       <EditPlantDialog plant={editingPlant} isOpen={editDialogOpen} onClose={handleCloseEditDialog} onUpdate={updatePlant} onDelete={deletePlant} />
-    </div>;
+    </div>
+  );
 };
+
+const EmptyTab = ({ icon, title, description }: { icon: string; title: string; description: string }) => (
+  <div className="flex flex-col items-center justify-center py-12">
+    <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center mb-4">
+      <span className="text-2xl">{icon}</span>
+    </div>
+    <h3 className="text-foreground text-sm font-bold mb-1">{title}</h3>
+    <p className="text-muted-foreground text-xs text-center">{description}</p>
+  </div>
+);
+
 export default Profile;
