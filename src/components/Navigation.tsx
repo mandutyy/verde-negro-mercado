@@ -10,7 +10,6 @@ const Navigation = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const { conversations } = useRealtimeChat();
   
   // Calculate total unread messages
