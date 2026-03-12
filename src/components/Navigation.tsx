@@ -52,8 +52,8 @@ const Navigation = memo(() => {
 
   return (
     <>
-      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
-        <div className="flex px-2 py-3 pb-safe pb-[env(safe-area-inset-bottom)]">
+      <footer className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border/50">
+        <div className="flex px-2 py-2 pb-safe pb-[env(safe-area-inset-bottom)]">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
