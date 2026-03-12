@@ -10,7 +10,6 @@ const Navigation = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const { conversations } = useRealtimeChat();
   
   // Calculate total unread messages
@@ -29,25 +28,12 @@ const Navigation = memo(() => {
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.id === 'upload') {
       setIsSheetOpen(true);
-      setSelectedOptions([]);
     }
   };
 
-  const toggleOption = (option: string) => {
-    setSelectedOptions(current => 
-      current.includes(option)
-        ? current.filter(item => item !== option)
-        : [...current, option]
-    );
-  };
-
-  const handleContinue = () => {
-    if (selectedOptions.length > 0) {
-      const typesParam = selectedOptions.join(',');
-      navigate(`/upload?type=${typesParam}`);
-      setIsSheetOpen(false);
-      setSelectedOptions([]);
-    }
+  const handleOptionSelect = (option: string) => {
+    navigate(`/upload?type=${option}`);
+    setIsSheetOpen(false);
   };
 
   return (
@@ -124,100 +110,29 @@ const Navigation = memo(() => {
           
           <div className="grid grid-cols-3 gap-3 pb-4">
             <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('sell')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('sell')}
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none bg-muted hover:bg-primary text-foreground hover:text-primary-foreground"
+              onClick={() => handleOptionSelect('sell')}
             >
-              <DollarSign 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('sell')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('sell')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Vender
-              </span>
+              <DollarSign className="text-primary group-hover:text-primary-foreground transition-colors" size={32} />
+              <span className="text-sm font-semibold">Vender</span>
             </button>
             
             <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('gift')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('gift')}
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none bg-muted hover:bg-primary text-foreground hover:text-primary-foreground"
+              onClick={() => handleOptionSelect('gift')}
             >
-              <Heart 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('gift')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('gift')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Regalar
-              </span>
+              <Heart className="text-primary group-hover:text-primary-foreground transition-colors" size={32} />
+              <span className="text-sm font-semibold">Regalar</span>
             </button>
             
             <button
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none",
-                selectedOptions.includes('exchange')
-                  ? "bg-[#38e07b] text-[#122118]"
-                  : "bg-[#264532] hover:bg-[#38e07b] text-white hover:text-[#122118]"
-              )}
-              onClick={() => toggleOption('exchange')}
+              className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl group transition-colors focus:outline-none bg-muted hover:bg-primary text-foreground hover:text-primary-foreground"
+              onClick={() => handleOptionSelect('exchange')}
             >
-              <RefreshCw 
-                className={cn(
-                  "transition-colors",
-                  selectedOptions.includes('exchange')
-                    ? "text-[#122118]"
-                    : "text-[#38e07b] group-hover:text-[#122118]"
-                )} 
-                size={32} 
-              />
-              <span className={cn(
-                "text-sm font-semibold transition-colors",
-                selectedOptions.includes('exchange')
-                  ? "text-[#122118]"
-                  : "text-white group-hover:text-[#122118]"
-              )}>
-                Intercambiar
-              </span>
+              <RefreshCw className="text-primary group-hover:text-primary-foreground transition-colors" size={32} />
+              <span className="text-sm font-semibold">Intercambiar</span>
             </button>
           </div>
-          
-          {selectedOptions.length > 0 && (
-            <div className="flex gap-3 pt-2">
-              <button
-                className="flex-1 bg-[#38e07b] hover:bg-[#32c96e] text-[#122118] font-bold py-3 px-6 rounded-xl transition-colors"
-                onClick={handleContinue}
-              >
-                Continuar ({selectedOptions.length})
-              </button>
-            </div>
-          )}
         </SheetContent>
       </Sheet>
     </>
