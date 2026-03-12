@@ -60,58 +60,57 @@ const PlantCard = memo(({
   return (
     <div 
       onClick={handleCardClick}
-      className="plant-card-hover bg-[#1b3124] rounded-xl shadow-sm border border-[#366348] overflow-hidden cursor-pointer hover:bg-[#264532] transition-colors"
+      className="plant-card-hover bg-card rounded-lg shadow-sm border border-border overflow-hidden cursor-pointer hover:bg-muted transition-colors"
     >
       <div className="relative">
         <img 
           src={image} 
           alt={title}
-          className="w-full h-48 object-cover"
+          className="w-full aspect-square object-cover"
           loading="lazy"
         />
         <button
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           className={cn(
-            "absolute top-3 right-3 p-2 rounded-full transition-all duration-200",
+            "absolute top-1.5 right-1.5 p-1 rounded-full transition-all duration-200",
             favorite 
               ? "bg-red-100 text-red-500" 
               : "bg-white/80 text-gray-400 hover:bg-white hover:text-red-500"
           )}
         >
           <Heart 
-            size={20} 
+            size={14} 
             className={favorite ? "fill-current" : ""} 
           />
         </button>
       </div>
       
-      <div className="p-4">
-        <h3 className="font-semibold text-white mb-1 line-clamp-2">
+      <div className="p-2">
+        <h3 className="font-semibold text-foreground text-xs line-clamp-1 mb-1">
           {title}
         </h3>
         
-        {/* Sale type badge and status */}
-        <div className="mb-3 flex gap-2">
+        <div className="mb-1 flex gap-1 flex-wrap">
           <span className={cn(
-            "inline-block px-2 py-1 rounded-full text-xs font-bold",
+            "inline-block px-1.5 py-0.5 rounded-full text-[10px] font-bold",
             getSaleTypeDisplay(saleType).className
           )}>
             {getSaleTypeDisplay(saleType).text}
           </span>
           {status === 'reserved' && (
-            <span className="inline-block px-2 py-1 rounded-full text-xs font-bold bg-orange-500 text-white">
+            <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500 text-white">
               RESERVADO
             </span>
           )}
         </div>
         
         <div className="flex justify-between items-end">
-          <span className="text-sm text-gray-300">
+          <span className="text-[10px] text-muted-foreground line-clamp-1">
             {location}
           </span>
           {price && (
-            <span className="text-lg font-bold text-[#38e07b]">
+            <span className="text-xs font-bold text-primary">
               {price}€
             </span>
           )}
