@@ -29,15 +29,40 @@ const EditProfile = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   
   const [formData, setFormData] = useState({
-    name: 'Juan Díaz',
-    location: 'Madrid, España',
-    bio: '🌱 Amante de las plantas desde siempre. Me encanta intercambiar y ayudar a otros con sus jardines urbanos.',
+    name: '',
+    location: '',
+    bio: '',
     avatar: '',
     coordinates: [-3.7038, 40.4168] as [number, number]
   });
   const [showMap, setShowMap] = useState(false);
   const [locationSearch, setLocationSearch] = useState('');
   const [searchResults, setSearchResults] = useState<typeof spanishCities>([]);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  // Load current profile data from DB
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, location, bio, avatar_url, coordinates')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!cancelled && data) {
+        setFormData({
+          name: data.name || '',
+          location: data.location || '',
+          bio: data.bio || '',
+          avatar: data.avatar_url || '',
+          coordinates: (data.coordinates as [number, number]) || [-3.7038, 40.4168]
+        });
+        setProfileLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
   const handleSave = async () => {
     if (!user?.id) {
       toast({
