@@ -140,7 +140,7 @@ const Home = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-3 gap-2">
               {plants
                 .filter(plant => {
                   if (activeCategory === 'all') return true;
