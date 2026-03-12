@@ -88,9 +88,8 @@ const Home = () => {
           </button>
         </div>
 
-
         {/* Category Filters */}
-        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[64px] z-10 bg-background border-t-0">
+        <div className="flex gap-3 px-4 py-2 overflow-x-auto whitespace-nowrap sticky top-[52px] z-10 bg-background">
           {categories.map((category) => (
             <button 
               key={category.value}
