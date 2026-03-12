@@ -1,9 +1,9 @@
 import { Settings, Star, LogIn, Share, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useUserPlants } from '@/hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -110,27 +110,27 @@ const Profile = () => {
   };
 
   const [profile, setProfile] = useState<{ name?: string; avatar_url?: string }>({});
+  const location = useLocation();
 
-  useEffect(() => {
+  const fetchProfile = useCallback(async () => {
     if (!user?.id) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('name, avatar_url')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!cancelled) {
-        setProfile({
-          name: data?.name || undefined,
-          avatar_url: data?.avatar_url || undefined,
-        });
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const { data } = await supabase
+      .from('profiles')
+      .select('name, avatar_url')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (data) {
+      setProfile({
+        name: data.name || undefined,
+        avatar_url: data.avatar_url || undefined,
+      });
+    }
   }, [user?.id]);
+
+  // Refetch profile every time we navigate to this page
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile, location.key]);
   const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const handleEditPlant = (plant: Plant) => {
