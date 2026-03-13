@@ -372,6 +372,34 @@ const EditProfile = () => {
               />
             </label>
 
+            {/* User Type Field */}
+            <div className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Tipo de perfil</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: 'particular', label: 'Particular', emoji: '👤' },
+                  { value: 'floristeria', label: 'Floristería', emoji: '💐' },
+                  { value: 'vivero', label: 'Vivero', emoji: '🌿' },
+                ].map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => handleInputChange('user_type', type.value)}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
+                      formData.user_type === type.value
+                        ? 'bg-primary/20 border-2 border-primary'
+                        : 'bg-muted border-2 border-transparent hover:bg-muted/80'
+                    }`}
+                  >
+                    <span className="text-xl">{type.emoji}</span>
+                    <span className={`text-xs font-semibold ${
+                      formData.user_type === type.value ? 'text-primary' : 'text-muted-foreground'
+                    }`}>{type.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Location Field */}
             <label className="flex flex-col gap-2">
               <p className="text-white text-sm font-medium leading-normal">Ubicación</p>
