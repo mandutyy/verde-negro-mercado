@@ -14,8 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      comment_votes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+          vote_type?: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_votes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
+          best_answer_id: string | null
           category: string
           comments_count: number | null
           content: string
@@ -23,11 +56,13 @@ export type Database = {
           id: string
           images: string[] | null
           likes_count: number | null
+          tags: string[] | null
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          best_answer_id?: string | null
           category?: string
           comments_count?: number | null
           content: string
@@ -35,11 +70,13 @@ export type Database = {
           id?: string
           images?: string[] | null
           likes_count?: number | null
+          tags?: string[] | null
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          best_answer_id?: string | null
           category?: string
           comments_count?: number | null
           content?: string
@@ -47,11 +84,20 @@ export type Database = {
           id?: string
           images?: string[] | null
           likes_count?: number | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_best_answer_id_fkey"
+            columns: ["best_answer_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversations: {
         Row: {
@@ -269,6 +315,7 @@ export type Database = {
           id: string
           post_id: string
           user_id: string
+          vote_count: number | null
         }
         Insert: {
           content: string
@@ -276,6 +323,7 @@ export type Database = {
           id?: string
           post_id: string
           user_id: string
+          vote_count?: number | null
         }
         Update: {
           content?: string
@@ -283,6 +331,7 @@ export type Database = {
           id?: string
           post_id?: string
           user_id?: string
+          vote_count?: number | null
         }
         Relationships: [
           {
