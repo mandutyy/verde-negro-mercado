@@ -33,6 +33,7 @@ const EditProfile = () => {
     location: '',
     bio: '',
     avatar: '',
+    user_type: 'particular',
     coordinates: [-3.7038, 40.4168] as [number, number]
   });
   const [showMap, setShowMap] = useState(false);
