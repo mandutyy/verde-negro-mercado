@@ -48,7 +48,7 @@ const EditProfile = () => {
     (async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('name, location, bio, avatar_url, coordinates')
+        .select('name, location, bio, avatar_url, coordinates, user_type')
         .eq('user_id', user.id)
         .maybeSingle();
       if (!cancelled && data) {
