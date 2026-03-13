@@ -141,6 +141,11 @@ const AppContent = () => {
             <CareGuides />
           </ProtectedRoute>
         } />
+        <Route path="/free-plants" element={
+          <ProtectedRoute>
+            <FreePlants />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
