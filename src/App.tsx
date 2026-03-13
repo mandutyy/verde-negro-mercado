@@ -133,8 +133,6 @@ const AppContent = () => {
       {/* Mobile-optimized bottom navigation */}
       {shouldShowNavigation && <Navigation />}
       
-      {/* Cookie consent banner */}
-      <CookieConsent />
     </div>
   );
 };
