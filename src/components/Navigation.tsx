@@ -19,7 +19,7 @@ const Navigation = memo(() => {
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
-    { icon: Heart, label: 'Favoritos', path: '/favorites', id: 'favorites' },
+    { icon: Heart, label: 'Gratis', path: '/free-plants', id: 'free-plants' },
     { icon: Upload, label: 'Publicar', path: '/upload', id: 'upload' },
     { icon: Users, label: 'Comunidad', path: '/community', id: 'community' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
