@@ -24,6 +24,8 @@ import PlantDetail from "./pages/PlantDetail";
 import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Community from "./pages/Community";
+import CareGuides from "./pages/CareGuides";
 // App root
 
 const AppContent = () => {
@@ -46,7 +48,8 @@ const AppContent = () => {
                                !location.pathname.startsWith('/plant/') &&
                                location.pathname !== '/settings' &&
                                location.pathname !== '/edit-profile' &&
-                               location.pathname !== '/search';
+                               location.pathname !== '/search' &&
+                               location.pathname !== '/care-guides';
   
   return (
     <div className="app-container bg-background w-full">
@@ -125,6 +128,16 @@ const AppContent = () => {
         <Route path="/plant/:id" element={
           <ProtectedRoute>
             <PlantDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/community" element={
+          <ProtectedRoute>
+            <Community />
+          </ProtectedRoute>
+        } />
+        <Route path="/care-guides" element={
+          <ProtectedRoute>
+            <CareGuides />
           </ProtectedRoute>
         } />
         <Route path="*" element={<NotFound />} />

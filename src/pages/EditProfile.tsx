@@ -33,6 +33,7 @@ const EditProfile = () => {
     location: '',
     bio: '',
     avatar: '',
+    user_type: 'particular',
     coordinates: [-3.7038, 40.4168] as [number, number]
   });
   const [showMap, setShowMap] = useState(false);
@@ -47,7 +48,7 @@ const EditProfile = () => {
     (async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('name, location, bio, avatar_url, coordinates')
+        .select('name, location, bio, avatar_url, coordinates, user_type')
         .eq('user_id', user.id)
         .maybeSingle();
       if (!cancelled && data) {
@@ -56,6 +57,7 @@ const EditProfile = () => {
           location: data.location || '',
           bio: data.bio || '',
           avatar: data.avatar_url || '',
+          user_type: (data as any).user_type || 'particular',
           coordinates: (data.coordinates as [number, number]) || [-3.7038, 40.4168]
         });
         setProfileLoaded(true);
@@ -83,8 +85,9 @@ const EditProfile = () => {
           location: formData.location,
           bio: formData.bio,
           avatar_url: formData.avatar,
+          user_type: formData.user_type,
           coordinates: formData.coordinates
-        }, { onConflict: 'user_id' });
+        } as any, { onConflict: 'user_id' });
 
       if (error) throw error;
 
@@ -368,6 +371,34 @@ const EditProfile = () => {
                 className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-[#38e07b] border-none bg-[#264532] min-h-36 placeholder:text-[#96c5a9] p-4 text-base font-normal leading-normal"
               />
             </label>
+
+            {/* User Type Field */}
+            <div className="flex flex-col gap-2">
+              <p className="text-white text-sm font-medium leading-normal">Tipo de perfil</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: 'particular', label: 'Particular', emoji: '👤' },
+                  { value: 'floristeria', label: 'Floristería', emoji: '💐' },
+                  { value: 'vivero', label: 'Vivero', emoji: '🌿' },
+                ].map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => handleInputChange('user_type', type.value)}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
+                      formData.user_type === type.value
+                        ? 'bg-primary/20 border-2 border-primary'
+                        : 'bg-muted border-2 border-transparent hover:bg-muted/80'
+                    }`}
+                  >
+                    <span className="text-xl">{type.emoji}</span>
+                    <span className={`text-xs font-semibold ${
+                      formData.user_type === type.value ? 'text-primary' : 'text-muted-foreground'
+                    }`}>{type.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Location Field */}
             <label className="flex flex-col gap-2">

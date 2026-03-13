@@ -80,14 +80,14 @@ const Profile = () => {
     try { await deletePlantMutation.mutateAsync(plantId); return true; } catch { return false; }
   };
 
-  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string; bio?: string; location?: string }>({});
+  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string; bio?: string; location?: string; user_type?: string }>({});
   const location = useLocation();
 
   const fetchProfile = useCallback(async () => {
     if (!user?.id) return;
     const { data } = await supabase
       .from('profiles')
-      .select('name, avatar_url, bio, location')
+      .select('name, avatar_url, bio, location, user_type')
       .eq('user_id', user.id)
       .maybeSingle();
     if (data) {
@@ -96,6 +96,7 @@ const Profile = () => {
         avatar_url: data.avatar_url || undefined,
         bio: data.bio || undefined,
         location: data.location || undefined,
+        user_type: (data as any).user_type || 'particular',
       });
     }
   }, [user?.id]);
@@ -199,6 +200,15 @@ const Profile = () => {
           </div>
 
           <h2 className="text-lg font-bold text-foreground">{displayName}</h2>
+
+          {profile.user_type && profile.user_type !== 'particular' && (
+            <span className={cn(
+              'px-2 py-0.5 rounded-full text-[10px] font-bold mt-1',
+              profile.user_type === 'floristeria' ? 'bg-pink-500/20 text-pink-400' : 'bg-primary/20 text-primary'
+            )}>
+              {profile.user_type === 'floristeria' ? '💐 Floristería' : '🌿 Vivero'}
+            </span>
+          )}
 
           {profile.location && (
             <p className="text-muted-foreground text-xs mt-0.5">{profile.location}</p>
