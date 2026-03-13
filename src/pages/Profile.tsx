@@ -87,7 +87,7 @@ const Profile = () => {
     if (!user?.id) return;
     const { data } = await supabase
       .from('profiles')
-      .select('name, avatar_url, bio, location')
+      .select('name, avatar_url, bio, location, user_type')
       .eq('user_id', user.id)
       .maybeSingle();
     if (data) {
