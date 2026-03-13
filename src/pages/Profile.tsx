@@ -96,6 +96,7 @@ const Profile = () => {
         avatar_url: data.avatar_url || undefined,
         bio: data.bio || undefined,
         location: data.location || undefined,
+        user_type: (data as any).user_type || 'particular',
       });
     }
   }, [user?.id]);
