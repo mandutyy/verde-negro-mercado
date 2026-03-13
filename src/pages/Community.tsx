@@ -217,14 +217,25 @@ const Community = () => {
             </div>
             <h1 className="text-foreground text-base font-bold">Comunidad</h1>
           </div>
-          <Button
-            onClick={() => setShowNewPost(true)}
-            size="sm"
-            className="bg-primary text-primary-foreground rounded-full h-8 px-3 text-xs font-bold"
-          >
-            <Plus size={14} className="mr-1" />
-            Publicar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate('/care-guides')}
+              size="sm"
+              variant="outline"
+              className="rounded-full h-8 px-3 text-xs font-bold border-border text-foreground"
+            >
+              <BookOpen size={14} className="mr-1" />
+              Guías
+            </Button>
+            <Button
+              onClick={() => setShowNewPost(true)}
+              size="sm"
+              className="bg-primary text-primary-foreground rounded-full h-8 px-3 text-xs font-bold"
+            >
+              <Plus size={14} className="mr-1" />
+              Publicar
+            </Button>
+          </div>
         </div>
 
         {/* Category tabs */}
