@@ -57,6 +57,7 @@ const EditProfile = () => {
           location: data.location || '',
           bio: data.bio || '',
           avatar: data.avatar_url || '',
+          user_type: (data as any).user_type || 'particular',
           coordinates: (data.coordinates as [number, number]) || [-3.7038, 40.4168]
         });
         setProfileLoaded(true);
