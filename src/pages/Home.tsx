@@ -123,6 +123,14 @@ const Home = () => {
         )}
       </div>
 
+      {/* Donation Banner */}
+      <div className="mx-3 mt-2 rounded-xl bg-primary/10 border border-primary/20 px-3.5 py-2.5 flex items-start gap-2.5">
+        <span className="text-lg leading-none mt-0.5">🌍</span>
+        <p className="text-xs text-foreground/80 leading-relaxed">
+          <span className="font-bold text-primary">El 50% de nuestros beneficios</span> se destina a la replantación de bosques y la lucha contra el cambio climático.
+        </p>
+      </div>
+
       {/* Content */}
       {mainTab === 'plantas' ? (
         <div className="px-3 pt-3 pb-24 flex-grow">
