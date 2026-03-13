@@ -24,6 +24,8 @@ import PlantDetail from "./pages/PlantDetail";
 import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Community from "./pages/Community";
+import CareGuides from "./pages/CareGuides";
 // App root
 
 const AppContent = () => {
