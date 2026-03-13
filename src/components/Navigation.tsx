@@ -1,6 +1,6 @@
 
 import { useMemo, memo, useState } from 'react';
-import { Heart, Home, MessageCircle, Upload, User, RefreshCw, DollarSign } from 'lucide-react';
+import { Heart, Home, MessageCircle, Upload, User, RefreshCw, DollarSign, Users, BookOpen } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
