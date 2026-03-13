@@ -26,6 +26,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Community from "./pages/Community";
 import CareGuides from "./pages/CareGuides";
+import FreePlants from "./pages/FreePlants";
 // App root
 
 const AppContent = () => {
