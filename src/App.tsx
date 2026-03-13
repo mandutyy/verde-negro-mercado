@@ -26,6 +26,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Community from "./pages/Community";
 import CareGuides from "./pages/CareGuides";
+import FreePlants from "./pages/FreePlants";
 // App root
 
 const AppContent = () => {
@@ -138,6 +139,11 @@ const AppContent = () => {
         <Route path="/care-guides" element={
           <ProtectedRoute>
             <CareGuides />
+          </ProtectedRoute>
+        } />
+        <Route path="/free-plants" element={
+          <ProtectedRoute>
+            <FreePlants />
           </ProtectedRoute>
         } />
         <Route path="*" element={<NotFound />} />
