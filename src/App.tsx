@@ -50,7 +50,8 @@ const AppContent = () => {
                                location.pathname !== '/settings' &&
                                location.pathname !== '/edit-profile' &&
                                location.pathname !== '/search' &&
-                               location.pathname !== '/care-guides';
+                               location.pathname !== '/care-guides' &&
+                               location.pathname !== '/community';
   
   return (
     <div className="app-container bg-background w-full">
