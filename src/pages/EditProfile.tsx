@@ -85,8 +85,9 @@ const EditProfile = () => {
           location: formData.location,
           bio: formData.bio,
           avatar_url: formData.avatar,
+          user_type: formData.user_type,
           coordinates: formData.coordinates
-        }, { onConflict: 'user_id' });
+        } as any, { onConflict: 'user_id' });
 
       if (error) throw error;
 
