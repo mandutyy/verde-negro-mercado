@@ -21,7 +21,7 @@ const Navigation = memo(() => {
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
     { icon: Gift, label: 'Gratis', path: '/free-plants', id: 'free-plants' },
     { icon: Upload, label: 'Publicar', path: '/upload', id: 'upload' },
-    { icon: Users, label: 'Comunidad', path: '/community', id: 'community' },
+    { icon: MessageCircle, label: 'Chat', path: '/messages', id: 'messages' },
     { icon: User, label: 'Perfil', path: '/profile', id: 'profile' },
   ], []);
 
