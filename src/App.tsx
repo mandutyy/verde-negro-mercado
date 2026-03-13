@@ -129,6 +129,16 @@ const AppContent = () => {
             <PlantDetail />
           </ProtectedRoute>
         } />
+        <Route path="/community" element={
+          <ProtectedRoute>
+            <Community />
+          </ProtectedRoute>
+        } />
+        <Route path="/care-guides" element={
+          <ProtectedRoute>
+            <CareGuides />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
