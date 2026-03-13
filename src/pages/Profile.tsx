@@ -80,7 +80,7 @@ const Profile = () => {
     try { await deletePlantMutation.mutateAsync(plantId); return true; } catch { return false; }
   };
 
-  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string; bio?: string; location?: string }>({});
+  const [profile, setProfile] = useState<{ name?: string; avatar_url?: string; bio?: string; location?: string; user_type?: string }>({});
   const location = useLocation();
 
   const fetchProfile = useCallback(async () => {
