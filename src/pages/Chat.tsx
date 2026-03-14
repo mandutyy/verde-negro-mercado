@@ -102,7 +102,7 @@ const Chat = () => {
         }
       } catch (error) {
         console.error('Error loading other user:', error);
-        setOtherUser({ name: 'Usuario' });
+        setOtherUser({ id: undefined, name: 'Usuario' });
       }
     };
 
