@@ -226,6 +226,18 @@ const Chat = () => {
             </div>
           ) : (
             messages.map((message) => {
+              // Check if this is a system message
+              const systemData = parseSystemMessage(message.content);
+              if (systemData) {
+                return (
+                  <SystemMessageCard
+                    key={message.id}
+                    data={systemData}
+                    timestamp={message.created_at}
+                  />
+                );
+              }
+
               const isOwnMessage = message.sender_id === user.id;
               return (
                 <div
