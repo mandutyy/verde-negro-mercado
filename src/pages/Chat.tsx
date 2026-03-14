@@ -81,7 +81,7 @@ const Chat = () => {
 
         if (profileError) {
           console.error('Error loading user profile:', profileError);
-          setOtherUser({ name: 'Usuario' });
+          setOtherUser({ id: otherUserId, name: 'Usuario' });
         } else {
           setOtherUser({ 
             name: profile.name || 'Usuario',
