@@ -41,31 +41,48 @@ const ContactButton: React.FC<ContactButtonProps> = ({
 
     setIsLoading(true);
     try {
-      // Check if conversation already exists for this plant
+      const participantsFilter = `and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`;
+
+      // Reuse existing conversation between both users (unique_conversation)
       const { data: existingConversation } = await supabase
         .from('conversations')
         .select('id')
-        .eq('plant_id', plantId)
-        .or(`and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`)
+        .or(participantsFilter)
         .maybeSingle();
 
       if (existingConversation) {
         navigate(`/chat/${existingConversation.id}`);
-      } else {
-        const { data: newConversation, error } = await supabase
-          .from('conversations')
-          .insert([{
-            participant_1: user.id,
-            participant_2: sellerId,
-            plant_id: plantId
-          }])
-          .select()
-          .single();
+        return;
+      }
 
-        if (error) throw error;
-        if (newConversation) {
-          navigate(`/chat/${newConversation.id}`);
+      const { data: newConversation, error } = await supabase
+        .from('conversations')
+        .insert([{
+          participant_1: user.id,
+          participant_2: sellerId,
+          plant_id: plantId
+        }])
+        .select('id')
+        .single();
+
+      // Handle race condition: conversation was created in parallel
+      if (error?.code === '23505') {
+        const { data: duplicatedConversation } = await supabase
+          .from('conversations')
+          .select('id')
+          .or(participantsFilter)
+          .maybeSingle();
+
+        if (duplicatedConversation) {
+          navigate(`/chat/${duplicatedConversation.id}`);
+          return;
         }
+      }
+
+      if (error) throw error;
+
+      if (newConversation) {
+        navigate(`/chat/${newConversation.id}`);
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
