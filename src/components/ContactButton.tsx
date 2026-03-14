@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ContactButtonProps {
   plantId: string;
@@ -21,7 +21,6 @@ const ContactButton: React.FC<ContactButtonProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { sendMessage } = useRealtimeChat();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,22 +41,37 @@ const ContactButton: React.FC<ContactButtonProps> = ({
 
     setIsLoading(true);
     try {
-      const initialMessage = `Hola! Estoy interesado en tu anuncio "${plantTitle || 'este producto'}". ¿Podrías darme más información?`;
-      
-      await sendMessage(initialMessage, sellerId, undefined, plantId);
-      
-      toast({
-        title: "Mensaje enviado",
-        description: `Le has escrito a ${sellerName || 'el vendedor'}`,
-      });
-      
-      // Navigate to messages to see the conversation
-      navigate('/messages');
+      // Check if conversation already exists for this plant
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('plant_id', plantId)
+        .or(`and(participant_1.eq.${user.id},participant_2.eq.${sellerId}),and(participant_1.eq.${sellerId},participant_2.eq.${user.id})`)
+        .maybeSingle();
+
+      if (existingConversation) {
+        navigate(`/chat/${existingConversation.id}`);
+      } else {
+        const { data: newConversation, error } = await supabase
+          .from('conversations')
+          .insert([{
+            participant_1: user.id,
+            participant_2: sellerId,
+            plant_id: plantId
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (newConversation) {
+          navigate(`/chat/${newConversation.id}`);
+        }
+      }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error starting conversation:', error);
       toast({
         title: "Error",
-        description: "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+        description: "No se pudo iniciar la conversación. Inténtalo de nuevo.",
         variant: "destructive",
       });
     } finally {
