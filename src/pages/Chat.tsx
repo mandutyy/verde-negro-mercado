@@ -219,7 +219,10 @@ const Chat = () => {
                 conversationId={conversationId}
               />
             )}
-            <Avatar className="h-9 w-9">
+            <Avatar 
+              className="h-9 w-9 cursor-pointer" 
+              onClick={() => otherUser?.id && navigate(`/user-profile/${otherUser.id}`)}
+            >
               <AvatarImage src={otherUser?.avatar_url || ""} />
               <AvatarFallback className="bg-[#264532] text-white text-sm">
                 {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
