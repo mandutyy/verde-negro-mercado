@@ -84,6 +84,7 @@ const Chat = () => {
           setOtherUser({ id: otherUserId, name: 'Usuario' });
         } else {
           setOtherUser({ 
+            id: otherUserId,
             name: profile.name || 'Usuario',
             avatar_url: profile.avatar_url
           });
