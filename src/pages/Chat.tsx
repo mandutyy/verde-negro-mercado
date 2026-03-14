@@ -208,6 +208,7 @@ const Chat = () => {
                 sellerId={plant.user_id}
                 sellerName={otherUser?.name}
                 plantTitle={plant.title}
+                conversationId={conversationId}
               />
             )}
           </div>
