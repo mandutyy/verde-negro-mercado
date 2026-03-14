@@ -18,7 +18,7 @@ const Chat = () => {
   const { messages, sendMessage, markMessagesAsRead } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
+  const [otherUser, setOtherUser] = useState<{ id?: string; name: string; avatar_url?: string } | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any>(null);
@@ -81,9 +81,10 @@ const Chat = () => {
 
         if (profileError) {
           console.error('Error loading user profile:', profileError);
-          setOtherUser({ name: 'Usuario' });
+          setOtherUser({ id: otherUserId, name: 'Usuario' });
         } else {
           setOtherUser({ 
+            id: otherUserId,
             name: profile.name || 'Usuario',
             avatar_url: profile.avatar_url
           });
@@ -101,7 +102,7 @@ const Chat = () => {
         }
       } catch (error) {
         console.error('Error loading other user:', error);
-        setOtherUser({ name: 'Usuario' });
+        setOtherUser({ id: undefined, name: 'Usuario' });
       }
     };
 
@@ -218,7 +219,10 @@ const Chat = () => {
                 conversationId={conversationId}
               />
             )}
-            <Avatar className="h-9 w-9">
+            <Avatar 
+              className="h-9 w-9 cursor-pointer" 
+              onClick={() => otherUser?.id && navigate(`/user-profile/${otherUser.id}`)}
+            >
               <AvatarImage src={otherUser?.avatar_url || ""} />
               <AvatarFallback className="bg-[#264532] text-white text-sm">
                 {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
