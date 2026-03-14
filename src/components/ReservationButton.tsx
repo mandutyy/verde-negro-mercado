@@ -20,7 +20,8 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
   sellerId, 
   sellerName,
   plantTitle,
-  isDisabled = false
+  isDisabled = false,
+  conversationId
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
