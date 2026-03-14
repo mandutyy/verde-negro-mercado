@@ -76,6 +76,20 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
 
       if (error) throw error;
 
+      // Insert system message into the conversation
+      if (conversationId) {
+        const systemContent = createSystemMessageContent({
+          type: 'reservation_requested',
+          plantTitle: plantTitle || 'esta planta',
+        });
+        
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: systemContent,
+        });
+      }
+
       toast({
         title: "Solicitud enviada",
         description: `Tu solicitud de reserva ha sido enviada a ${sellerName || 'el vendedor'}`,
