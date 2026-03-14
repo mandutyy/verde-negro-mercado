@@ -12,6 +12,7 @@ interface ReservationButtonProps {
   sellerName?: string;
   plantTitle?: string;
   isDisabled?: boolean;
+  conversationId?: string;
 }
 
 const ReservationButton: React.FC<ReservationButtonProps> = ({ 
