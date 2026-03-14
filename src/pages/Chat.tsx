@@ -18,7 +18,7 @@ const Chat = () => {
   const { messages, sendMessage, markMessagesAsRead } = useRealtimeChat(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [otherUser, setOtherUser] = useState<{ name: string; avatar_url?: string } | null>(null);
+  const [otherUser, setOtherUser] = useState<{ id?: string; name: string; avatar_url?: string } | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any>(null);
