@@ -179,29 +179,36 @@ const Chat = () => {
     <div className="relative flex h-screen w-full flex-col bg-[#122118] justify-between">
       <div className="flex-grow">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm p-4 pb-2 justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/messages')}
-            className="text-white flex size-10 items-center justify-center p-0 hover:bg-white/10"
-          >
-            <ArrowLeft size={24} />
-          </Button>
-          
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={otherUser?.avatar_url || ""} />
-              <AvatarFallback className="bg-[#264532] text-white">
-                {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-              {otherUser?.name || 'Usuario'}
-            </h2>
+        <div className="sticky top-0 z-10 flex items-center bg-[#122118]/80 backdrop-blur-sm px-3 py-2 justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/messages')}
+              className="text-white flex size-9 items-center justify-center p-0 hover:bg-white/10 shrink-0"
+            >
+              <ArrowLeft size={22} />
+            </Button>
+            
+            {plant && plant.images?.[0] && (
+              <img 
+                src={plant.images[0]} 
+                alt={plant.title}
+                className="w-10 h-10 rounded-lg object-cover shrink-0"
+              />
+            )}
+            
+            <div className="flex flex-col min-w-0">
+              <span className="text-white font-bold text-base leading-tight truncate">
+                {plant?.price ? `${plant.price.toFixed(2)} €` : 'Gratis'}
+              </span>
+              <span className="text-[#96c5a9] text-xs leading-tight truncate">
+                {plant?.title || 'Planta'}
+              </span>
+            </div>
           </div>
           
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2 shrink-0">
             {conversation?.plant_id && plant && user?.id !== plant.user_id && plant.status === 'active' && (
               <ReservationButton
                 plantId={plant.id}
@@ -211,6 +218,12 @@ const Chat = () => {
                 conversationId={conversationId}
               />
             )}
+            <Avatar className="h-9 w-9">
+              <AvatarImage src={otherUser?.avatar_url || ""} />
+              <AvatarFallback className="bg-[#264532] text-white text-sm">
+                {otherUser?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </div>
 
