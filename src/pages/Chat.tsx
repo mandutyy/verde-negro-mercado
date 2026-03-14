@@ -9,6 +9,7 @@ import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ReservationButton from '@/components/ReservationButton';
+import SystemMessageCard, { isSystemMessage, parseSystemMessage } from '@/components/chat/SystemMessageCard';
 
 const Chat = () => {
   const { conversationId } = useParams();
