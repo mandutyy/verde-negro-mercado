@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { createSystemMessageContent } from '@/components/chat/SystemMessageCard';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -12,6 +13,7 @@ interface ReservationButtonProps {
   sellerName?: string;
   plantTitle?: string;
   isDisabled?: boolean;
+  conversationId?: string;
 }
 
 const ReservationButton: React.FC<ReservationButtonProps> = ({ 
@@ -19,7 +21,8 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
   sellerId, 
   sellerName,
   plantTitle,
-  isDisabled = false
+  isDisabled = false,
+  conversationId
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -72,6 +75,20 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
         });
 
       if (error) throw error;
+
+      // Insert system message into the conversation
+      if (conversationId) {
+        const systemContent = createSystemMessageContent({
+          type: 'reservation_requested',
+          plantTitle: plantTitle || 'esta planta',
+        });
+        
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: systemContent,
+        });
+      }
 
       toast({
         title: "Solicitud enviada",

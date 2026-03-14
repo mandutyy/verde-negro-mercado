@@ -9,6 +9,7 @@ import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ReservationButton from '@/components/ReservationButton';
+import SystemMessageCard, { isSystemMessage, parseSystemMessage } from '@/components/chat/SystemMessageCard';
 
 const Chat = () => {
   const { conversationId } = useParams();
@@ -207,6 +208,7 @@ const Chat = () => {
                 sellerId={plant.user_id}
                 sellerName={otherUser?.name}
                 plantTitle={plant.title}
+                conversationId={conversationId}
               />
             )}
           </div>
@@ -224,6 +226,18 @@ const Chat = () => {
             </div>
           ) : (
             messages.map((message) => {
+              // Check if this is a system message
+              const systemData = parseSystemMessage(message.content);
+              if (systemData) {
+                return (
+                  <SystemMessageCard
+                    key={message.id}
+                    data={systemData}
+                    timestamp={message.created_at}
+                  />
+                );
+              }
+
               const isOwnMessage = message.sender_id === user.id;
               return (
                 <div
