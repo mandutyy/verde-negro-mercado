@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
+
 import { ArrowLeft, Star, Package, Heart, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -93,7 +93,12 @@ const UserProfile = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#122118] text-white">
-        <Header title="Cargando perfil..." showBackButton />
+        <div className="px-4 py-3">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#96c5a9] hover:text-white">
+            <ArrowLeft size={20} />
+            <span className="text-sm">Volver</span>
+          </button>
+        </div>
         <div className="px-4 py-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#38e07b] mx-auto"></div>
         </div>
@@ -104,11 +109,14 @@ const UserProfile = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-[#122118] text-white">
-        <Header title="Perfil no encontrado" showBackButton />
+        <div className="px-4 py-3">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#96c5a9] hover:text-white">
+            <ArrowLeft size={20} />
+            <span className="text-sm">Volver</span>
+          </button>
+        </div>
         <div className="px-4 py-8 text-center">
-          <h2 className="text-xl font-semibold mb-4">
-            Usuario no encontrado
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">Usuario no encontrado</h2>
         </div>
       </div>
     );
@@ -161,7 +169,13 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#122118] text-white pb-32">
-      <Header title={`Perfil de ${profile.name || 'Usuario'}`} showBackButton />
+      {/* Back button */}
+      <div className="sticky top-0 z-40 px-4 py-3">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#96c5a9] hover:text-white transition-colors">
+          <ArrowLeft size={20} />
+          <span className="text-sm">Volver</span>
+        </button>
+      </div>
       
       <div className="px-4 py-4">
         {/* Profile Info */}
