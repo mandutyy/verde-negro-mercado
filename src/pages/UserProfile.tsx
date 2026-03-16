@@ -109,11 +109,14 @@ const UserProfile = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-[#122118] text-white">
-        <Header title="Perfil no encontrado" showBackButton />
+        <div className="px-4 py-3">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#96c5a9] hover:text-white">
+            <ArrowLeft size={20} />
+            <span className="text-sm">Volver</span>
+          </button>
+        </div>
         <div className="px-4 py-8 text-center">
-          <h2 className="text-xl font-semibold mb-4">
-            Usuario no encontrado
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">Usuario no encontrado</h2>
         </div>
       </div>
     );
