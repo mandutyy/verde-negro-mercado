@@ -93,7 +93,12 @@ const UserProfile = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#122118] text-white">
-        <Header title="Cargando perfil..." showBackButton />
+        <div className="px-4 py-3">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#96c5a9] hover:text-white">
+            <ArrowLeft size={20} />
+            <span className="text-sm">Volver</span>
+          </button>
+        </div>
         <div className="px-4 py-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#38e07b] mx-auto"></div>
         </div>
