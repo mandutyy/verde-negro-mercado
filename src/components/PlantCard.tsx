@@ -1,8 +1,7 @@
 import { Heart } from 'lucide-react';
-import { useCallback, memo } from 'react';
+import { useCallback, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useFavorites } from '@/hooks/useApi';
 
 interface PlantCardProps {
   id: string;
@@ -26,13 +25,7 @@ const PlantCard = memo(({
   status = 'active'
 }: PlantCardProps) => {
   const navigate = useNavigate();
-  const { isFavorite: favorite, loading: favoriteLoading, toggleFavorite } = useFavorites(id);
-
-  const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFavorite();
-  }, [toggleFavorite]);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleCardClick = useCallback(() => {
     navigate(`/purchase/${id}`);
@@ -62,32 +55,18 @@ const PlantCard = memo(({
     >
       {/* Image */}
       <div className="relative">
+        {!imgLoaded && <div className="w-full aspect-[4/5] bg-muted animate-pulse" />}
         <img 
           src={image} 
           alt={title}
-          className="w-full aspect-[4/5] object-cover"
+          className={cn("w-full aspect-[4/5] object-cover", !imgLoaded && "hidden")}
           loading="lazy"
+          decoding="async"
+          onLoad={() => setImgLoaded(true)}
         />
         
         {/* Gradient overlay at bottom of image */}
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/40 to-transparent" />
-        
-        {/* Favorite button */}
-        <button
-          onClick={handleFavoriteClick}
-          disabled={favoriteLoading}
-          className={cn(
-            "absolute top-1.5 right-1.5 p-1 rounded-full transition-all duration-200 shadow-sm",
-            favorite 
-              ? "bg-red-500/20 text-red-400 backdrop-blur-sm" 
-              : "bg-black/30 text-white/70 backdrop-blur-sm hover:text-red-400"
-          )}
-        >
-          <Heart 
-            size={12} 
-            className={favorite ? "fill-current" : ""} 
-          />
-        </button>
 
         {/* Sale type badge on image */}
         <span className={cn(

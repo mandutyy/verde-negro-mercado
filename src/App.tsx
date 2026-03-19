@@ -1,48 +1,44 @@
 
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { Suspense, useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import Navigation from './components/Navigation';
-import { usePrefetchData } from '@/hooks/useApi';
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Home from "./pages/Home";
-import Upload from "./pages/Upload";
-import Purchase from "./pages/Purchase";
-import Favorites from "./pages/Favorites";
-import Messages from "./pages/Messages";
-import Chat from "./pages/Chat";
-import Profile from "./pages/Profile";
-import EditProfile from "./pages/EditProfile";
-import Settings from "./pages/Settings";
-import Search from "./pages/Search";
-import MyPlants from "./pages/MyPlants";
-import MyReviews from "./pages/MyReviews";
-import PlantDetail from "./pages/PlantDetail";
-import UserProfile from "./pages/UserProfile";
 import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import Community from "./pages/Community";
-import CareGuides from "./pages/CareGuides";
-import FreePlants from "./pages/FreePlants";
-// App root
+
+// Lazy load all pages for code splitting
+const Home = lazy(() => import("./pages/Home"));
+const Upload = lazy(() => import("./pages/Upload"));
+const Purchase = lazy(() => import("./pages/Purchase"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Chat = lazy(() => import("./pages/Chat"));
+const Profile = lazy(() => import("./pages/Profile"));
+const EditProfile = lazy(() => import("./pages/EditProfile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Search = lazy(() => import("./pages/Search"));
+const MyPlants = lazy(() => import("./pages/MyPlants"));
+const MyReviews = lazy(() => import("./pages/MyReviews"));
+const PlantDetail = lazy(() => import("./pages/PlantDetail"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Community = lazy(() => import("./pages/Community"));
+const CareGuides = lazy(() => import("./pages/CareGuides"));
+const FreePlants = lazy(() => import("./pages/FreePlants"));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 const AppContent = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const { prefetchPlants, prefetchUserData } = usePrefetchData();
   
-  // Precargar datos cuando el usuario se autentica
-  useEffect(() => {
-    if (user) {
-      prefetchPlants();
-      prefetchUserData();
-    }
-  }, [user, prefetchPlants, prefetchUserData]);
-  
-  // Hide navigation on specific pages
   const shouldShowNavigation = user && 
                                location.pathname !== '/auth' && 
                                !location.pathname.startsWith('/chat') && 
@@ -55,104 +51,32 @@ const AppContent = () => {
   
   return (
     <div className="app-container bg-background w-full">
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path="/upload" element={
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        } />
-        <Route path="/purchase/:id" element={
-          <ProtectedRoute>
-            <Purchase />
-          </ProtectedRoute>
-        } />
-        <Route path="/favorites" element={
-          <ProtectedRoute>
-            <Favorites />
-          </ProtectedRoute>
-        } />
-        <Route path="/messages" element={
-          <ProtectedRoute>
-            <Messages />
-          </ProtectedRoute>
-        } />
-        <Route path="/chat/:conversationId" element={
-          <ProtectedRoute>
-            <Chat />
-          </ProtectedRoute>
-        } />
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } />
-        <Route path="/profile/:username" element={
-          <ProtectedRoute>
-            <UserProfile />
-          </ProtectedRoute>
-        } />
-        <Route path="/user-profile/:id" element={
-          <ProtectedRoute>
-            <UserProfile />
-          </ProtectedRoute>
-        } />
-        <Route path="/edit-profile" element={
-          <ProtectedRoute>
-            <EditProfile />
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        } />
-        <Route path="/search" element={
-          <ProtectedRoute>
-            <Search />
-          </ProtectedRoute>
-        } />
-        <Route path="/my-plants" element={
-          <ProtectedRoute>
-            <MyPlants />
-          </ProtectedRoute>
-        } />
-        <Route path="/my-reviews" element={
-          <ProtectedRoute>
-            <MyReviews />
-          </ProtectedRoute>
-        } />
-        <Route path="/plant/:id" element={
-          <ProtectedRoute>
-            <PlantDetail />
-          </ProtectedRoute>
-        } />
-        <Route path="/community" element={
-          <ProtectedRoute>
-            <Community />
-          </ProtectedRoute>
-        } />
-        <Route path="/care-guides" element={
-          <ProtectedRoute>
-            <CareGuides />
-          </ProtectedRoute>
-        } />
-        <Route path="/free-plants" element={
-          <ProtectedRoute>
-            <FreePlants />
-          </ProtectedRoute>
-        } />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
+          <Route path="/purchase/:id" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+          <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/chat/:conversationId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/:username" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/user-profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/my-plants" element={<ProtectedRoute><MyPlants /></ProtectedRoute>} />
+          <Route path="/my-reviews" element={<ProtectedRoute><MyReviews /></ProtectedRoute>} />
+          <Route path="/plant/:id" element={<ProtectedRoute><PlantDetail /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
+          <Route path="/care-guides" element={<ProtectedRoute><CareGuides /></ProtectedRoute>} />
+          <Route path="/free-plants" element={<ProtectedRoute><FreePlants /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
       
-      {/* Mobile-optimized bottom navigation */}
       {shouldShowNavigation && <Navigation />}
-      
     </div>
   );
 };
