@@ -1,21 +1,35 @@
 
 import { useMemo, memo, useState } from 'react';
-import { Gift, Home, MessageCircle, Upload, User, RefreshCw, DollarSign, Heart, Users, BookOpen } from 'lucide-react';
+import { Gift, Home, MessageCircle, Upload, User, RefreshCw, DollarSign, Heart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navigation = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { conversations } = useRealtimeChat();
   
-  // Calculate total unread messages
-  const totalUnreadMessages = useMemo(() => {
-    return conversations.reduce((total, conv) => total + conv.unread_count, 0);
-  }, [conversations]);
+  // Lightweight unread count query instead of full useRealtimeChat
+  const { data: totalUnreadMessages = 0 } = useQuery({
+    queryKey: ['unreadCount', user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { data, error } = await supabase
+        .rpc('get_conversations_with_last_message', { user_uuid: user.id });
+      if (error) return 0;
+      return (data || []).reduce((total: number, conv: any) => total + (conv.unread_count || 0), 0);
+    },
+    staleTime: 30 * 1000, // 30 seconds
+    gcTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000, // Poll every 60s
+    enabled: !!user
+  });
   
   const navItems = useMemo(() => [
     { icon: Home, label: 'Inicio', path: '/', id: 'home' },
