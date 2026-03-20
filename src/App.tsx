@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
@@ -35,10 +35,40 @@ const PageLoader = () => (
   </div>
 );
 
+// Prefetch main routes when browser is idle
+const prefetchRoutes = () => {
+  const idle = 'requestIdleCallback' in window ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 200);
+  idle(() => {
+    import("./pages/Home");
+    import("./pages/Messages");
+    import("./pages/Profile");
+    import("./pages/FreePlants");
+  });
+};
+
 const AppContent = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   
+  // Prefetch critical routes after first render
+  useEffect(() => {
+    prefetchRoutes();
+  }, []);
+
+  // Handle Android back button: if user presses back on home, don't exit the app
+  useEffect(() => {
+    const handleBackButton = (e: PopStateEvent) => {
+      // If we're already on the home page, push state to prevent app exit
+      if (location.pathname === '/') {
+        window.history.pushState(null, '', '/');
+      }
+    };
+
+    window.addEventListener('popstate', handleBackButton);
+    return () => window.removeEventListener('popstate', handleBackButton);
+  }, [location.pathname]);
+
   const shouldShowNavigation = user && 
                                location.pathname !== '/auth' && 
                                !location.pathname.startsWith('/chat') && 
