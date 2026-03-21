@@ -7,6 +7,8 @@ import { usePlants } from '@/hooks/useApi';
 const Search = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [committedQuery, setCommittedQuery] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedType, setSelectedType] = useState('Todas');
   const [selectedStatus, setSelectedStatus] = useState('Todas');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
@@ -50,10 +52,11 @@ const Search = () => {
   ];
 
   const filteredPlants = useMemo(() => {
+    if (!hasSearched) return [];
     let filtered = [...plants];
 
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (committedQuery.trim()) {
+      const query = committedQuery.toLowerCase();
       filtered = filtered.filter(plant =>
         plant.title?.toLowerCase().includes(query) ||
         plant.description?.toLowerCase().includes(query) ||
@@ -90,10 +93,17 @@ const Search = () => {
     }
 
     return filtered;
-  }, [plants, searchQuery, selectedType, selectedStatus, priceRange, selectedLocation, priceTouched]);
+  }, [plants, committedQuery, selectedType, selectedStatus, priceRange, selectedLocation, priceTouched, hasSearched]);
 
   const clearSearch = () => {
     setSearchQuery('');
+    setCommittedQuery('');
+    setHasSearched(false);
+  };
+
+  const handleSearch = () => {
+    setCommittedQuery(searchQuery);
+    setHasSearched(true);
   };
 
   const getPlantTypeLabel = (saleType: string, price: number | null) => {
@@ -124,23 +134,32 @@ const Search = () => {
 
       <main className="px-4 pt-2 pb-24">
         {/* Search input */}
-        <div className="relative mb-4">
+        <form className="relative mb-4" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
           <input 
-            className="w-full rounded-full border-none bg-muted h-12 pl-12 pr-10 text-foreground placeholder:text-muted-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-full border-none bg-muted h-12 pl-12 pr-24 text-foreground placeholder:text-muted-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Buscar plantas, macetas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          {searchQuery && (
-            <button 
-              onClick={clearSearch}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {searchQuery && (
+              <button 
+                type="button"
+                onClick={clearSearch}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              >
+                <X size={18} />
+              </button>
+            )}
+            <button
+              type="submit"
+              className="bg-primary text-primary-foreground rounded-full h-8 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
             >
-              <X size={20} />
+              Buscar
             </button>
-          )}
-        </div>
+          </div>
+        </form>
 
         {/* Collapsible filters */}
         <button
@@ -232,7 +251,16 @@ const Search = () => {
         )}
 
         {/* Results */}
-        {loading ? (
+        {!hasSearched ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-14 h-14 bg-muted rounded-full mx-auto flex items-center justify-center mb-3">
+              <SearchIcon className="text-primary" size={22} />
+            </div>
+            <p className="text-muted-foreground text-sm text-center">
+              Escribe y pulsa Buscar para ver resultados
+            </p>
+          </div>
+        ) : loading ? (
           <div className="flex justify-center py-8">
             <div className="text-muted-foreground text-sm">Cargando...</div>
           </div>
